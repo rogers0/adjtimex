@@ -1,3 +1,44 @@
+adjtimex (1.6-2.2) stable; urgency=low
+
+  * Added patch to fix #54119 (Y2K display problem).
+  * fix rules files to work on both slink & potato.
+
+ -- Vincent Renardias <vincent@debian.org>  Mon, 10 Jan 2000 12:01:12 +0100
+
+adjtimex (1.6-2) unstable; urgency=low
+
+  * corrected reference in man page: clock -> hwclock (Bug#27854)
+
+ -- James R. Van Zandt <jrv@vanzandt.mv.com>  Sat, 24 Oct 1998 14:40:45 -0400
+
+adjtimex (1.6-1.1) unstable; urgency=low
+
+  * non-maintainer (binary-only) upload for Alpha
+  * changed architecture back to 'any'. Why should it be i386 only?
+  * don't use syscall1() to declare adjtimex() for Alpha
+
+ -- Paul Slootman <paul@debian.org>  Tue,  8 Sep 1998 20:42:52 +0200
+
+adjtimex (1.6-1) unstable; urgency=low
+
+  * New upstream release: Default log file is "/var/log/clocks.log".
+    Create log file if it does not exist. (Bug#25834)
+
+ -- James R. Van Zandt <jrv@vanzandt.mv.com>  Sat, 22 Aug 1998 20:33:22 -0400
+
+adjtimex (1.5-3) unstable; urgency=low
+
+  * architecture is i386 only
+
+ -- James R. Van Zandt <jrv@vanzandt.mv.com>  Mon, 29 Jun 1998 19:35:22 -0400
+
+adjtimex (1.5-2) unstable; urgency=low
+
+  * eliminate question in postinst, by eliminating postinst entirely
+    (Bug#22288) 
+
+ -- James R. Van Zandt <jrv@vanzandt.mv.com>  Sun,  7 Jun 1998 20:51:42 -0400
+
 adjtimex (1.5-1) frozen unstable; urgency=low
 
   * New upstream release.  No functional changes, but adjtimex is now

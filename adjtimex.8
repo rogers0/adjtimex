@@ -1,5 +1,5 @@
 .\"{{{  Title                      Emacs major mode should be: -*- nroff -*-
-.TH ADJTIMEX 8 "November 25, 1997"
+.TH ADJTIMEX 8 "October 24, 1998"
 .\"}}}
 .\"{{{  Name
 .SH NAME
@@ -169,7 +169,7 @@ Periodically compare the system clock with the CMOS clock.  After the
 first two calls, print values for tick and frequency offset that would
 bring the system clock into approximate agreement with the CMOS clock.
 CMOS clock readings are adjusted for systematic drift using using the
-correction in \fI/etc/adjtime\fP \(em see \fBclock\fP(8).  The
+correction in \fI/etc/adjtime\fP \(em see \fBhwclock\fP(8).  The
 interval between comparisons is 10 seconds, unless changed by the
 \fB\--interval\fP switch.  The optional argument is the number of
 comparisons.  (If the argument is supplied, the "\fB=\fP" is
@@ -184,7 +184,7 @@ Set the interval in seconds between clock comparisons for the
 The CMOS clock is set to UTC (universal time) rather than local time.
 .IP "\fB\-l\fP[\fIfile\fP], \fB\--log\fP[\fB=\fP\fIfile\fP]"
 Save the current values of the system and CMOS clocks, and optionally
-a reference time, to \fIfile\fP (default \fI/var/log/clock.log\fP).
+a reference time, to \fIfile\fP (default \fI/var/log/clocks.log\fP).
 The reference time is taken from a network timeserver (see the
 \fB--host\fP switch) or supplied by the user (see the \fB--watch\fP
 switch).
@@ -197,7 +197,7 @@ Protocol (NTP) server, or if that server is not synchronized.  Implies
 Ask for a keypress when the user knows the time, then ask what that
 time was, and its approximate accuracy.  Implies \fB--log\fP.
 .IP "\fB-r\fP[\fIfile\fP], \fB\--review\fP[\fB=\fP\fIfile\fP]"
-Review the clock log \fIfile\fP (default \fI/var/log/clock.log\fP) and
+Review the clock log \fIfile\fP (default \fI/var/log/clocks.log\fP) and
 estimate, if possible, the rates of the CMOS and system clocks.  
 Calculate least-squares rates using all suitable log entries.
 Suggest corrections to adjust for systematic drift.
@@ -225,7 +225,7 @@ in rc.local would approximately correct the system clock:
 .SH NOTES
 \fBadjtimex\fP adjusts only the system clock \(em the one that runs
 while the computer is powered up.  To set or regulate the CMOS clock,
-see \fBclock\fP(8).
+see \fBhwclock\fP(8).
 .\"}}}
 .\"{{{  Author
 .SH AUTHORS
@@ -235,7 +235,7 @@ Jim Van Zandt <jrv@vanzandt.mv.com>.
 .\"{{{  See also
 .SH "SEE ALSO"
 .BR date "(1L), " gettimeofday "(2), " settimeofday "(2), " 
-.BR clock "(8), " ntpdate "(8), " xntpd "(8), "
+.BR hwclock "(8), " ntpdate "(8), " xntpd "(8), "
 \fI/usr/src/linux/include/linux/timex.h,
 /usr/src/linux/include/linux/sched.h,
 /usr/src/linux/kernel/time.c,

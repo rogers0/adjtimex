@@ -22,10 +22,10 @@ the RTC since the last check), and two kernel time parameters: tick
 and frequency offset.  After the first two comparisons, it also prints
 suggested values of tick and frequency offset that will adjust the
 system clock to approximately agree with the RTC.  Of course, the RTC
-may have a systematic error of its own.  clock(8) uses the file
-/etc/adjtime to record the drift rate and the time since the RTC was
-last set.  adjtimex also consults this file and applies the correction
-to the times from the RTC.
+may have a systematic error of its own.  clock(8) or hwclock(8) use
+the file /etc/adjtime to record the drift rate and the time since the
+RTC was last set.  adjtimex also consults this file and applies the
+correction to the times from the RTC.
 
 adjtimex can also record the times on both clocks, and optionally
 another reference time, in a log.  It can later compare the logged
@@ -54,10 +54,10 @@ change the time.
 
 USAGE
 
-Create /etc/adjtime, which is used by clock(8) to correct for
-systematic error in the RTC.  Set it up as explained in the man page
-for clock(8).  clock is included (along with a lot of other useful
-utilities) in Rik Faith's collection:
+Create /etc/adjtime, which is used by clock(8) and hwclock(8) to
+correct for systematic error in the RTC.  Set it up as explained in
+the man page for each program.  clock is included (along with a lot of
+other useful utilities) in Rik Faith's collection:
 sunsite.unc.edu:pub/Linux/system/Misc/util-linux-1.10.tar.gz If your
 RTC is already accurate enough to suit you, just create a file
 /etc/adjtime containing as the first and only line: '0.0 0 0.0'.
@@ -138,8 +138,8 @@ either clock has been disturbed since the previous log entry.  You can
 take the time from an accurate clock, a radio time broadcast like WWV
 or CHU, etc.
 
-If you have ntpdate installed, and your computer has network
-connectivity, use
+If you have ntpdate installed (part of the xntp package), and your
+computer has network connectivity, use
 
 	# adjtimex  --log  --host www.xxx.yyy.zzz
 

@@ -40,6 +40,16 @@ binary-arch:	checkroot build
 # Must have debmake installed for this to work. Otherwise please copy
 # /usr/bin/debstd into the debian directory and change debstd to debian/debstd
 	debstd README debian/README.debian
+	#mv debian/tmp/usr/share/doc/adjtimex/* debian/tmp/usr/doc/adjtimex/
+	#rm -r debian/tmp/usr/share/doc/
+	#mv debian/tmp/usr/share/man debian/tmp/usr/man
+	if [ -d debian/tmp/usr/share/doc ]; then \
+		mv debian/tmp/usr/share/doc/adjtimex/* debian/tmp/usr/doc/adjtimex/; \
+		rm -r debian/tmp/usr/share/doc/; \
+	fi
+	if [ -d debian/tmp/usr/share/man ]; then \
+		mv debian/tmp/usr/share/man debian/tmp/usr/man; \
+	fi
 #	gzip -9f debian/tmp/usr/doc/adjtimex/changelog.Debian
 	chown -R root.root debian/tmp
 	chmod -R go=rX debian/tmp

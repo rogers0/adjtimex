@@ -48,8 +48,6 @@ int F_print = 0;
 #define WTMP_PATH "/var/log/wtmp"
 #endif
 
-static unsigned long epoch = 1900; /* year corresponding to 0x00   */
-
  /* Here the information for CMOS clock adjustments is kept. */
 #define ADJPATH "/etc/adjtime"
 
@@ -576,8 +574,6 @@ cmos clock last adjusted at Tue Aug 26 11:43:57 1997 (= 872610237)
       tm.tm_mon--;		/* DOS uses 1 base */
       tm.tm_wday -= 3;		/* DOS uses 3 - 9 for week days */
       tm.tm_isdst = -1;		/* don't know whether it's daylight */
-      if ((tm.tm_year += (epoch - 1900)) <= 69)
-	tm.tm_year += 100;
 
       if (universal)
 	cmos_time = mkgmtime(&tm);
@@ -1185,8 +1181,6 @@ compare_cmos_sys()
       tm.tm_mon--;		/* DOS uses 1 base */
       tm.tm_wday -= 3;		/* DOS uses 3 - 9 for week days */
       tm.tm_isdst = -1;		/* don't know whether it's daylight */
-      if ((tm.tm_year += (epoch - 1900)) <= 69)
-	tm.tm_year += 100;
 #ifdef DEBUG
       printf (" mday=%d  mon=%d  wday=%d  year=%d\n",
 	      tm.tm_mday, tm.tm_mon, tm.tm_wday, tm.tm_year);

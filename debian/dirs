@@ -1,6 +1,4 @@
 usr/bin
 usr/sbin
-usr/share/man/man8
 sbin
-usr/share/doc/adjtimex
-etc/init.d
+usr/share/man/man8

@@ -2,12 +2,16 @@
 
 set -e
 
-#		 old starting script
-oldfile=/etc/rc.boot/adjtimex
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+#		 old scripts
+oldfile=/etc/adjtimex.conf
+olderfile=/etc/rc.boot/adjtimex
 #		 new starting script
 startfile=/etc/init.d/adjtimex
-#		 configuration file
-conffile=/etc/adjtimex.conf
+#		 new configuration file
+conffile=/etc/default/adjtimex
 
 create_adjtimex_conf()
 {
@@ -35,12 +39,35 @@ create_adjtimex_conf()
 	' $oldfile` 
 
 #	echo "parameters from $oldfile: TICK=$TICK FREQ=$FREQ";
+    else 
+	if [ -f $olderfile ]; then
+	    TICK=`awk '
+	    BEGIN{tick=10000;}
+	    /[ \t]*TICK[ \t]*=[ \t]*"?[0-9]+"?/ {
+		sub(/[ \t]*TICK[ \t]*=[ \t]*"?/,"");
+	    tick=$0+0;
+	}
+	END {print tick;}
+	' $olderfile` 
+	    
+	    FREQ=`awk '
+	    BEGIN{freq=0;}
+	    /[ \t]*FREQ[ \t]*=[ \t]*"?[0-9]+"?/ {
+		sub(/[ \t]*FREQ[ \t]*=[ \t]*"?/,"");
+		freq=$0+0;
+	    }
+	    END {print freq;}
+	    ' $olderfile` 
+
+#	    echo "parameters from $olderfile: TICK=$TICK FREQ=$FREQ";
 	fi
+    fi
     
 	if [ -f $conffile ]; then 
 #	    echo "using existing $conffile";
 	    true;
 	else 
+	    if [ -d /etc/default ]; then true; else mkdir /etc/default; fi
 	    cat >$conffile <<EOF
 #  $conffile - configuration file for adjtimex(8)
 #
@@ -54,7 +81,7 @@ FREQ=$FREQ
 EOF
 	fi
 
-	rm -f $oldfile
+	rm -f $oldfile $olderfile
 }
 
 
@@ -62,9 +89,18 @@ case "$1" in
     configure)
 
 	create_adjtimex_conf
-	update-rc.d adjtimex start 20 S . >/dev/null
 
-	/etc/init.d/adjtimex start
+	db_get adjtimex/run_daemon
+	if [ "$RET" = "true" ]; then
+	    update-rc.d adjtimex start 20 S . >/dev/null
+	    /etc/init.d/adjtimex start
+	fi
+
+	db_get adjtimex/compare_rtc
+	if [ "$RET" = "true" ]; then
+	    /usr/sbin/adjtimexconfig
+	fi
+
 	;;
     abort-upgrade|abort-remove|abort-deconfigure)
 	exit 0
@@ -75,3 +111,4 @@ case "$1" in
 	;;
 esac
 
+#DEBHELPER#

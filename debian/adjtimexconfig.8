@@ -1,5 +1,5 @@
 .\"{{{  Title                    Emacs major mode should be: -*- nroff -*-
-.TH ADJTIMEXCONFIG 8 "September 30, 2000"
+.TH ADJTIMEXCONFIG 8 "April 27, 2003"
 .\"}}}
 .\"{{{  Name
 .SH NAME
@@ -16,7 +16,7 @@ adjtimexconfig \- find kernel clock variables and save for reboots
 This script uses \fBadjtimex\fP(8) to find values for the kernel
 variables \fBtick\fP and \fBfrequency\fP that will make the system
 clock approximately agree with the CMOS clock.  It then saves these
-values in the configuration file \fI/etc/adjtimex.conf\fP so the
+values in the configuration file \fI/etc/default/adjtimex\fP so the
 settings will be restored on every boot, when
 \fI/etc/init.d/adjtimex\fP runs.
 .P
@@ -31,7 +31,7 @@ Michael Meskes <meskes@debian.org>.
 .\"{{{
 .SH FILES
 .nf
-\fI/etc/adjtimex.conf\fP
+\fI/etc/default/adjtimex\fP
 \fI/etc/init.d/adjtimex\fP
 .fi
 .\"}}}

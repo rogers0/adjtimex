@@ -1,0 +1,15 @@
+         mode: 16384
+       offset: 0
+    frequency: 0
+     maxerror: 0
+     esterror: 0
+       status: 0
+time_constant: 0
+    precision: 0
+    tolerance: 0
+         tick: 0
+     raw time:  0s 0us = 0.000000
+for this kernel:
+   USER_HZ = 100 (nominally 100 ticks per second)
+   9000 <= tick <= 11000
+   -33554432 <= frequency <= 33554432

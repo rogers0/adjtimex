@@ -1,0 +1,8 @@
+#! /bin/sh -e
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+db_input medium adjtimex/run_daemon || true
+db_input medium adjtimex/compare_rtc || true
+db_go

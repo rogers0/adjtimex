@@ -6,9 +6,7 @@
 
 	AUTHORS
 		ssd@nevets.oau.org (Steven S. Dick)
-		jrv@vanzandt.mv.com (Jim Van Zandt)
-
-	$Id: adjtimex.c,v 1.7 1998/11/29 01:26:28 jrv Exp jrv $
+		jrv at comcast.net (Jim Van Zandt)
 
 */
 
@@ -33,11 +31,18 @@
 #include <time.h>
 #include <unistd.h>
 #include <utmp.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <linux/rtc.h>
 
 #ifdef __alpha__
 extern int adjtimex(struct timex *);
 #else
+#ifdef __ia64__
+extern int adjtimex(struct timex *);
+#else
 _syscall1(int, adjtimex, struct timex *, txcp)
+#endif
 #endif
 int F_print = 0;
 
@@ -60,12 +65,26 @@ static unsigned long epoch = 1900; /* year corresponding to 0x00   */
 #define SECONDSPERDAY 86400
 #define BUFLEN 128
 
-#ifndef USE_INLINE_ASM_IO
-     int cmos_fd = -1;
-#endif
+static int cmos_fd = -1;
 
-#define CMOS_READ(addr)      ({outb(0x70,(addr)|0x80); inb(0x71);})
-#define CMOS_WRITE(addr,val) ({outb(0x70,(addr)|0x80); outb(0x71,(val)); })
+/* to enable use of /dev/rtc interface, we would initialize
+   using_dev_rtc to -1.  However, reading /dev/rtc does not wait until
+   the beginning of the next second.  It only returns the current
+   timer value, so it's only accurate to 1 sec which isn't good enough
+   for us.  I see this comment in drivers/char/rtc.c, function
+   rtc_get_rtc_time(), in the kernel sources:
+
+	 * read RTC once any update in progress is done. The update
+	 * can take just over 2ms. We wait 10 to 20ms. There is no need to
+	 * to poll-wait (up to 1s - eeccch) for the falling edge of RTC_UIP.
+	 * If you need to know *exactly* when a second has started, enable
+	 * periodic update complete interrupts, (via ioctl) and then 
+	 * immediately read /dev/rtc which will block until you get the IRQ.
+	 * Once the read clears, read the RTC time (again via ioctl). Easy.
+
+   However it doesn't say how to restore the interrupt setup.  Until I
+   find out about that, I'll continue to use the poll-wait.  */
+static int using_dev_rtc = 0;
 
 struct hack {
   double ref;			/* reference time for time hack */
@@ -107,16 +126,18 @@ struct option longopt[]=
   {"adjust", 2, NULL, 'a'},
   {"compare", 2, NULL, 'c'},
   {"log", 2, NULL, 'l'},
-  {"esterr", 1, NULL, 'e'},
+  {"esterror", 1, NULL, 'e'},
   {"frequency", 1, NULL, 'f'},
   {"host", 1, NULL, 'h'},
   {"help", 0, NULL, HELP},
   {"interval", 1, NULL, 'i'},
-  {"maxerr", 1, NULL, 'm'},
+  {"maxerror", 1, NULL, 'm'},
   {"offset", 1, NULL, 'o'},
   {"print", 0, NULL, 'p'},
   {"review", 2, NULL, 'r'},
   {"singleshot", 1, NULL, 's'},
+  {"status", 1, NULL, 'S'},
+  {"reset", 0, NULL, 'R'},
   {"timeconstant", 1, NULL, 'T'},
   {"tick", 1, NULL, 't'},
   {"utc", 0, NULL, 'u'},
@@ -129,6 +150,8 @@ int adjusting = 0;
 int comparing = 0;
 int logging = 0;
 int reviewing = 0;
+int resetting = 0;		/* nonzero if need to call
+				   reset_time_status() */
 int interval = 10;
 int count = 8;
 int marked;
@@ -164,39 +187,86 @@ void
 usage(void)
 {
   char msg[]=
-"
-Usage: adjtimex  [OPTION]... 
-Mandatory or optional arguments to long options are mandatory or optional
-for short options too.
-
-Get/Set Kernel Time Parameters:
-       -p, --print               print values of kernel time variables
-       -t, --tick val            set the kernel tick interval in usec
-       -f, --frequency newfreq   set system clock frequency offset
-       -s, --singleshot adj      slew the system clock by adj usec
-       -o, --offset adj          add a time offset of adj usec
-       -m, --maxerror val        set maximum error (usec)
-       -e, --esterror val        set estimated error (usec)
-       -T, --timeconstant val    set phase locked loop time constant
-       -a, --adjust[=count]      set system clock parameters per CMOS 
-                                 clock or (with --review) log file
-
-Estimate Systematic Drifts:
-       -c, --compare[=count]     compare system and CMOS clocks
-       -i, --interval tim        set clock comparison interval (sec)
-       -l, --log[=file]          log current times to file
-           --host timeserver     query the timeserver
-       -w, --watch               get current time from user
-       -r, --review[=file]       review clock log file, estimate drifts
-       -u, --utc                 the CMOS clock is set to UTC
-
-Informative Output:
-           --help                print this help, then exit
-       -v, --version             print adjtimex program version, then exit
-";
+"\n"
+"Usage: adjtimex  [OPTION]... \n"
+"Mandatory or optional arguments to long options are mandatory or optional\n"
+"for short options too.\n"
+"\n"
+"Get/Set Kernel Time Parameters:\n"
+"       -p, --print               print values of kernel time variables\n"
+"       -t, --tick val            set the kernel tick interval in usec\n"
+"       -f, --frequency newfreq   set system clock frequency offset\n"
+"       -s, --singleshot adj      slew the system clock by adj usec\n"
+"       -S, --status val          set kernel clock status\n"
+"       -R, --reset               reset status after setting parameters\n"
+"                                 (needed for early kernels)\n"
+"       -o, --offset adj          add a time offset of adj usec\n"
+"       -m, --maxerror val        set maximum error (usec)\n"
+"       -e, --esterror val        set estimated error (usec)\n"
+"       -T, --timeconstant val    set phase locked loop time constant\n"
+"       -a, --adjust[=count]      set system clock parameters per CMOS \n"
+"                                 clock or (with --review) log file\n"
+"\n"
+"Estimate Systematic Drifts:\n"
+"       -c, --compare[=count]     compare system and CMOS clocks\n"
+"       -i, --interval tim        set clock comparison interval (sec)\n"
+"       -l, --log[=file]          log current times to file\n"
+"           --host timeserver     query the timeserver\n"
+"       -w, --watch               get current time from user\n"
+"       -r, --review[=file]       review clock log file, estimate drifts\n"
+"       -u, --utc                 the CMOS clock is set to UTC\n"
+"\n"
+"Informative Output:\n"
+"           --help                print this help, then exit\n"
+"       -v, --version             print adjtimex program version, then exit\n"
+;
 
   fputs(msg, stdout);
   exit(0);
+}
+
+/* return apparent value of USER_HZ in HZ, minimum nominal and maximum
+   values for tick in TICK_MIN TICK_MID and TICK_MAX, and maximum
+   frequency offset in MAXFREQ */
+void probe_time(int *hz, int *tick_min, int *tick_mid, int *tick_max,
+		long *maxfreq)
+{
+  struct timex txc;
+  int tick_orig, tick_lo, tick_try, tick_hi, i;
+
+  txc.modes = 0;
+  adjtimex(&txc);
+  *maxfreq = txc.tolerance;
+  tick_orig = tick_hi = txc.tick;
+  tick_lo = tick_hi*2/3;
+  for (i = 0; i < 15; i++)
+    {			/* conduct binary search for minimum
+			   accepted tick value */
+//      printf(" %d < minimum accepted tick value <= %d\n", tick_lo, tick_hi);
+      txc.tick = tick_try = (tick_lo + tick_hi)/2;
+      txc.modes = ADJ_TICK;
+      if (adjtimex(&txc) == -1) tick_lo = tick_try;
+      else tick_hi = tick_try;
+    }
+  *tick_min = tick_hi;
+  tick_lo = tick_orig;
+  tick_hi = tick_lo*4/3;
+  for (i = 0; i < 15; i++)
+    {			/* conduct binary search for maximum
+			   accepted tick value */
+//      printf(" %d <= maximum accepted tick value < %d\n", tick_lo, tick_hi);
+      txc.tick = tick_try = (tick_lo + tick_hi)/2;
+      txc.modes = ADJ_TICK;
+      if (adjtimex(&txc) == -1) tick_hi = tick_try;
+      else tick_lo = tick_try;
+    }
+  *tick_max = tick_lo;
+  *tick_mid = (*tick_min + *tick_max)/2;
+  *hz = (900000/ *tick_min + 1100000/ *tick_max)/2;
+
+  txc.tick = tick_orig;
+  txc.modes = ADJ_TICK;
+  adjtimex(&txc);		/* reset to original value */
 }
 
 int
@@ -208,7 +278,8 @@ main(int argc, char *argv[])
 
     txc.modes = 0;
 
-    while((c = getopt_long_only(argc, argv, "", 
+    while((c = getopt_long_only(argc, argv, 
+				"a::c::l::e:f:h:i:m:o:prPPsPS:RT:t:uvw", 
 				longopt, NULL)) != -1)
       {
 	switch(c)
@@ -271,6 +342,11 @@ main(int argc, char *argv[])
 	    txc.offset = atol(optarg);
 	    txc.modes |= ADJ_OFFSET_SINGLESHOT;
 	    break;
+	  case 'S':
+	    txc.status = atol(optarg);
+	    txc.modes |= ADJ_STATUS;
+	    break;
+	  case 'R': resetting = 1; break;
 	  case 'f':
 	    txc.freq = atol(optarg);
 	    txc.modes |= ADJ_FREQUENCY;
@@ -396,18 +472,27 @@ main(int argc, char *argv[])
 	    fprintf(stderr, "%d ", ret);
 	errno = saveerr;
 	perror("adjtimex");
+	{
+	  int hz, tick_min, tick_mid, tick_max;
+	  long maxfreq;
+	  probe_time(&hz, &tick_min, &tick_mid, &tick_max, &maxfreq);
+	  
+	  printf("for this kernel:\n"
+		 "   USER_HZ = %d (nominally %d ticks per second)\n"
+		 "   %d <= tick <= %d\n"
+		 "   %ld <= frequency <= %ld\n",
+		 hz, hz, tick_min, tick_max, -maxfreq, maxfreq);
+	}
 	exit(1);
     }
-    if (changes)
+    if (changes && resetting)
       reset_time_status();
 
     return 0;
 }
 
-
-
-     static inline void
-       outb (short port, char val)
+static inline void
+outb (short port, char val)
 {
 #ifdef USE_INLINE_ASM_IO
   __asm__ volatile ("out%B0 %0,%1"::"a" (val), "d" (port));
@@ -436,6 +521,19 @@ inb (short port)
 void
 cmos_init ()
 {
+  if (using_dev_rtc < 0)
+    {
+      cmos_fd = open ("/dev/rtc", O_RDONLY);
+      if (cmos_fd >= 0)
+	{
+	  using_dev_rtc = 1;
+	  return;
+	}
+      using_dev_rtc = 0;
+    }
+  else if (using_dev_rtc > 0)
+    return;
+
 #ifdef USE_INLINE_ASM_IO
   if (ioperm (0x70, 2, 1))
     {
@@ -444,7 +542,7 @@ cmos_init ()
     }
 #else
   if (cmos_fd < 0) 
-    cmos_fd = open ("/dev/port", 2);
+    cmos_fd = open ("/dev/port", O_RDWR);
   if (cmos_fd < 0)
     {
       perror ("unable to open /dev/port read/write : ");
@@ -458,6 +556,8 @@ cmos_init ()
 #endif
 }
 
+#define CMOS_READ(addr)      ({outb(0x70,(addr)|0x80); inb(0x71);})
+
 static inline int
 cmos_read_bcd (int addr)
 {
@@ -467,18 +567,54 @@ cmos_read_bcd (int addr)
   return (b & 15) + (b >> 4) * 10;
 }
 
-static void 
+static void
+cmos_read_time (struct tm *tm)
+{
+  if (using_dev_rtc > 0)
+    ioctl (cmos_fd, RTC_RD_TIME, tm);
+  else
+    {
+      long i;
+
+      /* read RTC exactly on falling edge of update flag */
+      /* Wait for rise.... (may take up to 1 second) */
+
+      for (i = 0; i < 10000000; i++)
+	if (CMOS_READ (10) & 0x80)
+	  break;
+
+      /* Wait for fall.... (must try at least 2.228 ms) */
+
+      for (i = 0; i < 1000000; i++)
+	if (!(CMOS_READ (10) & 0x80))
+	  break;
+
+      /* The "do" loop is "low-risk programming" */
+      /* In theory it should never run more than once */
+      do
+	{
+	  tm->tm_sec = cmos_read_bcd (0);
+	  tm->tm_min = cmos_read_bcd (2);
+	  tm->tm_hour = cmos_read_bcd (4);
+	  tm->tm_wday = cmos_read_bcd (6);
+	  tm->tm_mday = cmos_read_bcd (7);
+	  tm->tm_mon = cmos_read_bcd (8);
+	  tm->tm_year = cmos_read_bcd (9);
+	}
+      while (tm->tm_sec != cmos_read_bcd (0));
+    }
+}
+
+static inline void 
 xusleep(long microseconds)
 {
-  fd_set rfds, wfds, efds;
-  struct timeval tv;
+  struct timespec ts;
 
-  FD_ZERO(&rfds);
-  FD_ZERO(&wfds);
-  FD_ZERO(&efds);
-  tv.tv_sec = microseconds/1000000;
-  tv.tv_usec = microseconds - tv.tv_sec*1000000;
-  (void)select(0, &rfds, &wfds, &efds, &tv);
+  ts.tv_sec = microseconds/1000000;
+  ts.tv_nsec = (microseconds - ts.tv_sec*1000000) * 1000;
+
+  while (nanosleep (&ts, &ts) < 0)
+    continue;
 }
 
 /* compare the system and CMOS clocks.  If "adjusting" is nonzero,
@@ -495,11 +631,15 @@ compare()
   double factor;
   double cmos_adjustment;
   double not_adjusted;
-  int i;
   int loops = 0;
   extern char *optarg;
   struct timeval now;
   int wrote_to_log = 0;
+  int hz, tick_min, tick_mid, tick_max;
+  long maxfreq;
+
+  probe_time(&hz, &tick_min, &tick_mid, &tick_max, &maxfreq);
+
 
       /* Read adjustment parameters first */
   if ((adj = fopen (ADJPATH, "r")) == NULL)
@@ -536,38 +676,13 @@ cmos clock last adjusted at Tue Aug 26 11:43:57 1997 (= 872610237)
   }
 #endif
 
+  cmos_init ();
+
   while (count != 0)
     {
       if (count > 0) count--;
 
-      cmos_init ();
-
-      /* read RTC exactly on falling edge of update flag */
-      /* Wait for rise.... (may take up to 1 second) */
-
-      for (i = 0; i < 10000000; i++)
-	if (CMOS_READ (10) & 0x80)
-	  break;
-
-      /* Wait for fall.... (must try at least 2.228 ms) */
-
-      for (i = 0; i < 1000000; i++)
-	if (!(CMOS_READ (10) & 0x80))
-	  break;
-
-      /* The "do" loop is "low-risk programming" */
-      /* In theory it should never run more than once */
-      do
-	{
-	  tm.tm_sec = cmos_read_bcd (0);
-	  tm.tm_min = cmos_read_bcd (2);
-	  tm.tm_hour = cmos_read_bcd (4);
-	  tm.tm_wday = cmos_read_bcd (6);
-	  tm.tm_mday = cmos_read_bcd (7);
-	  tm.tm_mon = cmos_read_bcd (8);
-	  tm.tm_year = cmos_read_bcd (9);
-	}
-      while (tm.tm_sec != cmos_read_bcd (0));
+      cmos_read_time (&tm);
 
       /* fetch system time immediately */
       gettimeofday (&now, NULL);
@@ -635,77 +750,83 @@ cmos clock last adjusted at Tue Aug 26 11:43:57 1997 (= 872610237)
       txc.modes = 0;
       if (adjtimex (&txc) < 0) {perror ("adjtimex"); exit(1);}
 /*
-                                           --- current ---    -- suggested --
-cmos time     system-cmos       2nd diff    tick      freq     tick      freq
-856231718    -17999.867235  -17999.867235   10000         0
-856231728    -17999.867023       0.000212   10000         0
-856231738    -17999.866792       0.000231   10000         0    10000   1678819
-
+                                       --- current ---   -- suggested --
+cmos time     system-cmos  error_ppm   tick      freq    tick      freq
+1094939320  -14394.974188
+1094939330  -14394.971203      298.5  10001   1290819
+1094939340  -14394.968203      300.0  10001   1290819    9998   1289097
 */
-
 
       if (! marked++ )
 	{
 	  if (interval)
 	    printf (
-"                                           --- current ---    -- suggested --\n"
-"cmos time     system-cmos       2nd diff    tick      freq     tick      freq\n");
+"                                      --- current ---   -- suggested --\n"
+"cmos time     system-cmos  error_ppm   tick      freq    tick      freq\n");
 	  else
 	    printf (
-"cmos time     system-cmos       2nd diff    tick      freq\n");
+"cmos time     system-cmos  error_ppm   tick      freq\n");
 	}
-      printf ("%9ld  %14.6f %14.6f %7ld %9ld",
+      printf ("%9ld  %11.6f",
 	      (long) cmos_sec,
-	      dif,
-	      dif - dif_prev,
-	      txc.tick,
-	      txc.freq);
-      if (++loops > 2)
-	{
+	      dif);
+      if (++loops > 1)
+	{			/* print difference in rates */
 #define SHIFT (1<<16)
-	  long tick_delta = 0;
 	  double second_diff, error_ppm;
-
 	  second_diff = dif - dif_prev;
-	  error_ppm = second_diff/interval*1000000 - txc.freq/(double)SHIFT;
-	  if (error_ppm > 100)
-	    tick_delta = -(error_ppm + 50)/100;
-	  else if (error_ppm < -100)
-	    tick_delta = (-error_ppm + 50)/100;
-	  error_ppm += tick_delta*100;
-	  printf("  %7ld %9.0f\n", txc.tick + tick_delta, -error_ppm*SHIFT);
-	  if (loops > 4 && adjusting)
-	    {
-	      txc.modes = ADJ_FREQUENCY | ADJ_TICK;
-	      txc.tick += tick_delta;
-	      txc.freq = -error_ppm*SHIFT;
-	      if (adjtimex (&txc) < 0) 
+	  error_ppm = second_diff/interval*1000000;
+	  printf ("%11.1f %6ld %9ld",
+		  error_ppm,
+		  txc.tick,
+		  txc.freq);
+	  if (loops > 2)
+	    {			/* print suggested values */
+	      long tick_delta = 0, freq_delta = 0;
+	      
+	      tick_delta = ceil((-error_ppm + txc.freq/SHIFT - hz)/hz);
+	      error_ppm += tick_delta*hz;
+	      freq_delta = -error_ppm*SHIFT;
+	      printf("  %6ld %9ld\n",
+		     txc.tick + tick_delta, txc.freq + freq_delta);
+	      if (loops > 4 && adjusting)
 		{
-		  perror ("adjtimex"); 
-		  exit(1);
+		  txc.modes = ADJ_FREQUENCY | ADJ_TICK;
+		  txc.tick += tick_delta;
+		  txc.freq += freq_delta;
+		  if (adjtimex (&txc) < 0) 
+		    {
+		      perror ("adjtimex"); 
+		      exit(1);
+		    }
+		  if (resetting)
+		    reset_time_status();
+		  loops -= 3;
 		}
-	      reset_time_status();
-	      loops -= 3;
 	    }
-	}
+	  else
+	    printf("\n");
+	    }
       else
 	printf("\n");
       dif_prev = dif;
       if (interval == 0)
 	break;
-      xusleep (interval*1000000L - 900000); /* reading RTC takes 1 sec */
+      if (count)		/* if it is not the last round */
+	xusleep (interval*1000000L - 900000); /* reading RTC takes 1 sec */
     }
 }
 
 void reset_time_status()
 {
   /* Using the adjtimex(2) system call to set any time parameter makes
-     the kernel think the clock is synchronized with an external time
-     source, so it sets the kernel variable time_status to TIME_OK.
-     Thereafter, it will periodically adjust the CMOS clock to match.
-     We prevent this by setting the clock, because that has the side
-     effect of resetting time_status to TIME_BAD.  We try not to
-     actually change the clock setting. */
+     an early kernel (2.0.40 and 2.4.18 or later are reportedly okay)
+     think the clock is synchronized with an external time source, so
+     it sets the kernel variable time_status to TIME_OK.  Thereafter,
+     it will periodically adjust the CMOS clock to match.  We prevent
+     this by setting the clock, because that has the side effect of
+     resetting time_status to TIME_BAD.  We try not to actually change
+     the clock setting. */
   struct timeval tv1, tv2;
   long carry_sec, overhead_usec;
   if (gettimeofday(&tv1, NULL)) {perror("adjtimex"); exit(1);}
@@ -1418,7 +1539,11 @@ void review()
   char startstring[26], finishstring[26];
   double x[2], p[4], h[4], z[2], r[4], cmos_var, sys_var, ref_var;
   long tick_delta = 0;
-  double error_ppm;
+  double error_ppm = 0;
+  int hz, tick_min, tick_mid, tick_max;
+  long maxfreq;
+
+  probe_time(&hz, &tick_min, &tick_mid, &tick_max, &maxfreq);
 
   /* read all the previous time hacks in */
   sethackent();
@@ -1453,7 +1578,7 @@ void review()
 	  cmos_time = hacks[i]->cmos - hacks[i-1]->cmos;
 	  hacks[i]->relative_rate =
 	    diff_ppm = 1.e6*(sys_time - cmos_time)*2/(sys_time + cmos_time)
-	    - 100*(hacks[i]->tick - 10000) - hacks[i]->freq/SHIFT;
+	    - 100*(hacks[i]->tick - tick_mid) - hacks[i]->freq/SHIFT;
 	  if (fabs(diff_ppm) > 10000.) /* agree within 1 percent? */
 	    continue;
 	  hacks[i]->valid = CMOS_VALID | SYS_VALID;
@@ -1520,7 +1645,7 @@ void review()
 	  sys_time = hacks[i]->sys - hacks[i-1]->sys;
 	  hacks[i]->sys_rate =
 	    diff_ppm = 1.e6*(sys_time - ref_time)*2/(ref_time + sys_time)
-	    - 100*(hacks[i]->tick - 10000) - hacks[i]->freq/SHIFT;
+	    - 100*(hacks[i]->tick - tick_mid) - hacks[i]->freq/SHIFT;
 	  if (fabs(diff_ppm) > 10000.) /* agree within 1 percent? */
 	    continue;
 	  hacks[i]->valid |= REF_VALID | SYS_VALID;
@@ -1618,16 +1743,16 @@ void review()
   if (digits < 0) digits = 0;
   printf("   sys_error = %.*f +- %.*f ppm",
 	 digits, x[1], digits, sigma_ppm);
-  if (sigma_ppm < 100)
+  if (sigma_ppm < hz)
     {
       error_ppm = x[1];
-      if (error_ppm > 100)
-	tick_delta = -(error_ppm + 50)/100;
-      else if (error_ppm < -100)
-	tick_delta = (-error_ppm + 50)/100;
-      error_ppm += tick_delta*100;
+      if (error_ppm > hz)
+	tick_delta = -(error_ppm + hz/2)/hz;
+      else if (error_ppm < -hz)
+	tick_delta = (-error_ppm + hz/2)/hz;
+      error_ppm += tick_delta*hz;
       printf("      suggested tick = %5ld  freq = %7.0f\n",
-	     10000 + tick_delta, -error_ppm*SHIFT);
+	     tick_mid + tick_delta, -error_ppm*SHIFT);
     }
   else
     printf("      (no suggestion)\n");
@@ -1643,14 +1768,15 @@ void review()
   if (sigma_ppm < 100 && adjusting)
     {
       txc.modes = ADJ_FREQUENCY | ADJ_TICK;
-      txc.tick = 10000 + tick_delta;
+      txc.tick = tick_mid + tick_delta;
       txc.freq = -error_ppm*SHIFT;
       if (adjtimex (&txc) < 0) 
 	{
 	  perror ("adjtimex"); 
 	  exit(1);
 	}
-      reset_time_status();
+      if (resetting)
+	reset_time_status();
       printf("                                               "
 	     "new tick = %5ld  freq = %7ld\n", txc.tick, txc.freq );
     }

@@ -1,42 +1,126 @@
-2002-01-06  James R. Van Zandt  <jrv@voyager.mv.com>
+2004-09-19  James R. Van Zandt  <jrv@debian.org>
+
+	* Makefile.in (VERSION): version 1.20
+
+	* adjtimex.c (compare): in "compare" or "adjust", return
+	immediately after printing last result (instead of sleeping an
+	extra $interval seconds) (Thanks to Alain Guilbert <derogaton at
+	oreka.com> 
+
+2004-09-11  James R. Van Zandt  <jrv@debian.org>
+
+	* Makefile.in (VERSION): version 1.19
+
+	* adjtimex.c (compare): Account for the current frequency value
+	when calculating the recommended frequency value.  Simplify
+	calculation of recommended tick.
+	(compare): print estimated system clock error in ppm instead of
+	obscure "second diff".
+
+	* adjtimex.8: use 2^16 instead of the more obscure 1<<16.
+
+	* adjtimex.c: revert to poll-wait instead of using /dev/rtc,
+	because the latter only provides time with one second precision.
+
+2004-04-11  James R. Van Zandt  <jrv@debian.org>
+
+	* Makefile.in (VERSION): version 1.18
+
+	* Makefile.in (install): create manual directory if necessary
+
+	* adjtimex.c (usage): Don't split strings across lines.
+	(main): --reset switch enables resetting of status (no longer
+	default action, because it's not needed by recent kernels) (thanks
+	to Alain Guibert <derogaton at oreka.com>)
+
+2004-04-09  James R. Van Zandt  <jrv@debian.org>
+
+	* adjtimex.c (longopt): --status switch sets clock status
+	(courtesy of Alain Guibert <derogaton at oreka.com>
+	
+2004-04-04  James R. Van Zandt  <jrv@debian.org>
+
+	* Makefile.in (CFLAGS): add compiler switch -Wall
+	(mandir): put man pages in $(prefix)/share/man/man8
+
+2004-04-03  James R. Van Zandt  <jrv@debian.org>
+
+	* Makefile.in (VERSION): version 1.17
+
+	* adjtimex.c: update email 
+	(main): If adjtimex() returns an error, print HZ and legal ranges
+	for tick and freq.  (thanks to Sami Farin <safari at iki.fi>)
+	(review): calculate reasonable tick and frequency when HZ != 100.
+	(cmos_init): use /dev/rtc when available (thanks to Richard
+	Henderson <rth at twiddle.net>
+
+	* adjtimex.c (longopt): fix spelling to match documentation:
+	--esterror and --maxerror (thanks to   Alain Guibert) 
+
+2003-08-24  James R. Van Zandt  <jrv at debian.org>
+
+	* Makefile.in (VERSION): version 1.16
+
+	* adjtimex.c (main): added optstring, so options can be single
+	letters again.
+
+2003-05-31  James R. Van Zandt  <jrv at debian.org>
+
+	* adjtimex.c (usage): Escape the embedded newlines in the help
+	message, and add explicit ones.  (gcc 3.3 complains otherwise)
+
+2003-04-30  James R. Van Zandt  <jrv at debian.org>
+
+	* Makefile.in (VERSION): version 1.15
+
+	* adjtimex.c: for ia64, call adjtimex instead of using syscall
+
+2003-04-27  James R. Van Zandt  <jrv at debian.org>
+
+	* adjtimex.8: Compare the roles of ntpd, hwclock, and adjtimex.
+	Fix case: -T (not -t) to set PLL time constant (thanks to Sanjoy
+	Mahajan <sanjoy at mrao.cam.ac.uk>
+
+2002-01-06  James R. Van Zandt  <jrv at debian.org>
 
 	* adjtimex.c (cmos_init): don't re-open the FD if it's already
-	open (thanks to Jonathan H N Chin <jhnc%stone@newton.cam.ac.uk>)
+	open (thanks to Jonathan H N Chin <jhnc%stone at newton.cam.ac.uk>)
 
-2001-06-15  James R. Van Zandt  <jrv@voyager.mv.com>
+2001-06-15  James R. Van Zandt  <jrv at debian.org>
 
 	* Makefile.in (VERSION): version 1.12.1
 	* README.ru: added Russian translation, courtesy of Alex Savvin
-	<alex@dag.bryansk.ru>
+	<alex at dag.bryansk.ru>
 
-2000-12-02  James R. Van Zandt  <jrv@voyager.mv.com>
+2000-12-02  James R. Van Zandt  <jrv at debian.org>
 
 	* adjtimex.c (valid_cmos_rate): Fix grammar in message.
 
-2000-11-21  James R. Van Zandt  <jrv@voyager.mv.com>
+2000-11-21  James R. Van Zandt  <jrv at debian.org>
 
 	* Makefile.in (VERSION): version 1.12
 
 	* adjtimex.c (puthackent): clear lfile after closing file, so it
 	does not get closed a second time (thanks to Bjorn Eriksson
-	<mdeans@algonet.se>).
+	<mdeans at algonet.se>).
 
-2000-05-14  James R. Van Zandt  <jrv@voyager.mv.com>
+2000-05-14  James R. Van Zandt  <jrv at debian.org>
 
 	* Makefile.in (VERSION): version 1.11
 
 	* adjtimex.c (review): With both --review and --adjust, set
 	sytem time parameters to the least-squares estimates.
 
-2000-01-31  James R. Van Zandt  <jrv@voyager.mv.com>
+2000-01-31  James R. Van Zandt  <jrv at debian.org>
 
 	* Makefile.in (VERSION): version 1.10
 
 	* adjtimex.c: #define _GNU_SOURCE so strptime is available
 	* (log_times): use popen() to recover output from ntpdate, instead
-	of an unsafe temporary file (thanks to Colin Phipps <crp22@cam.ac.uk>)
+	of an unsafe temporary file (thanks to Colin Phipps <crp22 at
+	cam.ac.uk>) 
 
-2000-01-03  James R. Van Zandt  <jrv@voyager.mv.com>
+2000-01-03  James R. Van Zandt  <jrv at debian.org>
 
 	* Makefile.in (VERSION): version 1.9
 
@@ -48,7 +132,7 @@
 
 	* adjtimex.c (compare): Y2K fixes (okay until 2070)
 
-1999-12-16  James R. Van Zandt  <jrv@voyager.mv.com>
+1999-12-16  James R. Van Zandt  <jrv at debian.org>
 
 	* Makefile.in (adjtimex.lsm): make adjtimex.lsm from
 	adjtimex.lsm.in (so version number gets entered automatically).
@@ -59,7 +143,7 @@
 
 	* README: refer to ntpd instead of xntpd
 
-1999-09-06  James R. Van Zandt  <jrv@voyager.mv.com>
+1999-09-06  James R. Van Zandt  <jrv at debian.org>
 
 	* Makefile.in (bindir): executable goes into /sbin, so it's
 	available even if /usr is in a separate filesystem.
@@ -68,31 +152,31 @@
 	* (VERSION): 1.8 (setting here rather than using RCS version
 	number of adjtimex.c)
 
-1998-11-28  James R. Van Zandt  <jrv@voyager.mv.com>
+1998-11-28  James R. Van Zandt  <jrv at debian.org>
 
 	* adjtimex.c: Don't use syscall1() to declare adjtimex() for
-	Alpha.  Courtesy of Paul Slootman <paul@debian.org>
+	Alpha.  Courtesy of Paul Slootman <paul at debian.org>
 
-1998-10-24  James R. Van Zandt  <jrv@voyager.mv.com>
+1998-10-24  James R. Van Zandt  <jrv at debian.org>
 
 	* adjtimex.8: change references: clock -> hwclock
 
-1998-08-22  root  <jrv@voyager.mv.com>
+1998-08-22  root  <jrv at debian.org>
 
 	* adjtimex.c (gethackent): Create log file if it does not exist.
 
-1998-08-18  James R. Van Zandt  <jrv@voyager.mv.com>
+1998-08-18  James R. Van Zandt  <jrv at debian.org>
 
 	* adjtimex.8: default log file is "/var/log/clocks.log".
 
-1998-04-20  James R. Van Zandt  <jrv@voyager.mv.com>
+1998-04-20  James R. Van Zandt  <jrv at debian.org>
 
 	* adjtimex.c:
 	 Code cleanups to silence warnings: Added some casts.  Removed unused
 	variables.  Added parens around assignments inside tests.
 	 Code is now covered by GNU GPL.
 
-1997-12-11  James R. Van Zandt  <jrv@voyager.mv.com>
+1997-12-11  James R. Van Zandt  <jrv at debian.org>
 
 	* adjtimex.c:
 	  Scanning wtmp rather than utmp, looking for clock resets and reboots.
@@ -144,13 +228,13 @@
 	  Error sends short message to stderr.
 	  Usage message reworded.
 
-1997-11-26  James R. Van Zandt  <jrv@voyager.mv.com>
+1997-11-26  James R. Van Zandt  <jrv at debian.org>
 
 	* adjtimex.c:   Credit Michael Meskes.
 	  Error sends short message to stderr.
 	  Usage message reworded.
 
-1997-11-25  James R. Van Zandt  <jrv@voyager.mv.com>
+1997-11-25  James R. Van Zandt  <jrv at debian.org>
 
 	* adjtimex.c:   Including string.h rather than strings.h
 	  Really implementing --version switch
@@ -163,7 +247,7 @@
 	  Making no adjustment recommendations unless uncertainty is < 100 ppm.
 	  Caveating uncertainty of least-squares solution.
 
-1997-09-13  James R. Van Zandt  <jrv@voyager.mv.com>
+1997-09-13  James R. Van Zandt  <jrv at debian.org>
 
 	* adjtimex.c:   --compare-all renamed to --log.
 	  --log can be used with --compare.
@@ -173,7 +257,7 @@
 	time is not available.
 	  No longer printing sys_error header an extra time.
 
-1997-09-01  James R. Van Zandt  <jrv@voyager.mv.com>
+1997-09-01  James R. Van Zandt  <jrv at debian.org>
 
 	* adjtimex.c:  LOG_PATH, WTMP_PATH, and ADJPATH introduced.
 	 added mkgmtime() which is like mktime() but assumes it's given UTC.
@@ -188,7 +272,7 @@
 	 review() calculates adjustments from log entries.  uses
 	kalman_update(), which uses matrix routines from mat.c.
 
-1997-08-21  James R. Van Zandt  <jrv@voyager.mv.com>
+1997-08-21  James R. Van Zandt  <jrv at debian.org>
 
 	* adjtimex.c:
 	 Scanning wtmp rather than utmp, looking for clock resets and reboots.
@@ -205,16 +289,16 @@
 	 compare_cmos_sys() compares the times on the two clocks, using
 	enhanced real time clock support (/proc/rtc) if not root.
 
-1997-02-28  James R. Van Zandt  <jrv@voyager.mv.com>
+1997-02-28  James R. Van Zandt  <jrv at debian.org>
 
 	Added --help and --version switches.
 
-1997-02-25  James R. Van Zandt  <jrv@voyager.mv.com>
+1997-02-25  James R. Van Zandt  <jrv at debian.org>
 	put settimeofday() stuff in separate function, called twice.
 
 	Incorporated clockdiff functions into adjtimex, as the
 	"--comparing" and "--adjusting" options.  (Thanks to Michael
-	Meskes <meskes@debian.org> for the idea -- he implemented this
+	Meskes <meskes at debian.org> for the idea -- he implemented this
 	functionality in the configuration script of his Debian
 	package.)  Repeat count set by "--count", and interval set by
 	"--interval".
@@ -222,7 +306,7 @@
 	Parsing command line options with getopt_long_only().
 	Test for "-singleshot" had broken "-offset" option.
 
-1997-02-21  James R. Van Zandt  <jrv@voyager.mv.com>
+1997-02-21  James R. Van Zandt  <jrv at debian.org>
 
 	Removed "status" setting option.
 	Checking that ADJ_OFFSET_SINGLESHOT is not used with any other option.
@@ -230,13 +314,13 @@
 	Ensuring kernel resets its internal status to TIME_BAD by calling
 	settimeofday().
 
-1995-03-15  James R. Van Zandt  <jrv@voyager.mv.com>
+1995-03-15  James R. Van Zandt  <jrv at debian.org>
 
 	Moved documentation to README file and man page.
 	Ran through indent.
 	Usage msg only shows "print" once.
 
-1995-03-07  James R. Van Zandt  <jrv@voyager.mv.com>
+1995-03-07  James R. Van Zandt  <jrv at debian.org>
 
 	Initial revision
 

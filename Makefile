@@ -1,16 +1,16 @@
+# Generated automatically from Makefile.in by configure.
 #### Start of system configuration section.             -*-makefile-*- ####
  srcdir = .
-VPATH = .
 
 VERSION=1.20
 
-CFLAGS = @CFLAGS@ -Wall
-prefix = @prefix@
-man1dir=@mandir@/man1
-exec_prefix = @exec_prefix@
+CFLAGS = -g -O2 -Wall
+prefix = /usr
+man1dir=${prefix}/share/man/man1
+exec_prefix = ${prefix}
 bindir=/sbin
 
-INSTALL=@INSTALL@
+INSTALL=/usr/bin/install -c
 
 # Extension (not including `.') for the manual page filenames.
 manext = 8

@@ -1,0 +1,84 @@
+#
+#    Translators, if you are not familiar with the PO format, gettext
+#    documentation is worth reading, especially sections dedicated to
+#    this format, e.g. by running:
+#         info -n '(gettext)PO Files'
+#         info -n '(gettext)Header Entry'
+#
+#    Some information specific to po-debconf are available at
+#            /usr/share/doc/po-debconf/README-trans
+#         or http://www.debian.org/intl/l10n/po-debconf/README-trans
+#
+#    Developers do not need to manually edit POT or PO files.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: adjtimex 1.15.1-1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2004-09-20 20:18-0400\n"
+"PO-Revision-Date: 2003-08-02 09:30+0100\n"
+"Last-Translator: Christian Perrier <bubulle@debian.org>\n"
+"Language-Team: adjtimex <debian-l10n-french@lists.debian.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-15\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: boolean
+#. Description
+#: ../templates:4
+msgid "Should adjtimex be run at installation and at every startup?"
+msgstr ""
+"Faut-il lancer adjtimex lors de l'installation et à chaque démarrage du "
+"système ?"
+
+#. Type: boolean
+#. Description
+#: ../templates:4
+msgid ""
+"adjtimex can run at system startup to set the kernel time parameters to the "
+"values in /etc/default/adjtimex. Don't accept if you just want to use "
+"adjtimex to inspect the current parameters."
+msgstr ""
+"Adjtimex peut être lancé au démarrage du système afin de régler les "
+"paramètres d'horloge du noyau en fonction des valeurs contenues dans /etc/"
+"default/adjtimex. N'acceptez pas si vous souhaitez vous servir d'adjtimex "
+"pour simplement consulter les paramètres actuels."
+
+#. Type: boolean
+#. Description
+#: ../templates:12
+msgid "Should adjtimexconfig be run at installation time?"
+msgstr "Faut-il lancer adjtimexconfig lors de l'installation ?"
+
+#. Type: boolean
+#. Description
+#: ../templates:12
+msgid ""
+"The adjtimexconfig script will use adjtimex to find values for the kernel "
+"variables tick and frequency that will make the system clock approximately "
+"agree with the hardware clock (also known as the CMOS clock).  It then saves "
+"these values in the configuration file /etc/default/adjtimex so the settings "
+"will be restored on every boot, when /etc/init.d/adjtimex runs."
+msgstr ""
+"Le script adjtimexconfig utilise adjtimex afin de trouver les valeurs "
+"appropriées pour les variables du noyau concernant le battement (« tick ») "
+"et la fréquence d'horloge. Cela permettra à l'horloge du système d'être à "
+"peu près en accord avec l'horloge matérielle (parfois appelée « horloge "
+"CMOS »). Ces valeurs seront alors conservées dans le fichier de "
+"configuration /etc/default/adjtimex ce qui permettra de les restaurer à "
+"chaque démarrage quand /etc/init.d/adjtimex s'exécutera. "
+
+#. Type: boolean
+#. Description
+#: ../templates:12
+msgid ""
+"The script takes 70 sec to run. Alternatively, you can run adjtimexconfig "
+"yourself at a later time, or determine the kernel variables one of several "
+"other ways (see the adjtimex man page) and install them in /etc/default/"
+"adjtimex."
+msgstr ""
+"La durée d'exécution du script est de 70 secondes. Vous pouvez également "
+"utiliser adjtimexconfig vous-même plus tard ou déterminer les valeurs des "
+"variables du noyau d'une autre manière (il en existe plusieurs : voir la "
+"page de manuel d'adjtimex). Ces valeurs devront ensuite être placées dans /"
+"etc/default/adjtimex."

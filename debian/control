@@ -2,18 +2,18 @@ Source: adjtimex
 Section: admin
 Priority: optional
 Maintainer: James R. Van Zandt <jrv@debian.org>
-Build-Depends: debmake
-Standards-Version: 3.2.1
+Build-Depends: debhelper (>= 4.1.16)
+Standards-Version: 3.6.1
 
 Package: adjtimex
 Architecture: any
-Depends: ${shlibs:Depends}
+Depends: ${shlibs:Depends}, debconf
 Suggests: ntpdate
 Description: Utility to display or set the kernel time variables
  This program gives you raw access to the kernel time variables.  For
  a machine connected to the Internet, or equipped with a precision
  oscillator or radio clock, the best way to keep the system clock
- correct is with xntpd.  However, for a standalone or intermittently
+ correct is with ntpd.  However, for a standalone or intermittently
  connected machine, you may use adjtimex instead to at least correct
  for systematic drift.  adjtimex can optionally adjust the system
  clock using the CMOS clock as a reference, and can log times for

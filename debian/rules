@@ -4,10 +4,24 @@
 
 package=adjtimex
 
+CFLAGS = -O2 -Wall
+INSTALL = install
+INSTALL_FILE    = $(INSTALL) -p    -o root -g root  -m  644
+INSTALL_PROGRAM = $(INSTALL) -p    -o root -g root  -m  755
+INSTALL_SCRIPT  = $(INSTALL) -p    -o root -g root  -m  755
+INSTALL_DIR     = $(INSTALL) -p -d -o root -g root  -m  755
+
+ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
+  CFLAGS += -g
+endif
+ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
+  INSTALL_PROGRAM += -s
+endif
+
 build:
 	$(checkdir)
 	./configure
-	make CFLAGS="-O2 -g -Wall"
+	make CFLAGS=$(CFLAGS)
 
 	touch build
 
@@ -28,22 +42,19 @@ binary-arch:	checkroot build
 	$(checkdir)
 	-rm -rf debian/tmp
 	install -d debian/tmp
-	cd debian/tmp && install -d `cat ../dirs`
-	install -s -m 755 adjtimex debian/tmp/sbin
-#	install -m 644 adjtimex.8 debian/tmp/usr/share/man/man8
-#	install -m 644 debian/adjtimexconfig.8 debian/tmp/usr/share/man/man8
-#	(cd debian/tmp/usr/share/man/man8; gzip -9f adjtimex.8 adjtimexconfig.8)
-	install -m 755 debian/adjtimexconfig debian/tmp/usr/sbin
-	install -m 644 debian/copyright debian/tmp/usr/share/doc/$(package)
-	install -m 755 debian/adjtimex debian/tmp/etc/init.d/$(package)
-	install -m 644 README debian/tmp/usr/share/doc/$(package)
+	cd debian/tmp && $(INSTALL_DIR) `cat ../dirs`
+	$(INSTALL_PROGRAM) adjtimex debian/tmp/sbin
+	$(INSTALL_SCRIPT) debian/adjtimexconfig debian/tmp/usr/sbin
+	$(INSTALL_FILE) debian/copyright debian/tmp/usr/share/doc/$(package)
+	$(INSTALL_SCRIPT) debian/adjtimex debian/tmp/etc/init.d/$(package)
+	$(INSTALL_FILE) README debian/tmp/usr/share/doc/$(package)
 # Must have debmake installed for this to work. Otherwise please copy
 # /usr/bin/debstd into the debian directory and change debstd to debian/debstd
 	debstd README debian/README.debian
 #	gzip -9f debian/tmp/usr/share/doc/adjtimex/changelog.Debian
 	chown -R root.root debian/tmp
 	chmod -R go=rX debian/tmp
-	dpkg-gencontrol
+	dpkg-gencontrol -isp
 	dpkg --build debian/tmp ..
 
 define checkdir

@@ -1,3 +1,33 @@
+2002-01-06  James R. Van Zandt  <jrv@voyager.mv.com>
+
+	* adjtimex.c (cmos_init): don't re-open the FD if it's already
+	open (thanks to Jonathan H N Chin <jhnc%stone@newton.cam.ac.uk>)
+
+2001-06-15  James R. Van Zandt  <jrv@voyager.mv.com>
+
+	* Makefile.in (VERSION): version 1.12.1
+	* README.ru: added Russian translation, courtesy of Alex Savvin
+	<alex@dag.bryansk.ru>
+
+2000-12-02  James R. Van Zandt  <jrv@voyager.mv.com>
+
+	* adjtimex.c (valid_cmos_rate): Fix grammar in message.
+
+2000-11-21  James R. Van Zandt  <jrv@voyager.mv.com>
+
+	* Makefile.in (VERSION): version 1.12
+
+	* adjtimex.c (puthackent): clear lfile after closing file, so it
+	does not get closed a second time (thanks to Bjorn Eriksson
+	<mdeans@algonet.se>).
+
+2000-05-14  James R. Van Zandt  <jrv@voyager.mv.com>
+
+	* Makefile.in (VERSION): version 1.11
+
+	* adjtimex.c (review): With both --review and --adjust, set
+	sytem time parameters to the least-squares estimates.
+
 2000-01-31  James R. Van Zandt  <jrv@voyager.mv.com>
 
 	* Makefile.in (VERSION): version 1.10

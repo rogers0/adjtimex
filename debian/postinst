@@ -6,7 +6,7 @@ set -e
 oldfile=/etc/rc.boot/adjtimex
 #		 new starting script
 startfile=/etc/init.d/adjtimex
-
+#		 configuration file
 conffile=/etc/adjtimex.conf
 
 create_adjtimex_conf()

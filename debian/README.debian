@@ -3,7 +3,7 @@ adjtimex for DEBIAN
 
 This is the Debian Linux prepackaged version of adjtimex.
 
-This package was put together by Jim Van Zandt <jrv@vanzandt.mv.com>,
+This package was put together by Jim Van Zandt <jrv@debian.org>,
 who also maintains the program and therefore used the master sources.
 
 further Information:
@@ -18,4 +18,4 @@ further Information:
 	/usr/doc/adjtimex/README
 
 
-James R. Van Zandt <jrv@vanzandt.mv.com>, Sun,  7 Mar 1999 21:58:51 -0500
+James R. Van Zandt <jrv@debian.org>, Sun,  7 Mar 1999 21:58:51 -0500

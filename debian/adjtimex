@@ -3,23 +3,25 @@
 # Run ADJTIMEX at startup.
 
 test -x /sbin/adjtimex  || exit 0
- 
-cfg=/etc/adjtimex.conf
 
+# default values
 TICK=10000
 FREQ=0
+ 
+# values in $cfg take precedence over the values here
+cfg=/etc/adjtimex.conf
 
 if [ -f $cfg ]; then
   . $cfg
 fi
 
 case "$1" in
-  start)
+  start|restart|force-reload)
     echo -n "Regulating system time... "
     /sbin/adjtimex -tick $TICK -frequency $FREQ
     echo "done."
     ;;
-  stop|restart|force-reload)
+  stop)
     ;;
   *)
     echo "/etc/init.d/adjtimex: unknown command $1"

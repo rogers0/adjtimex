@@ -1,5 +1,5 @@
 .\"{{{  Title                    Emacs major mode should be: -*- nroff -*-
-.TH ADJTIMEXCONFIG 8 "March 1, 1997"
+.TH ADJTIMEXCONFIG 8 "September 30, 2000"
 .\"}}}
 .\"{{{  Name
 .SH NAME
@@ -15,25 +15,27 @@ adjtimexconfig \- find kernel clock variables and save for reboots
 .SH DESCRIPTION
 This script uses \fBadjtimex\fP(8) to find values for the kernel
 variables \fBtick\fP and \fBfrequency\fP that will make the system
-clock approximately agree with the CMOS clock.  It then saves
-these values in the script \fI/etc/rc.boot/adjtimex\fP which restores
-the values on every boot.
+clock approximately agree with the CMOS clock.  It then saves these
+values in the configuration file \fI/etc/adjtimex.conf\fP so the
+settings will be restored on every boot, when
+\fI/etc/init.d/adjtimex\fP runs.
 .P
+\fPadjtimexconfig\fP uses the drift rate recorded in
+\fI/etc/adjtime\fP to adjust the times it reads from the CMOS clock.
 If you find the CMOS clock has a systematic drift, read the
-\fBclock\fP(8) manual page, modify \fI/etc/adjtime\fP as required, and
-run \fBadjtimexconfig\fP again.  \fPadjtimexconfig\fP uses the drift
-rate recorded in \fI/etc/adjtime\fP to adjust the CMOS clock readings.
+\fBclock\fP(8) or \fBhwclock\fP(8) manual page, modify
+\fI/etc/adjtime\fP as required, and run \fBadjtimexconfig\fP again.
 .SH AUTHOR
 Michael Meskes <meskes@debian.org>.
 .\"}}}
 .\"{{{
 .SH FILES
 .nf
-\fI/etc/rc.boot/adjtimex\fP
-\fI/etc/adjtime\fP
+\fI/etc/adjtimex.conf\fP
+\fI/etc/init.d/adjtimex\fP
 .fi
 .\"}}}
 .\"{{{  See also
 .SH "SEE ALSO"
-.BR adjtimex "(8), "clock "(8), " xntpd (8)
+.BR adjtimex "(8), "clock "(8), "hwclock "(8), "ntpd (8)
 .\"}}}

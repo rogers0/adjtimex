@@ -1,3 +1,55 @@
+adjtimex (1.13-1) unstable; urgency=low
+
+  * New upstream release (closes:Bug#127483)
+
+ -- James R. Van Zandt <jrv@debian.org>  Sun,  6 Jan 2002 21:06:23 -0500
+
+adjtimex (1.12-3) unstable; urgency=low
+
+  * New maintainer email (fix remaining references)
+
+ -- James R. Van Zandt <jrv@debian.org>  Sun,  9 Dec 2001 15:25:06 -0500
+
+adjtimex (1.12-2) unstable; urgency=low
+
+  * New maintainer email
+
+ -- James R. Van Zandt <jrv@debian.org>  Sun,  9 Dec 2001 13:24:59 -0500
+
+adjtimex (1.12-1) unstable; urgency=low
+
+  * New upstream release
+  * debian/control: move Build-Depends entry to source section
+    (closes:bug#91928).  Policy version 3.5.2 
+  * debian/rules: by default, compile without -g option.  Honor
+    DEB_BUILD_OPTIONS.  
+
+ -- James R. Van Zandt <jrv@vanzandt.mv.com>  Wed, 22 Nov 2000 01:37:58 -0500
+
+adjtimex (1.11-3) unstable; urgency=low
+
+  * adjtimexconfig: install new values in /etc/adjtimex.conf rather than
+    the startup script /etc/init.d/adjtimex (thanks to Zsolt Szabo
+    <szazs@mm.bme.hu>).
+
+ -- James R. Van Zandt <jrv@vanzandt.mv.com>  Sat, 30 Sep 2000 09:34:58 -0400
+
+adjtimex (1.11-2) unstable; urgency=low
+
+  * build-depends on debmake
+
+ -- James R. Van Zandt <jrv@vanzandt.mv.com>  Sun,  3 Sep 2000 13:50:02 -0400
+
+adjtimex (1.11-1) unstable; urgency=low
+
+  * /etc/init.d/adjtimex: restart|force-reload also run adjtimex
+    (closes:bug#69514), add comment explaining precedence of
+    /etc/adjtimex.conf 
+
+  * New upstream release
+
+ -- James R. Van Zandt <jrv@vanzandt.mv.com>  Mon, 28 Aug 2000 21:19:48 -0400
+
 adjtimex (1.10-1) frozen unstable; urgency=high
 
   * New upstream release - security fix: use popen() to recover output from
@@ -195,7 +247,4 @@ Tue Jul  2 10:01:35 MET DST 1996 Michael Meskes (meskes@debian.org)
 
 	* Really say what we're doing in postinst (Bug#3474)
 
-Local variables:
-mode: debian-changelog
-add-log-mailing-address: "jrv@vanzandt.mv.com"
-End:
+

@@ -1,8 +1,9 @@
 Source: adjtimex
 Section: admin
 Priority: optional
-Maintainer: James R. Van Zandt <jrv@vanzandt.mv.com>
-Standards-Version: 3.0.0
+Maintainer: James R. Van Zandt <jrv@debian.org>
+Build-Depends: debmake
+Standards-Version: 3.2.1
 
 Package: adjtimex
 Architecture: any

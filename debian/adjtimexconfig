@@ -9,22 +9,46 @@ echo -n "Adjusting ... "
 ticks=`tail -1 /etc/adj.adjust|awk '{print $6}'`
 freq=`tail -1 /etc/adj.adjust|awk '{print $7}'`
 
-# Reset settings in /etc/init.d/adjtimex.
+# Recreate /etc/adjtimex.conf if necessary
 
-grep "TICK=" /etc/init.d/adjtimex | cut -d'#' -f1 > /etc/adj.tick
-grep "FREQ=" /etc/init.d/adjtimex | cut -d'#' -f1 > /etc/adj.freq
+if [ -f $conffile ]; then 
+#   echo "using existing $conffile";
+    true;
+else 
+cat >$conffile <<EOF
+#  $conffile - configuration file for adjtimex(8)
+#
+#  you may adjust these values manually or by calling /usr/sbin/adjtimexconfig
+#
+#  This file is sourced by $startfile
+#
+TICK=$TICK
+FREQ=$FREQ
 
-TICKLINE="`echo -n "TICK="$ticks" # old: "; cat /etc/adj.tick`"
-FREQLINE="`echo -n "FREQ="$freq" # old: "; cat /etc/adj.freq`"
-
-cp /etc/init.d/adjtimex /etc/init.d/adjtimex.TMP
-sed -e "s/^TICK=.*/$TICKLINE/" -e "s/^FREQ=.*/$FREQLINE/" \
- < /etc/init.d/adjtimex.TMP > /etc/init.d/adjtimex
-
-if [ -s /etc/init.d/adjtimex ]
-then
-	rm -f /etc/init.d/adjtimex.TMP
+EOF
 fi
-rm -f /etc/adj.tick /etc/adj.freq /etc/adj.adjust
+
+# Reset values in /etc/adjtimex.conf
+
+sed -e "s/^TICK=.*/TICK=$ticks/" -e "s/^FREQ=.*/FREQ=$freq/"	\
+    /etc/adjtimex.conf >/etc/adjtimex.conf.TMP &&		\
+    mv /etc/adjtimex.conf.TMP /etc/adjtimex.conf
+
+# grep "TICK=" /etc/init.d/adjtimex | cut -d'#' -f1 > /etc/adj.tick
+# grep "FREQ=" /etc/init.d/adjtimex | cut -d'#' -f1 > /etc/adj.freq
+# 
+# TICKLINE="`echo -n "TICK="$ticks" # old: "; cat /etc/adj.tick`"
+# FREQLINE="`echo -n "FREQ="$freq" # old: "; cat /etc/adj.freq`"
+# 
+# cp /etc/init.d/adjtimex /etc/init.d/adjtimex.TMP
+# sed -e "s/^TICK=.*/$TICKLINE/" -e "s/^FREQ=.*/$FREQLINE/" \
+#  < /etc/init.d/adjtimex.TMP > /etc/init.d/adjtimex
+# 
+# if [ -s /etc/init.d/adjtimex ]
+# then
+# 	  rm -f /etc/init.d/adjtimex.TMP
+# fi
+# rm -f /etc/adj.tick /etc/adj.freq /etc/adj.adjust
+rm -f /etc/adj.adjust
 
 echo "Done"

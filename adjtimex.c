@@ -61,7 +61,7 @@ static unsigned long epoch = 1900; /* year corresponding to 0x00   */
 #define BUFLEN 128
 
 #ifndef USE_INLINE_ASM_IO
-     int cmos_fd;
+     int cmos_fd = -1;
 #endif
 
 #define CMOS_READ(addr)      ({outb(0x70,(addr)|0x80); inb(0x71);})
@@ -178,10 +178,11 @@ Get/Set Kernel Time Parameters:
        -m, --maxerror val        set maximum error (usec)
        -e, --esterror val        set estimated error (usec)
        -T, --timeconstant val    set phase locked loop time constant
+       -a, --adjust[=count]      set system clock parameters per CMOS 
+                                 clock or (with --review) log file
 
 Estimate Systematic Drifts:
        -c, --compare[=count]     compare system and CMOS clocks
-       -a, --adjust[=count]      adjust system clock per CMOS clock
        -i, --interval tim        set clock comparison interval (sec)
        -l, --log[=file]          log current times to file
            --host timeserver     query the timeserver
@@ -319,6 +320,12 @@ main(int argc, char *argv[])
       exit(1);
     }
 
+    if (reviewing)
+      {
+	review();
+	exit(0);
+      }
+
     if (adjusting || comparing)
       {
 	if (changes || F_print)
@@ -341,12 +348,6 @@ main(int argc, char *argv[])
 	  }
 	  */
 	log_times();
-	exit(0);
-      }
-
-    if (reviewing)
-      {
-	review();
 	exit(0);
       }
 
@@ -442,7 +443,8 @@ cmos_init ()
       exit (1);
     }
 #else
-  cmos_fd = open ("/dev/port", 2);
+  if (cmos_fd < 0) 
+    cmos_fd = open ("/dev/port", 2);
   if (cmos_fd < 0)
     {
       perror ("unable to open /dev/port read/write : ");
@@ -1040,7 +1042,7 @@ int valid_cmos_rate(double ftime_cmos, double ftime_ref, double sigma_ref)
   do
     {
       printf("\nAre you sure that, since %.24s,\n", ctime(&prev.log));
-      printf("  the real time clock (cmos clock) has running continuously,\n");
+      printf("  the real time clock (cmos clock) has run continuously,\n");
       printf("  it has not been reset with `/sbin/clock',\n");
       printf("  no operating system other than Linux has been running, and\n");
       printf("  ntpd has not been running? (y/n) [%c] ", default_answer);
@@ -1337,6 +1339,7 @@ void puthackent(struct hack *ph)
 	  ph->sys, ph->tick, ph->freq, ph->sys_ok?"y":"n",
 	  ph->cmos, ph->cmos_ok?"y":"n");
   fclose(lfile);
+  lfile = NULL;
 }
 
 /* convert a broken-down time representing UTC to calendar time
@@ -1402,6 +1405,10 @@ static void *xrealloc(void *pv, int n)
   return p;
 }
 
+/*
+  review log file and find least-square estimates of drifts.  If
+  "adjusting" is nonzero, set sytem time parameters to the
+  least-squares estimates. */
 void review()
 {
   int i, n, nmax = 0, digits;
@@ -1410,6 +1417,8 @@ void review()
   time_t start, finish;
   char startstring[26], finishstring[26];
   double x[2], p[4], h[4], z[2], r[4], cmos_var, sys_var, ref_var;
+  long tick_delta = 0;
+  double error_ppm;
 
   /* read all the previous time hacks in */
   sethackent();
@@ -1598,6 +1607,11 @@ void review()
 	   -x[0]*SECONDSPERDAY/1.e6);
   else
     printf("      (no suggestion)\n");
+  {
+    struct cmos_adj *pca = get_cmos_adjustment();
+    printf("                                           "
+	   "current adjustment = %6.4f sec/day\n", pca->ca_factor);
+  }
 
   sigma_ppm = sqrt(p[3]);
   digits = -(int)floor(log(.5*sigma_ppm)/log(10.));
@@ -1606,23 +1620,40 @@ void review()
 	 digits, x[1], digits, sigma_ppm);
   if (sigma_ppm < 100)
     {
-      long tick_delta = 0;
-      double error_ppm;
-      
       error_ppm = x[1];
       if (error_ppm > 100)
 	tick_delta = -(error_ppm + 50)/100;
       else if (error_ppm < -100)
 	tick_delta = (-error_ppm + 50)/100;
       error_ppm += tick_delta*100;
-      printf("      suggested tick = %ld  freq = %1.0f\n",
+      printf("      suggested tick = %5ld  freq = %7.0f\n",
 	     10000 + tick_delta, -error_ppm*SHIFT);
     }
   else
     printf("      (no suggestion)\n");
+  {
+    txc.modes = 0;
+    adjtimex(&txc);
+    printf("                                           "
+	   "current tick = %5ld  freq = %7ld\n", txc.tick, txc.freq );
+  }
   printf(
 "note: clock variations and unstated data errors may mean that the\n"
-"least squares solution has a bigger uncertainty than estimated here\n");
+"least squares solution has a bigger error than estimated here\n");
+  if (sigma_ppm < 100 && adjusting)
+    {
+      txc.modes = ADJ_FREQUENCY | ADJ_TICK;
+      txc.tick = 10000 + tick_delta;
+      txc.freq = -error_ppm*SHIFT;
+      if (adjtimex (&txc) < 0) 
+	{
+	  perror ("adjtimex"); 
+	  exit(1);
+	}
+      reset_time_status();
+      printf("                                               "
+	     "new tick = %5ld  freq = %7ld\n", txc.tick, txc.freq );
+    }
 
   for (i = 0; i < n; i++)
     free(hacks[i]);

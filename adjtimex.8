@@ -1,5 +1,5 @@
 .\"{{{  Title                      Emacs major mode should be: -*- nroff -*-
-.TH ADJTIMEX 8 "October 24, 1998"
+.TH ADJTIMEX 8 "September 30, 2000"
 .\"}}}
 .\"{{{  Name
 .SH NAME
@@ -59,13 +59,13 @@ follow.
 .RI \--esterror " val"
 .RI \-T " val"
 .RI \--timeconstant " val"
+.RI \-a[ count ]
+.RI \--adjust[= count ]
 .TP
 .B Estimate Systematic Drifts
 .br
 .RI \-c[ count ]
 .RI \--compare[= count ]
-.RI \-a[ count ]
-.RI \--adjust[= count ]
 .RI \-i " tim"
 .RI \--interval " tim"
 .RI \-l " file"
@@ -172,11 +172,13 @@ CMOS clock readings are adjusted for systematic drift using using the
 correction in \fI/etc/adjtime\fP \(em see \fBhwclock\fP(8).  The
 interval between comparisons is 10 seconds, unless changed by the
 \fB\--interval\fP switch.  The optional argument is the number of
-comparisons.  (If the argument is supplied, the "\fB=\fP" is
+comparisons (default 8).  (If the argument is supplied, the "\fB=\fP" is
 required.)
 .IP "\fB\-a\fP[\fP\fIcount\fP], \fB\--adjust\fP[\fB=\fP\fIcount\fP]"
-Same as \fB--compare\fP, except the recommended values are actually 
-installed after every other comparison.
+By itself, same as \fB--compare\fP, except the recommended values are
+actually installed after every other comparison.  With \fB--review\fP,
+the tick and frequency are set to the least-squares estimates.  (In
+the latter case, any \fIcount\fP value is ignored.)
 .IP "\fB\-i\fP \fItim\fP, \fB\--interval\fP \fItim\fP"
 Set the interval in seconds between clock comparisons for the
 \fB--compare\fP and \fB--adjust\fP options.
@@ -197,10 +199,12 @@ Protocol (NTP) server, or if that server is not synchronized.  Implies
 Ask for a keypress when the user knows the time, then ask what that
 time was, and its approximate accuracy.  Implies \fB--log\fP.
 .IP "\fB-r\fP[\fIfile\fP], \fB\--review\fP[\fB=\fP\fIfile\fP]"
-Review the clock log \fIfile\fP (default \fI/var/log/clocks.log\fP) and
-estimate, if possible, the rates of the CMOS and system clocks.  
-Calculate least-squares rates using all suitable log entries.
-Suggest corrections to adjust for systematic drift.
+Review the clock log \fIfile\fP (default \fI/var/log/clocks.log\fP)
+and estimate, if possible, the rates of the CMOS and system clocks.
+Calculate least-squares rates using all suitable log entries.  Suggest
+corrections to adjust for systematic drift.  With \fB--adjust\fP, the
+frequency and tick are set to the suggested values.  (The CMOS clock
+correction is not changed.)
 .IP "\fB\-h\fP, \fB\--help\fP"
 Print the program options.
 .IP "\fB\-v\fP, \fB\--version\fP"

@@ -19,20 +19,23 @@ mandir = $(prefix)/man/man$(manext)
 
 SHELL = /bin/sh
 
-SRC = adjtimex.c adjtimex.man install-sh configure.in \
- configure Makefile.in README adjtimex.lsm
+SRC = adjtimex.c adjtimex.8 mat.c mat.h install-sh configure.in \
+ configure Makefile.in README adjtimex.lsm COPYING COPYRIGHT
 
-MISC = Makefile adjtimex.man README  adjtimex.lsm
+MISC = Makefile adjtimex.8 README  adjtimex.lsm
 DISTFILES = $(MISC) $(SRCS)
 
 all: adjtimex
 
-adjtimex: adjtimex.c
-	$(CC) $(CFLAGS) -o adjtimex adjtimex.c
+adjtimex: adjtimex.c mat.o
+	$(CC) $(CFLAGS) -I. -o adjtimex adjtimex.c mat.o -lm
 	
+mat.o: mat.c
+	$(CC) $(CFLAGS) -c mat.c
+
 install: all
 	$(INSTALL) -g bin -m 755 -o root adjtimex $(bindir)/adjtimex
-	-$(INSTALL) -g man -m 444 -o root $(srcdir)/adjtimex.man \
+	-$(INSTALL) -g man -m 444 -o root $(srcdir)/adjtimex.8 \
 		$(mandir)/adjtimex.$(manext)
 
 uninstall:

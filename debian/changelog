@@ -1,4 +1,31 @@
-adjtimex (1.3-2) unstable; urgency=low
+adjtimex (1.5-1) frozen unstable; urgency=low
+
+  * New upstream release.  No functional changes, but adjtimex is now
+    covered by the GNU GPL. (Bug#21358)
+
+ -- James R. Van Zandt <jrv@vanzandt.mv.com>  Mon, 20 Apr 1998 21:38:53 -0400
+
+adjtimex (1.4-2) unstable; urgency=low
+
+  * Ensure that changelog is compressed *before* calculating md5sum
+    (Bug#19266)
+
+ -- James R. Van Zandt <jrv@vanzandt.mv.com>  Sat, 14 Mar 1998 20:47:52 -0500
+
+adjtimex (1.4-1) unstable; urgency=low
+
+  * New upstream release.  Log times for long-term estimation of drifts.
+
+ -- James R. Van Zandt <jrv@vanzandt.mv.com>  Thu, 11 Dec 1997 21:48:01 -0500
+
+adjtimex (1.3-3) stable; urgency=medium
+
+  * Moved temporary files from /tmp to /etc, to eliminate security
+    hole (bug #11610).
+
+ -- Jim Van Zandt <jrv@vanzandt.mv.com>  Sun, 3 Aug 1997 11:34:48 -0400
+
+adjtimex (1.3-2) stable; urgency=medium
 
   * Removed conflict with xntp, since ntpdate from the xntp package
     is still compatible with adjtimex.
@@ -62,3 +89,8 @@ Tue Jul  2 10:01:35 MET DST 1996 Michael Meskes (meskes@debian.org)
         adjtimex (1.2-4):
 
 	* Really say what we're doing in postinst (Bug#3474)
+
+Local variables:
+mode: debian-changelog
+add-log-mailing-address: "jrv@vanzandt.mv.com"
+End:

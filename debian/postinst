@@ -2,6 +2,21 @@
 
 set -e
 
+case "$1" in
+    configure)
+        # continue below
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+        exit 0;
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2;
+        exit 0;
+    ;;
+esac
+
 while true
 do
 	echo "Most system clocks are not really exact. Shall I adjust the system clock to"

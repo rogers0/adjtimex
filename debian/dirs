@@ -1,0 +1,6 @@
+usr/bin
+usr/sbin
+usr/man/man8
+usr/sbin
+etc/rc.boot
+usr/doc/adjtimex

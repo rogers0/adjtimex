@@ -17,16 +17,16 @@ fi
 
 case "$1" in
   start|restart|force-reload)
-    echo -n "Regulating system clock... "
-    /sbin/adjtimex -tick $TICK -frequency $FREQ
+    echo -n "Regulating system clock..."
+    /sbin/adjtimex -tick "$TICK" -frequency "$FREQ"
     echo "done."
     ;;
   stop)
     ;;
   *)
-    echo "/etc/init.d/adjtimex: unknown command $1"
-    echo "Usage: /etc/init.d/adjtimex {start|stop|restart|force-reload}"
-    exit 1
+    echo "/etc/init.d/adjtimex: unknown command $1" >&2
+    echo "Usage: /etc/init.d/adjtimex {start|stop|restart|force-reload}" >&2
+    exit 3
     ;;
 esac
 

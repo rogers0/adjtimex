@@ -1,3 +1,10 @@
+adjtimex (1.20-3) unstable; urgency=low
+
+  * debian/adjtimex.init: adjust printout to conform to Debian standard,
+    output error to stderr (Thanks to Thomas Hood, closes:bug#294824)
+
+ -- James R. Van Zandt <jrv@debian.org>  Sun, 13 Mar 2005 17:20:28 -0500
+
 adjtimex (1.20-2) unstable; urgency=low
 
   * debian/po/de.po: replace corrupted file (closes: #250250)

@@ -1,14 +1,14 @@
-# Generated automatically from Makefile.in by configure.
 #### Start of system configuration section. ####
  srcdir = .
+VPATH = .
 
-CFLAGS = -g -O
-prefix = /usr/local
-man1dir=${prefix}/man/man1
-exec_prefix = ${prefix}
+CFLAGS = @CFLAGS@
+prefix = @prefix@
+man1dir=@mandir@/man1
+exec_prefix = @exec_prefix@
 bindir=$(exec_prefix)/bin
 
-INSTALL=/usr/bin/install -c
+INSTALL=@INSTALL@
 
 # Extension (not including `.') for the manual page filenames.
 manext = 8

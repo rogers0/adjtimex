@@ -1,0 +1,194 @@
+..\"{{{  Title                      Emacs major mode should be: -*- nroff -*-
+.TH ADJTIMEX 8 "February 25, 1997"
+..\"}}}
+..\"{{{  Name
+.SH NAME
+adjtimex \- display or set the kernel time variables
+..\"}}}
+..\"{{{  Synopsis
+.SH SYNOPSIS
+.ad l
+.\" commands only
+.B adjtimex
+.RB [ \--print ]
+.RB [ \--tick
+.IR val ]
+.RB [ \--frequency
+.IR newfreq ]
+[\fB\--compare\fP[\fB=\fP\fIcount\fP]]
+[\fB\--adjust\fP[\fB=\fP\fIcount\fP]]
+.RB [ \--interval
+.IR tim ]
+.RB [ \--offset
+.IR val ]
+.RB [ \--singleshot
+.IR adjustment ]
+.RB [ \--maxerror
+.IR val ]
+.RB [ \--esterror
+.IR val ]
+.RB [ \--timeconstant
+.IR val ]
+.RB [ \--help ]
+.RB [ \--version ]
+..\"}}}
+..\"{{{  Config
+.SH DESCRIPTION
+This program gives you raw access to the kernel time variables.  For a
+machine connected to the Internet, or equipped with a precision
+oscillator or radio clock, the best way to regulate the system clock
+is with \fBxntpd\fP(8).  For a standalone or intermittently connected
+machine, you may use \fBadjtimex\fP instead to at least correct for
+systematic drift.
+.PP
+Anyone may print out the time variables, but only the superuser
+may change them.
+.PP
+If your computer can be connected to the net, you might run
+\fBxntpd\fP for at least several hours and use \fBadjtimex \--print\fP
+to learn what values of tick and freq it settled on.  Alternately, you
+could estimate values using the CMOS clock as a reference (see the
+\fB--compare\fP and \fB--adjust\fP switches).  You could then add a
+line to \fIrc.local\fP invoking \fBadjtimex\fP to set those parameters
+each time you reboot.
+..\"}}}
+..\"{{{  Options
+.SH OPTIONS
+Options may be introduced by either \fB-\fP or \fB--\fP, and unique
+abbreviations may be used.
+.IP "\fB\--print\fP"
+Print the current values of the kernel time variables.  NOTE: The time
+is "raw", and may be off by up to one timer tick (10 msec).  "status"
+gives the value of the \fBtime_status\fP variable in the kernel.  For
+Linux 1.0 and 1.2 kernels, the value is as follows:
+.nf
+      0   clock is synchronized (so the kernel should 
+          periodically set the CMOS clock to match the
+          system clock)
+      1   inserting a leap second at midnight
+      2   deleting a leap second at midnight
+      3   leap second in progress
+      4   leap second has occurred
+      5   clock not externally synchronized (so the 
+          kernel should leave the CMOS clock alone)
+.fi
+For Linux 2.0 kernels, the value is a sum of these:
+.nf
+      1   PLL updates enabled
+      2   PPS freq discipline enabled
+      4   PPS time discipline enabled
+      8   frequency-lock mode enabled
+     16   inserting leap second
+     32   deleting leap second
+     64   clock unsynchronized
+    128   holding frequency
+    256   PPS signal present
+    512   PPS signal jitter exceeded
+   1024   PPS signal wander exceeded
+   2048   PPS signal calibration error
+   4096   clock hardware fault
+.fi
+.IP "\fB\--tick\fP \fIval\fP"
+Set the number of microseconds that should be added to the system time
+for each kernel tick interrupt.  There are supposed to be 100 ticks
+per second, so \fIval\fP should be close to 10000.  Increasing
+\fIval\fP by 1 speeds up the system clock by about 100 ppm, or 8.64
+sec/day.  \fItick\fP must be in the range 9000...11000.
+.IP "\fB\--frequency\fP \fInewfreq\fP"
+Set the system clock frequency offset to \fInewfreq\fP.  \fInewfreq\fP
+can be negative or positive, and gives a much finer adjustment than
+the \fB\--tick\fP switch.  The value is scaled such that \fInewfreq\fP
+= 1<<16 speeds up the system clock by about 1 ppm, or .0864 sec/day.
+Thus, \fB--tick 10000 \--frequency 6553600\fP is about the same as
+\fB--tick 10001 --frequency 0\fP.  \fInewfreq\fP must be in the range
+-6553600...6553600, allowing maximum adjustments of plus or minus 100
+ppm.
+.IP "\fB\--compare\fP[\fB=\fP\fIcount\fP]"
+Periodically compare the system clock with the CMOS clock.  After the
+first two calls, print values for tick and frequency offset that would
+bring the system clock into approximate agreement with the CMOS clock.
+CMOS clock readings are adjusted for systematic drift using using the
+correction in \fI/etc/adjtime\fP \(em see \fBclock\fP(8).  The
+interval between comparisons is 10 seconds, unless changed by the
+\fB\--interval\fP switch.  The optional argument is the number of
+comparisons.  (If the argument is supplied, the "\fB=\fP" is
+required.)
+.IP "\fB\--adjust\fP[\fB=\fP\fIcount\fP]"
+Same as \fB--compare\fP, except the recommended values are actually 
+installed after every other comparison.
+.IP "\fB\--interval\fP \fItim\fP"
+Set the interval in seconds between clock comparisons for the
+\fB--compare\fP and \fB--adjust\fP options.
+.IP "\fB\--singleshot\fP \fIadj\fP"
+Slew the system clock by \fIadj\fP usec.  
+(Its rate is changed temporarily by about 1 part in 2000.)
+.IP "\fB\--offset\fP \fIadj\fP" 
+Add a time offset of \fIadj\fP usec.
+The kernel code adjusts the time gradually by \fIadj\fP, 
+notes how long it has been since the last time offset, 
+and then adjusts the frequency offset to correct for the apparent drift.  
+..\"The short range of this parameter makes it almost 
+..\"totally useless except for use with xntpd:
+\fIadj\fP must be in the range -512000...512000.
+.IP "\fB\--maxerror\fP \fIval\fP"
+Set maximum error (usec). 
+.IP "\fB\--esterror\fP \fIval\fP"
+Set estimated error (usec). 
+The maximum and estimated error are not used by the kernel.
+They are merely made available to user processes via the 
+\fBadjtimex\fP(2) system call.
+.IP "\fB\--timeconstant\fP \fIval\fP"
+Set phase locked loop (PLL) time constant. 
+\fIval\fP determines the bandwidth or "stiffness"
+of the PLL.  The effective PLL time constant will be a multiple of (1
+<< \fIval\fP).  For room-temperature quartz
+oscillators, David Mills recommends the value 2,
+which corresponds
+to a PLL time constant of about 900 sec and a maximum update interval
+of about 64 sec.  The maximum update interval scales directly with the
+time constant, so that at the maximum time constant of 6, the
+update interval can be as large as 1024 sec.
+
+Values of \fIval\fP between zero and 2 give quick convergence; values
+between 2 and 6 can be used to reduce network load, but at a modest cost
+in accuracy. 
+.IP "\fB\--help\fP"
+Print the program options.
+.IP "\fB\--version\fP"
+Print the program version.
+.PP
+..\"}}}
+..\"{{{  Examples
+.SH EXAMPLES
+If your system clock gained 8 seconds in 24 hours, you
+could set the tick to 9999, and then it would lose 0.64 seconds a day
+(that is, 1 tick unit = 8.64 seconds per day).
+To correct the rest of the error, you could set the frequency offset to
+(1<<16)*0.64/.0864 = 485452.  Thus, putting the following
+in rc.local would approximately correct the system clock:
+
+.nf
+     adjtimex  --tick 9999  --freq 485452
+.fi
+.PP
+..\"}}}
+..\"{{{  Notes
+.SH NOTES
+\fBadjtimex\fP deals only with the system clock \(em the one that runs
+while the computer is powered up.  To set or regulate the CMOS clock,
+see \fBclock\fP(8).
+..\"}}}
+..\"{{{  Author
+.SH AUTHORS
+Steven S. Dick <ssd@nevets.oau.org>, 
+Jim Van Zandt <jrv@vanzandt.mv.com>.
+..\"}}}
+..\"{{{  See also
+.SH "SEE ALSO"
+.BR date "(1L), " gettimeofday "(2), " settimeofday "(2), " 
+.BR clock "(8), " xntpd (8),
+\fI/usr/src/linux/include/linux/timex.h,
+/usr/src/linux/include/linux/sched.h,
+/usr/src/linux/kernel/time.c,
+/usr/src/linux/kernel/sched.c\fP
+..\"}}}

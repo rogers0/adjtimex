@@ -1,0 +1,39 @@
+..\"{{{  Title                    Emacs major mode should be: -*- nroff -*-
+.TH ADJTIMEXCONFIG 8 "March 1, 1997"
+..\"}}}
+..\"{{{  Name
+.SH NAME
+adjtimexconfig \- find kernel clock variables and save for reboots
+..\"}}}
+..\"{{{  Synopsis
+.SH SYNOPSIS
+.ad l
+.\" commands only
+.B /usr/sbin/adjtimexconfig
+..\"}}}
+..\"{{{  Config
+.SH DESCRIPTION
+This script uses \fBadjtimex\fP(8) to find values for the kernel
+variables \fBtick\fP and \fBfrequency\fP that will make the system
+clock approximately agree with the CMOS clock.  It then saves
+these values in the script \fI/etc/rc.boot/adjtimex\fP which restores
+the values on every boot.
+.P
+If you find the CMOS clock has a systematic drift, read the
+\fBclock\fP(8) manual page, modify \fI/etc/adjtime\fP as required, and
+run \fBadjtimexconfig\fP again.  \fPadjtimexconfig\fP uses the drift
+rate recorded in \fI/etc/adjtime\fP to adjust the CMOS clock readings.
+.SH AUTHOR
+Michael Meskes <meskes@debian.org>.
+..\"}}}
+..\"{{{
+.SH FILES
+.nf
+\fI/etc/rc.boot/adjtimex\fP
+\fI/etc/adjtime\fP
+.fi
+..\"}}}
+..\"{{{  See also
+.SH "SEE ALSO"
+.BR adjtimex "(8), "clock "(8), " xntpd (8)
+..\"}}}

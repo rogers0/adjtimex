@@ -11,13 +11,14 @@ DOCS=README debian/README debian/changelog
 
 build:
 	$(checkdir)
-	$(MAKE) LDFLAGS=-s CC="gcc -g -O2" adjtimex clockdiff
+	./configure
+	$(MAKE) LDFLAGS=-s CC="gcc -g -O2" adjtimex 
 	touch build
 
 clean:
 	$(checkdir)
 	-rm -f build
-	-rm -f *.o adjtimex clockdiff
+	-rm -f *.o adjtimex 
 	-rm -rf debian/tmp *~ 
 
 binary: binary-indep binary-arch
@@ -35,10 +36,10 @@ binary-arch:	build
 	install -d -m 755 -o root -g root debian/tmp/usr/sbin
 	install -d -m 755 -o root -g root debian/tmp/usr/man/man8
 	install -s -m 755 -o root -g root adjtimex debian/tmp/usr/sbin
-	install -m 644 -o root -g root adjtimex.8 debian/tmp/usr/man/man8
-	gzip -9f debian/tmp/usr/man/man8/adjtimex.8
-	install -s -m 755 -o root -g root clockdiff debian/tmp/usr/sbin
-	install -m 755 -o root -g root debian/conftimex debian/tmp/usr/sbin
+	install -m 644 -o root -g root adjtimex.man debian/tmp/usr/man/man8/adjtimex.8
+	install -m 644 -o root -g root debian/adjtimexconfig.8 debian/tmp/usr/man/man8/adjtimexconfig.8
+	gzip -9f debian/tmp/usr/man/man8/{adjtimex,adjtimexconfig}.8
+	install -m 755 -o root -g root debian/adjtimexconfig debian/tmp/usr/sbin
 	install -m 644 debian/copyright debian/tmp/usr/doc/copyright/$(package)
 	install -m 755 debian/rc debian/tmp/etc/rc.boot/$(package)
 	install -m 644 debian/README debian/tmp/usr/doc/$(package)

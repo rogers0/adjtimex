@@ -1,10 +1,10 @@
 #!/bin/sh
 
 #
-# you may to adjust these values manually or by calling /usr/sbin/conftimex
+# you may to adjust these values manually or by calling /usr/sbin/adjtimexconfig
 #
 
 TICK=10000
 FREQ=0
 
-/usr/sbin/adjtimex -tick ${TICK} -frequency ${FREQ} -status 4
+/usr/sbin/adjtimex -tick ${TICK} -frequency ${FREQ}

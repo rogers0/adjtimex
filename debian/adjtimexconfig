@@ -1,0 +1,30 @@
+#!/bin/sh
+
+echo -n "Adjusting ... "
+
+# Get the parameters
+
+/usr/sbin/adjtimex  --tick 10000 --frequency 0
+/usr/sbin/adjtimex --adjust >/tmp/adj.adjust
+ticks=`tail -1 /tmp/adj.adjust|awk '{print $6}'`
+freq=`tail -1 /tmp/adj.adjust|awk '{print $7}'`
+
+# Reset settings in /etc/rc.boot/adjtimex.
+
+grep "TICK=" /etc/rc.boot/adjtimex | cut -d'#' -f1 > /tmp/adj.tick
+grep "FREQ=" /etc/rc.boot/adjtimex | cut -d'#' -f1 > /tmp/adj.freq
+
+TICKLINE="`echo -n "TICK="$ticks" # old: "; cat /tmp/adj.tick`"
+FREQLINE="`echo -n "FREQ="$freq" # old: "; cat /tmp/adj.freq`"
+
+cp /etc/rc.boot/adjtimex /etc/rc.boot/adjtimex.TMP
+sed -e "s/^TICK=.*/$TICKLINE/" -e "s/^FREQ=.*/$FREQLINE/" \
+ < /etc/rc.boot/adjtimex.TMP > /etc/rc.boot/adjtimex
+
+if [ -s /etc/rc.boot/adjtimex ]
+then
+	rm -f /etc/rc.boot/adjtimex.TMP
+fi
+rm -f /tmp/adj.tick /tmp/adj.freq /tmp/adj.adjust
+
+echo "Done"

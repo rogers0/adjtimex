@@ -1,21 +1,17 @@
 This is the Debian Linux prepackaged version of adjtimex.
 
-This package was put together by Michael Meskes
-<meskes@informatik.rwth-aachen.de> from sources obtained from
-sunsite.unc.edu:/pub/Linux/system/Admin/time/adjtimex.1.2.tar.gz
+This package was put together by Jim Van Zandt <jrv@vanzandt.mv.com>,
+who also developed the program and therefore used the master sources.
 
 further Information:
 
 * adjtimex manpage
 * copying policy 
 	/usr/doc/copyright/adjtimex
-	(or debian.copyright in the source package)
+	(or debian/copyright in the source package)
 * changelog for debian package
 	/usr/doc/adjtimex/debian.changelog	 
 * adjtimex's README:
 	/usr/doc/adjtimex/README
 
-Michael Meskes <meskes@informatik.rwth-aachen.de> Fri May 17 12:47:56 MET DST 1996
-
-
-
+Jim Van Zandt <jrv@vanzandt.mv.com> Fri Feb 28 22:01:17 EST 1997

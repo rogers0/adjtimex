@@ -1,0 +1,16 @@
+Source: adjtimex
+Maintainer: Michael Meskes <meskes@debian.org>
+Section: admin
+Priority: optional
+Standards-Version: 2.1.0.0
+
+Package: adjtimex
+Architecture: any
+Description: Utility to display or set the kernel time variables
+ This program gives you raw access to the kernel time variables.  For a
+ machine connected to the Internet, or equipped with a precision oscillator 
+ or radio clock, the best way to keep the system clock
+ correct is with xntpd.  For a standalone or intermittently
+ connected machine, you may use adjtimex instead to at least correct
+ for systematic drift.
+Depends: ${shlibs:Depends}

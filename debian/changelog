@@ -1,0 +1,39 @@
+adjtimex (1.2-5) unstable; urgency=LOW
+
+  * New packaging format
+  * Corrected comment in /etc/rc.boot/adjtimex
+  * Corrected the installation of doc files
+
+ -- Michael Meskes <meskes@debian.org>  Wed, 18 Sep 1996 09:22:51 +0200
+
+Fri May 17 12:48:07 MET DST 1996 Michael Meskes (meskes@debian.org)
+
+	adjtimex (1.2-1):
+	
+	* Added Debian Linux package maintenance system files.
+
+Fri May 17 20:39:30 MET DST 1996 Michael Meskes	(meskes@debian.org)
+
+        adjtimex (1.2-2):
+
+	* Corrected mode for /etc/rc.boot/adjtimex
+
+	* Added conftimex script
+
+	* Automatically configure system
+
+Sun Jun 30 13:17:53 MET DST 1996 Michael Meskes (meskes@debian.org)
+
+        adjtimex (1.2-3):
+
+	* Corrected rules file for new naming scheme
+
+	* Gzip manpage
+
+	* Strip binaries
+
+Tue Jul  2 10:01:35 MET DST 1996 Michael Meskes (meskes@debian.org)
+
+        adjtimex (1.2-4):
+
+	* Really say what we're doing in postinst (Bug#3474)

@@ -1,0 +1,47 @@
+#!/bin/sh
+
+echo -n "Adjusting ... "
+
+/usr/sbin/adjtimex -status 4 -tick 10000 -frequency 0
+
+ticks=`clockdiff -p10 -c2 |
+	tail -1 | 
+	awk '{print sprintf ("%d", $3 * 1000) }'` 
+
+ticks=`expr 10000 - $ticks`
+
+adjtimex -status 4  -tick $ticks
+
+freq1=`clockdiff -p10 -c2 |
+        tail -1 | 
+        awk '{print sprintf("%d", $3 * 100000) }'`
+
+freq1=`expr $freq1 \* -65536`
+
+adjtimex -status 4  -tick $ticks -frequency $freq1
+
+freq2=`clockdiff -p10 -c2 |
+        tail -1 | 
+        awk '{print sprintf("%d", $3 * 100000) }'`
+
+freq2=`expr $freq2 \* -65536 + $freq1`
+
+# Reset settings in /etc/rc.boot/adjtimex.
+
+grep "TICK=" /etc/rc.boot/adjtimex | cut -d'#' -f1 > /tmp/adj.tick
+grep "FREQ=" /etc/rc.boot/adjtimex | cut -d'#' -f1 > /tmp/adj.freq
+
+TICKLINE="`echo -n "TICK="$ticks" # old: "; cat /tmp/adj.tick`"
+FREQLINE="`echo -n "FREQ="$freq2" # old: "; cat /tmp/adj.freq`"
+
+cp /etc/rc.boot/adjtimex /etc/rc.boot/adjtimex.TMP
+sed -e "s/^TICK=.*/$TICKLINE/" -e "s/^FREQ=.*/$FREQLINE/" \
+< /etc/rc.boot/adjtimex.TMP > /etc/rc.boot/adjtimex
+
+if [ -s /etc/rc.boot/adjtimex ]
+then
+	rm -f /etc/rc.boot/adjtimex.TMP
+fi
+rm -f /tmp/adj.tick /tmp/adj.freq
+
+echo "Done"

@@ -1,0 +1,33 @@
+#!/bin/sh
+
+set -e
+
+while true
+do
+	echo "Most system clocks are not really exact. Shall I adjust the time variables"
+	echo -n "to correct for systematic drift. (y/n) [N] "
+	read input
+	if [ $input = "y" ]
+	then
+		cat << EOF
+This configuartion tool tries to adjust the ticks (once) and the frequency
+(twice). It seems to adjust the clock good enough. But your milage may vary.
+You can edit the output (/etc/rc.boot/adjtimex) manually at any time.
+
+Note, that  the adjustment might result in incorrect values on a heavily
+loaded system. If it does please try calling \`/usr/sbin/conftimex'
+manually.
+
+EOF
+		/usr/sbin/conftimex
+		sh /etc/rc.boot/adjtimex
+		break
+	else
+		cat << EOF
+This adjustment can be done at any time by calling \`/usr/sbin/conftimex'.
+
+EOF
+		break
+	fi 2>/dev/null
+done
+

@@ -48,10 +48,10 @@ Options[] =
     { "print", 1, 0, 0 } ,
     { "offset", 1, ADJ_OFFSET, TXO(offset) } ,
     { "singleshot", 2, ADJ_OFFSET_SINGLESHOT, TXO(offset) } ,
-    { "frequency", 1, ADJ_FREQUENCY, TXO(frequency) } ,
+    { "frequency", 1, ADJ_FREQUENCY, TXO(freq) } ,
     { "maxerror", 1, ADJ_MAXERROR, TXO(maxerror) } ,
     { "esterror", 1, ADJ_ESTERROR, TXO(esterror) } ,
-    { "timeconstant", 3, ADJ_TIMECONST, TXO(time_constant) } ,
+    { "timeconstant", 3, ADJ_TIMECONST, TXO(constant) } ,
     { "tick", 3, ADJ_TICK, TXO(tick) } ,
     { "status", 2, ADJ_STATUS, (long *) TXO(status) } ,
     { 0, 0, 0, 0 }
@@ -77,7 +77,7 @@ main(int argc, char *argv[])
     unsigned int len;
     long num;
 
-    txc.mode = 0;
+    txc.modes = 0;
 
     {
 	char **ap, *s;
@@ -112,7 +112,7 @@ main(int argc, char *argv[])
 				*(int *) op->offset = num;
 			    else
 				*op->offset = num;
-			    txc.mode |= op->mask;
+			    txc.modes |= op->mask;
 			}
 		    }
 		    break;
@@ -137,14 +137,14 @@ main(int argc, char *argv[])
 	       "    precision: %ld\n"
 	       "    tolerance: %ld\n"
 	       "         tick: %ld\n"
-	       "         time:  %lds %ldus\n",
-	       txc.mode,
+	       "         time:  %ds %dus\n",
+	       txc.modes,
 	       txc.offset,
-	       txc.frequency,
+	       txc.freq,
 	       txc.maxerror,
 	       txc.esterror,
 	       txc.status,
-	       txc.time_constant,
+	       txc.constant,
 	       txc.precision,
 	       txc.tolerance,
 	       txc.tick,

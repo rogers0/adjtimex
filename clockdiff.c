@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
+#include <stdlib.h>
 #include <string.h>
 #include <limits.h>
 #include <sys/types.h>
@@ -116,8 +117,9 @@ volatile void
 usage()
 {
 	fprintf(stderr,
-		"compare  [-p N]\n"
-		"  -p N  repeat every N seconds, forever\n"
+		"compare  [-p N] [-c N]\n"
+		"  -p N  repeat every N seconds\n"
+		"  -c N  loop N times otherwise loop forever\n"
 	);
 	exit(1);
 }
@@ -141,8 +143,9 @@ main(int argc, char **argv, char **envp)
 	int arg;
 	extern char *optarg;
 	struct timeval now;
-
-	while ((arg = getopt(argc, argv, "p:")) != -1) {
+	int count = -1;
+	
+	while ((arg = getopt(argc, argv, "p:c:")) != -1) {
 		switch (arg) {
 		case 'p':
 			/* reading RTC takes 1 sec */
@@ -152,6 +155,13 @@ main(int argc, char **argv, char **envp)
 				exit(1);
 			}
 			break;
+		case 'c':
+			count = atoi(optarg);
+			if (count <= 0 ) {
+			        fprintf(stderr, "loop count out of range\n");
+                                exit(1);
+                        }
+			break;
 		case ':':
 			fprintf(stderr, "missing parameter\n");
 			break;
@@ -160,7 +170,9 @@ main(int argc, char **argv, char **envp)
 		}
 	}
 
-	while (1) {
+	while (count != 0) {
+		if (count > 0 ) count--;
+		
 		cmos_init();
 
 		/* Read adjustment parameters first */
@@ -268,7 +280,7 @@ main(int argc, char **argv, char **envp)
 #endif
 		dif = system_sec - cmos_sec;
 		
-		txc.mode = 0;
+		txc.modes = 0;
 		if (adjtimex(&txc) < 0)
 			perror("compare: adjtimex");
 			
@@ -276,13 +288,13 @@ main(int argc, char **argv, char **envp)
 		       (long) cmos_sec,
 		       dif,
 		       dif - dif_prev,
-		       txc.frequency,
+		       txc.freq,
 		       txc.tick,
 		       txc.offset);
 		dif_prev = dif;
 		if(interval == 0)
 			break;
-		sleep(interval);
+		if (count) sleep(interval);
 	}
 	return 0;
 }

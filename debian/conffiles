@@ -1,1 +1,1 @@
-/etc/rc.boot/adjtimex
+/etc/init.d/adjtimex

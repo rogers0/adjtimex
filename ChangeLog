@@ -1,3 +1,52 @@
+2000-01-31  James R. Van Zandt  <jrv@voyager.mv.com>
+
+	* Makefile.in (VERSION): version 1.10
+
+	* adjtimex.c: #define _GNU_SOURCE so strptime is available
+	* (log_times): use popen() to recover output from ntpdate, instead
+	of an unsafe temporary file (thanks to Colin Phipps <crp22@cam.ac.uk>)
+
+2000-01-03  James R. Van Zandt  <jrv@voyager.mv.com>
+
+	* Makefile.in (VERSION): version 1.9
+
+	* adjtimex.c (usage): remove invalid entries -? and -h
+
+	* adjtimex.c (main): Get version from -D flag rather than RCS string.
+
+	* Makefile.in (adjtimex): Pass version in -D flag.
+
+	* adjtimex.c (compare): Y2K fixes (okay until 2070)
+
+1999-12-16  James R. Van Zandt  <jrv@voyager.mv.com>
+
+	* Makefile.in (adjtimex.lsm): make adjtimex.lsm from
+	adjtimex.lsm.in (so version number gets entered automatically).
+
+	* adjtimex.c (valid_system_rate): refer to ntpd instead of xntpd
+
+	* adjtimex.8: refer to ntpd instead of xntpd
+
+	* README: refer to ntpd instead of xntpd
+
+1999-09-06  James R. Van Zandt  <jrv@voyager.mv.com>
+
+	* Makefile.in (bindir): executable goes into /sbin, so it's
+	available even if /usr is in a separate filesystem.
+	Removed unused variables DISTFILES and MISC.
+
+	* (VERSION): 1.8 (setting here rather than using RCS version
+	number of adjtimex.c)
+
+1998-11-28  James R. Van Zandt  <jrv@voyager.mv.com>
+
+	* adjtimex.c: Don't use syscall1() to declare adjtimex() for
+	Alpha.  Courtesy of Paul Slootman <paul@debian.org>
+
+1998-10-24  James R. Van Zandt  <jrv@voyager.mv.com>
+
+	* adjtimex.8: change references: clock -> hwclock
+
 1998-08-22  root  <jrv@voyager.mv.com>
 
 	* adjtimex.c (gethackent): Create log file if it does not exist.

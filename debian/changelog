@@ -1,9 +1,73 @@
-adjtimex (1.6-2.2) stable; urgency=low
+adjtimex (1.10-1) frozen unstable; urgency=high
 
-  * Added patch to fix #54119 (Y2K display problem).
-  * fix rules files to work on both slink & potato.
+  * New upstream release - security fix: use popen() to recover output from
+    ntpdate, instead of an unsafe temporary file (thanks to Colin Phipps
+    <crp22@cam.ac.uk>) (closes:bug#56752)
 
- -- Vincent Renardias <vincent@debian.org>  Mon, 10 Jan 2000 12:01:12 +0100
+ -- James R. Van Zandt <jrv@vanzandt.mv.com>  Tue,  1 Feb 2000 21:29:03 -0500
+
+adjtimex (1.9-2) unstable; urgency=low
+
+  * Suggest ntpdate (closes:bug#56751)
+
+ -- James R. Van Zandt <jrv@vanzandt.mv.com>  Mon, 31 Jan 2000 19:26:16 -0500
+
+adjtimex (1.9-1) unstable; urgency=low
+
+  * New upstream release
+  * Removed pointer to /usr/doc/copyright/GPL
+
+ -- James R. Van Zandt <jrv@vanzandt.mv.com>  Mon,  3 Jan 2000 21:34:59 -0500
+
+adjtimex (1.8.1-1) unstable; urgency=low
+
+  * New upstream release (closes:bug#52637)
+
+ -- James R. Van Zandt <jrv@vanzandt.mv.com>  Thu, 16 Dec 1999 20:13:43 -0500
+
+adjtimex (1.8-4) unstable; urgency=low
+
+  * Change references from /usr/sbin/adjtimex to /sbin/adjtimex in
+    adjtimexconfig
+
+ -- James R. Van Zandt <jrv@vanzandt.mv.com>  Tue,  2 Nov 1999 20:21:48 -0500
+
+adjtimex (1.8-3) unstable; urgency=low
+
+  * *Really* install binary into /sbin, so it is available
+    even if /usr is not mounted (closes:Bug#44399)
+
+ -- James R. Van Zandt <jrv@vanzandt.mv.com>  Sat, 30 Oct 1999 17:57:57 -0400
+
+adjtimex (1.8-2) unstable; urgency=low
+
+  * Install compatibility symlink /usr/doc/adjtimex.
+
+ -- James R. Van Zandt <jrv@vanzandt.mv.com>  Sun, 24 Oct 1999 10:54:01 -0400
+
+adjtimex (1.8-1) unstable; urgency=low
+
+  * New upstream release: Install binary into /sbin, so it is available
+    even if /usr is not mounted (closes:Bug#44399)
+
+ -- James R. Van Zandt <jrv@vanzandt.mv.com>  Mon,  6 Sep 1999 13:08:15 -0400
+
+adjtimex (1.7-2) unstable; urgency=low
+
+  * Link against glibc2.1
+  * Upgrade to FHS
+  * Include full license statement in copyright file
+  * Revise GPL reference in copyright file
+
+ -- James R. Van Zandt <jrv@vanzandt.mv.com>  Sat,  4 Sep 1999 12:04:34 -0400
+
+adjtimex (1.7-1) unstable; urgency=low
+
+  * install configuration file in /etc/init.d rather than /etc/rc.boot
+  closes: #30120, #32436.
+  * New upstream release (incorporates Paul Slootman's alpha patch)
+
+ -- James R. Van Zandt <jrv@vanzandt.mv.com>  Sat, 28 Nov 1998 20:33:38 -0500
 
 adjtimex (1.6-2) unstable; urgency=low
 

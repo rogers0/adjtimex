@@ -1,0 +1,77 @@
+#! /bin/sh
+
+set -e
+
+#		 old starting script
+oldfile=/etc/rc.boot/adjtimex
+#		 new starting script
+startfile=/etc/init.d/adjtimex
+
+conffile=/etc/adjtimex.conf
+
+create_adjtimex_conf()
+{
+
+    TICK=10000
+    FREQ=0
+	
+    if [ -f $oldfile ]; then
+	TICK=`awk '
+	BEGIN{tick=10000;}
+	/[ \t]*TICK[ \t]*=[ \t]*"?[0-9]+"?/ {
+	    sub(/[ \t]*TICK[ \t]*=[ \t]*"?/,"");
+	    tick=$0+0;
+	}
+	END {print tick;}
+	' $oldfile` 
+
+	FREQ=`awk '
+	BEGIN{freq=0;}
+	/[ \t]*FREQ[ \t]*=[ \t]*"?[0-9]+"?/ {
+	    sub(/[ \t]*FREQ[ \t]*=[ \t]*"?/,"");
+	    freq=$0+0;
+	}
+	END {print freq;}
+	' $oldfile` 
+
+#	echo "parameters from $oldfile: TICK=$TICK FREQ=$FREQ";
+	fi
+    
+	if [ -f $conffile ]; then 
+#	    echo "using existing $conffile";
+	    true;
+	else 
+	    cat >$conffile <<EOF
+#  $conffile - configuration file for adjtimex(8)
+#
+#  you may adjust these values manually or by calling /usr/sbin/adjtimexconfig
+#
+#  This file is sourced by $startfile
+#
+TICK=$TICK
+FREQ=$FREQ
+
+EOF
+	fi
+
+	rm -f $oldfile
+}
+
+
+case "$1" in
+    configure)
+
+	create_adjtimex_conf
+	update-rc.d adjtimex start 20 S . >/dev/null
+
+	/etc/init.d/adjtimex start
+	;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+	exit 0
+	;;
+    *)
+	echo "postinst called with unknown argument \`$1'" >&2
+	exit 0
+	;;
+esac
+

@@ -2,11 +2,12 @@ Source: adjtimex
 Section: admin
 Priority: optional
 Maintainer: James R. Van Zandt <jrv@vanzandt.mv.com>
-Standards-Version: 2.4.0
+Standards-Version: 3.0.0
 
 Package: adjtimex
 Architecture: any
 Depends: ${shlibs:Depends}
+Suggests: ntpdate
 Description: Utility to display or set the kernel time variables
  This program gives you raw access to the kernel time variables.  For
  a machine connected to the Internet, or equipped with a precision

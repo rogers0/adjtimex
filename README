@@ -46,7 +46,7 @@ You will have to log in as root for most of the following.
 
 The standard kernel will leave the RTC alone only until one of the
 time parameters is set (using adjtimex, for example).  Then it thinks
-xntpd is regulating the system time, and it starts "correcting" the
+ntpd is regulating the system time, and it starts "correcting" the
 RTC approximately every eleven minutes.  adjtimex prevents this by
 setting the time after setting any parameter.  It does not actually
 change the time.

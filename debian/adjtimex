@@ -1,0 +1,31 @@
+#!/bin/sh
+#
+# Run ADJTIMEX at startup.
+
+test -x /sbin/adjtimex  || exit 0
+ 
+cfg=/etc/adjtimex.conf
+
+TICK=10000
+FREQ=0
+
+if [ -f $cfg ]; then
+  . $cfg
+fi
+
+case "$1" in
+  start)
+    echo -n "Regulating system time... "
+    /sbin/adjtimex -tick $TICK -frequency $FREQ
+    echo "done."
+    ;;
+  stop|restart|force-reload)
+    ;;
+  *)
+    echo "/etc/init.d/adjtimex: unknown command $1"
+    echo "Usage: /etc/init.d/adjtimex {start|stop|restart|force-reload}"
+    exit 1
+    ;;
+esac
+
+exit 0

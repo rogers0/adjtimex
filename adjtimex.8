@@ -16,7 +16,7 @@ adjtimex \- display or set the kernel time variables
 This program gives you raw access to the kernel time variables.  For a
 machine connected to the Internet, or equipped with a precision
 oscillator or radio clock, the best way to regulate the system clock
-is with \fBxntpd\fP(8).  For a standalone or intermittently connected
+is with \fBntpd\fP(8).  For a standalone or intermittently connected
 machine, you may use \fBadjtimex\fP instead to at least correct for
 systematic drift.
 .PP
@@ -24,7 +24,7 @@ Anyone may print out the time variables, but only the superuser
 may change them.
 .PP
 If your computer can be connected to the net, you might run
-\fBxntpd\fP for at least several hours and use \fBadjtimex \--print\fP
+\fBntpd\fP for at least several hours and use \fBadjtimex \--print\fP
 to learn what values of tick and freq it settled on.  Alternately, you
 could estimate values using the CMOS clock as a reference (see the
 \fB--compare\fP and \fB--adjust\fP switches).  You could then add a
@@ -140,7 +140,7 @@ The kernel code adjusts the time gradually by \fIadj\fP,
 notes how long it has been since the last time offset, 
 and then adjusts the frequency offset to correct for the apparent drift.  
 .\"The short range of this parameter makes it almost 
-.\"totally useless except for use with xntpd:
+.\"totally useless except for use with ntpd:
 \fIadj\fP must be in the range -512000...512000.
 .IP "\fB\-m\fP \fIval\fP, \fB\--maxerror\fP \fIval\fP"
 Set maximum error (usec). 
@@ -235,7 +235,7 @@ Jim Van Zandt <jrv@vanzandt.mv.com>.
 .\"{{{  See also
 .SH "SEE ALSO"
 .BR date "(1L), " gettimeofday "(2), " settimeofday "(2), " 
-.BR hwclock "(8), " ntpdate "(8), " xntpd "(8), "
+.BR hwclock "(8), " ntpdate "(8), " ntpd "(8), "
 \fI/usr/src/linux/include/linux/timex.h,
 /usr/src/linux/include/linux/sched.h,
 /usr/src/linux/kernel/time.c,

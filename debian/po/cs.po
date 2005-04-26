@@ -1,0 +1,67 @@
+# Czech translation of adjtimex templates
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: adjtimex 1.20-3\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2004-09-20 20:18-0400\n"
+"PO-Revision-Date: 2005-4-10 22:13+0200\n"
+"Last-Translator: Martin Sin <martin.sin@seznam.cz>\n"
+"Language-Team: Czech <debian-l10n-czech@lists.debian.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-2\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: boolean
+#. Description
+#: ../templates:4
+msgid "Should adjtimex be run at installation and at every startup?"
+msgstr "Má být adjtimex spu¹tìn pøi instalaci a pøi ka¾dém spu¹tìní?"
+
+#. Type: boolean
+#. Description
+#: ../templates:4
+msgid ""
+"adjtimex can run at system startup to set the kernel time parameters to the "
+"values in /etc/default/adjtimex. Don't accept if you just want to use "
+"adjtimex to inspect the current parameters."
+msgstr ""
+"adjtimex mù¾e bì¾et pøi ka¾dém startu systému a nastavit parametry jádra na "
+"hodnoty z /etc/default/adjtimex. Pøi nesouhlasu bude adjtimex nastaven na "
+"zji¹tìní aktuálních parametrù."
+
+#. Type: boolean
+#. Description
+#: ../templates:12
+msgid "Should adjtimexconfig be run at installation time?"
+msgstr "Má být adjtimexconfig spu¹tìn pøi instalaci?"
+
+#. Type: boolean
+#. Description
+#: ../templates:12
+msgid ""
+"The adjtimexconfig script will use adjtimex to find values for the kernel "
+"variables tick and frequency that will make the system clock approximately "
+"agree with the hardware clock (also known as the CMOS clock).  It then saves "
+"these values in the configuration file /etc/default/adjtimex so the settings "
+"will be restored on every boot, when /etc/init.d/adjtimex runs."
+msgstr ""
+"Skript adjtimexconfig pou¾ije adjtimex k nalezení hodnot pro promìnné "
+"èasovaèe a frekvence jádra tak, ¾e nastaví systémové hodiny pøibli¾nì na "
+"hodnotu hardwarových hodin (také známých jako CMOS hodiny). Pak ulo¾í tyto "
+"hodnoty do konfiguraèního souboru /etc/default/adjtimex aby mohlo být "
+"nastavení obnoveno pøi ka¾dém startu, v¾dy pøi spu¹tìní /etc/init.d/adjtimex."
+
+#. Type: boolean
+#. Description
+#: ../templates:12
+msgid ""
+"The script takes 70 sec to run. Alternatively, you can run adjtimexconfig "
+"yourself at a later time, or determine the kernel variables one of several "
+"other ways (see the adjtimex man page) and install them in /etc/default/"
+"adjtimex."
+msgstr ""
+"Spu¹tìní skriptu zabere 70 sekund. Nebo mù¾ete spustit adjtimexconfig "
+"samostatnì pozdìji, pøípadnì urèit promìnné jádra jedním z nìkolika rùzných "
+"zpùsobù (podívejte se na manuálovou stránku adjtimex)  a umístìte je do /etc/"
+"default/adjtimex."

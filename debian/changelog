@@ -1,7 +1,14 @@
+adjtimex (1.20-5) unstable; urgency=low
+
+  * debian/po/vi.po: Vietnamese translation for debconf template, courtesy
+    of Clytie Siddall <clytie@riverland.net.au> (closes:Bug#307600)
+
+ -- James R. Van Zandt <jrv@debian.org>  Sat,  7 May 2005 11:58:47 -0400
+
 adjtimex (1.20-4) unstable; urgency=low
 
-  * debian/po/cs.po: Czech translation for adjtimex, courtesy of Martin
-    Šín <martin.sin@seznam.cz> (closes:Bug#304377)
+  * debian/po/cs.po: Czech translation for debconf template, courtesy of
+    Martin Šín <martin.sin@seznam.cz> (closes:Bug#304377)
 
  -- James R. Van Zandt <jrv@debian.org>  Mon, 25 Apr 2005 20:14:42 -0400
 

@@ -1,3 +1,19 @@
+adjtimex (1.20-6) unstable; urgency=low
+
+  * control: depend on debconf | debconf-2.0 (closes: #331733), update to
+    policy 3.6.2
+  * debian/po/de.po: fix spelling error in German translation, thanks to
+    Philipp Meier <meier@meisterbohne.de> (closes: #279254)
+  * debian/po/sv.po: Swedish translation for debconf template, courtesy
+    of Daniel Nylander <yeager@lidkoping.net> (closes: #333124)
+  * debian/po: Add Portugese  translation for debconf template, courtesy of
+    Miguel Figueiredo <elmig@debianpt.org> (closes: #336333)
+  * debian/po: Add Russian translation for debconf template, courtesy of
+    Yuri Kozlov <kozlov.y@gmail.com> (closes: #337967)
+  * debian/copyright: update FSF address.
+
+ -- James R. Van Zandt <jrv@debian.org>  Fri, 25 Nov 2005 21:04:08 -0500
+
 adjtimex (1.20-5) unstable; urgency=low
 
   * debian/po/vi.po: Vietnamese translation for debconf template, courtesy
@@ -31,7 +47,7 @@ adjtimex (1.20-1) unstable; urgency=low
 
   * adjtimex.c (compare): in "compare" or "adjust", return immediately
     after printing last result, instead of sleeping an extra $interval
-    seconds. (Thanks to Alain Guilbert <derogaton at oreka.com>,
+    seconds. (Thanks to Alain Guibert <derogaton at oreka.com>,
     closes:Bug#243652)
 
   * postinst: remove /etc/rcS.d/S20adjtimex link if configured not to run

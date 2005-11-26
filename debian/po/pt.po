@@ -1,0 +1,71 @@
+# 2005-10-27 - Marco Ferra <mferra@sdf.lonestar.org> (initial translation)
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: adjtimex 1.20-5\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2004-09-20 20:18-0400\n"
+"PO-Revision-Date: 2005-10-27 01:11+0100\n"
+"Last-Translator: Marco Ferra <mferra@sdf.lonestar.org>\n"
+"Language-Team: Portuguese <traduz@debianpt.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: boolean
+#. Description
+#: ../templates:4
+msgid "Should adjtimex be run at installation and at every startup?"
+msgstr ""
+"Deve o adjtimex correr enquanto o instala e depois sempre que o sistema "
+"inicia?"
+
+#. Type: boolean
+#. Description
+#: ../templates:4
+msgid ""
+"adjtimex can run at system startup to set the kernel time parameters to the "
+"values in /etc/default/adjtimex. Don't accept if you just want to use "
+"adjtimex to inspect the current parameters."
+msgstr ""
+"O adjtimex pode correr quando o sistema inicia para ajustar os paramêtros "
+"temporais do kernel para os valores especificados em /etc/default/adjtimex. "
+"Por favor recuse se apenas deseja usar o adjtimex para inspecionar os "
+"paramêtros actuais."
+
+#. Type: boolean
+#. Description
+#: ../templates:12
+msgid "Should adjtimexconfig be run at installation time?"
+msgstr "Deve o adjtimexconfig correr enquanto o instala?"
+
+#. Type: boolean
+#. Description
+#: ../templates:12
+msgid ""
+"The adjtimexconfig script will use adjtimex to find values for the kernel "
+"variables tick and frequency that will make the system clock approximately "
+"agree with the hardware clock (also known as the CMOS clock).  It then saves "
+"these values in the configuration file /etc/default/adjtimex so the settings "
+"will be restored on every boot, when /etc/init.d/adjtimex runs."
+msgstr ""
+"O script adjtimexconfig irá usar o comando adjtimex para encontrar os "
+"valores para variáveis do kernel que o farão aproximar e estar de acordo com "
+"o relógio por hardware (tambem conhecido pelo CMOS clock).  Este então "
+"guarda esses valores no ficheiro /etc/default/adjtimex para que estes "
+"paramêtros sejam reavidos sempre que o sistema inicia, nomeadamente quando "
+"o /etc/init.d/adjtimex corre."
+
+#. Type: boolean
+#. Description
+#: ../templates:12
+msgid ""
+"The script takes 70 sec to run. Alternatively, you can run adjtimexconfig "
+"yourself at a later time, or determine the kernel variables one of several "
+"other ways (see the adjtimex man page) and install them in /etc/default/"
+"adjtimex."
+msgstr ""
+"Este script demora 70 segundos a correr.  De forma alternativa pode correr o "
+"adjtimexconfig por si próprio numa altura mais tarde ou determinar as "
+"variáveis do kernel de outras formas (leia a página do manual do adjtimex) e "
+"instale-os em /etc/default/adjtimex."

@@ -1,0 +1,81 @@
+# translation of adjtimex_1.20-5_templates_ru.po to Russian
+#
+#    Translators, if you are not familiar with the PO format, gettext
+#    documentation is worth reading, especially sections dedicated to
+#    this format, e.g. by running:
+#         info -n '(gettext)PO Files'
+#         info -n '(gettext)Header Entry'
+#    Some information specific to po-debconf are available at
+#            /usr/share/doc/po-debconf/README-trans
+#         or http://www.debian.org/intl/l10n/po-debconf/README-trans#
+#    Developers do not need to manually edit POT or PO files.
+# Yuri Kozlov <kozlov.y@gmail.com>, 2005.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: template_adjtimex_1.20-5\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2004-09-20 20:18-0400\n"
+"PO-Revision-Date: 2005-11-07 19:24+0300\n"
+"Last-Translator: Yuri Kozlov <kozlov.y@gmail.com>\n"
+"Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.9.1\n"
+
+#. Type: boolean
+#. Description
+#: ../templates:4
+msgid "Should adjtimex be run at installation and at every startup?"
+msgstr "Должен adjtimex быть запущен сейчас и каждый раз при старте системы?"
+
+#. Type: boolean
+#. Description
+#: ../templates:4
+msgid ""
+"adjtimex can run at system startup to set the kernel time parameters to the "
+"values in /etc/default/adjtimex. Don't accept if you just want to use "
+"adjtimex to inspect the current parameters."
+msgstr ""
+"adjtimex можно запускать при старте системы для установки значений "
+"параметров времени ядра из файла /etc/default/adjtimex. Не соглашайтесь, "
+"если просто хотите использовать adjtimex для проверки текущих "
+"параметров."
+
+#. Type: boolean
+#. Description
+#: ../templates:12
+msgid "Should adjtimexconfig be run at installation time?"
+msgstr "Должен adjtimexconfig быть запущен сейчас?"
+
+#. Type: boolean
+#. Description
+#: ../templates:12
+msgid ""
+"The adjtimexconfig script will use adjtimex to find values for the kernel "
+"variables tick and frequency that will make the system clock approximately "
+"agree with the hardware clock (also known as the CMOS clock).  It then saves "
+"these values in the configuration file /etc/default/adjtimex so the settings "
+"will be restored on every boot, when /etc/init.d/adjtimex runs."
+msgstr ""
+"Сценарий adjtimexconfig использует adjtimex для поиска значений переменных "
+"ядра импульса сигнала и частоты, которые помогают согласовывать системные "
+"часы с аппаратными часами (так называемые часы CMOS). Затем он сохраняет эти "
+"значения в конфигурационный файл /etc/default/adjtimex, для того чтобы "
+"восстанавливать их при каждой загрузке с помощью сценария /etc/init.d/adjtimex."
+
+#. Type: boolean
+#. Description
+#: ../templates:12
+msgid ""
+"The script takes 70 sec to run. Alternatively, you can run adjtimexconfig "
+"yourself at a later time, or determine the kernel variables one of several "
+"other ways (see the adjtimex man page) and install them in /etc/default/"
+"adjtimex."
+msgstr ""
+"Длительность работы сценария -- 70 секунд. В качестве альтернативы вы можете запустить "
+"adjtimexconfig вручную позже, или определить переменные ядра одним из нескольких "
+"других способов (смотрите страницу руководства по adjtimex) и сохранить их в "
+"файл /etc/default/adjtimex."
+

@@ -3,11 +3,11 @@ Section: admin
 Priority: optional
 Maintainer: James R. Van Zandt <jrv@debian.org>
 Build-Depends: debhelper (>= 4.1.16)
-Standards-Version: 3.6.1
+Standards-Version: 3.6.2
 
 Package: adjtimex
 Architecture: any
-Depends: ${shlibs:Depends}, debconf
+Depends: ${shlibs:Depends}, debconf | debconf-2.0
 Suggests: ntpdate
 Description: Utility to display or set the kernel time variables
  This program gives you raw access to the kernel time variables.  For

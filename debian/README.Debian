@@ -10,12 +10,12 @@ further Information:
 
 * adjtimex manpage
 * copying policy 
-	/usr/doc/adjtimex/copyright
+	/usr/share/doc/adjtimex/copyright
 	(or debian/copyright in the source package)
 * changelog for debian package
-	/usr/doc/adjtimex/debian.changelog	 
+	/usr/share/doc/adjtimex/changelog.Debian	 
 * adjtimex's README:
-	/usr/doc/adjtimex/README
+	/usr/share/doc/adjtimex/README
 
 
 James R. Van Zandt <jrv@debian.org>, Sun,  7 Mar 1999 21:58:51 -0500

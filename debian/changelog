@@ -1,3 +1,12 @@
+adjtimex (1.20-7) unstable; urgency=low
+
+  * debian/README.Debian: correct references to files, which are no longer
+    in /usr/doc/adjtimex (closes:#365761)
+  * debian/rules: declare debhelper compat level 5
+  * debian/control: build-depends on debhelper ver 5
+
+ -- James R. Van Zandt <jrv@debian.org>  Thu,  4 May 2006 21:54:33 -0400
+
 adjtimex (1.20-6) unstable; urgency=low
 
   * control: depend on debconf | debconf-2.0 (closes: #331733), update to

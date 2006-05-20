@@ -93,7 +93,12 @@ case "$1" in
 	db_get adjtimex/run_daemon
 	if [ "$RET" = "true" ]; then
 	    update-rc.d adjtimex start 20 S . >/dev/null
-	    /etc/init.d/adjtimex start
+    
+	    if which invoke-rc.d >/dev/null 2>&1; then
+		invoke-rc.d adjtimex start
+	    else
+		/etc/init.d/adjtimex start
+	    fi
 	fi
 
 	db_get adjtimex/compare_rtc

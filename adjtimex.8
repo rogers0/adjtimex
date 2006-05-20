@@ -1,5 +1,5 @@
 .\"{{{  Title                      Emacs major mode should be: -*- nroff -*-
-.TH ADJTIMEX 8 "September 11, 2004"
+.TH ADJTIMEX 8 "May 23, 2006"
 .\"}}}
 .\"{{{  Name
 .SH NAME
@@ -120,6 +120,8 @@ follow.
 \-\-help
 \-v
 \-\-version
+\-V
+\-\-verbose
 .br
 .IP "\fB\-p\fP, \fB\-\-print\fP"
 Print the current values of the kernel time variables.  NOTE: The time
@@ -224,8 +226,7 @@ They are merely made available to user processes via the
 .IP "\fB\-T\fP \fIval\fP, \fB\-\-timeconstant\fP \fIval\fP"
 Set phase locked loop (PLL) time constant. 
 \fIval\fP determines the bandwidth or "stiffness"
-of the PLL.  The effective PLL time constant will be a multiple of (1
-<< \fIval\fP).  For room\-temperature quartz
+of the PLL.  The effective PLL time constant will be a multiple of (2^\fIval\fP).  For room\-temperature quartz
 oscillators, David Mills recommends the value 2,
 which corresponds
 to a PLL time constant of about 900 sec and a maximum update interval
@@ -245,7 +246,13 @@ correction in \fI/etc/adjtime\fP \(em see \fBhwclock\fP(8).  The
 interval between comparisons is 10 seconds, unless changed by the
 \fB\-\-interval\fP switch.  The optional argument is the number of
 comparisons.  (If the argument is supplied, the "\fB=\fP" is
-required.)
+required.)  If the CMOS clock and the system clock differ by more than
+six minutes, \fBadjtimex\fP will try shifting the time from the CMOS
+clock by some multiple of one hour, up to plus or minus 13 hours in
+all.  This should allow correct operation, including logging, if the
+\-\-utc switch was used when the CMOS clock is set to local time (or
+vice-versa), or if summer time has started or stopped since the CMOS
+clock was last set.
 .IP "\fB\-a\fP[\fP\fIcount\fP], \fB\-\-adjust\fP[\fB=\fP\fIcount\fP]"
 By itself, same as \fB\-\-compare\fP, except the recommended values are
 actually installed after every third comparison.  With \fB\-\-review\fP,
@@ -277,7 +284,9 @@ Calculate least\-squares rates using all suitable log entries.  Suggest
 corrections to adjust for systematic drift.  With \fB\-\-adjust\fP, the
 frequency and tick are set to the suggested values.  (The CMOS clock
 correction is not changed.)
-.IP "\fB\-h\fP, \fB\-\-help\fP"
+.IP "\fB\-V\fP, \fB\-\-verbose\fP"
+Increase verbosity.
+.IP "\fB\-\-help\fP"
 Print the program options.
 .IP "\fB\-v\fP, \fB\-\-version\fP"
 Print the program version.
@@ -305,7 +314,7 @@ see \fBhwclock\fP(8).
 .\"}}}
 .\"{{{  Author
 .SH AUTHORS
-Steven S. Dick <ssd@nevets.oau.org>, 
+Steven S. Dick <ssd at nevets.oau.org>, 
 Jim Van Zandt <jrv at comcast.net>.
 .\"}}}
 .\"{{{  See also

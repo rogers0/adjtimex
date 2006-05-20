@@ -5,9 +5,11 @@
 
 
 	AUTHORS
-		ssd@nevets.oau.org (Steven S. Dick)
-		jrv at comcast.net (Jim Van Zandt)
+		ssd at nevets.oau.org (Steven S. Dick)
+		jrvz at comcast.net (Jim Van Zandt)
 
+		TODO: review code controlled by DEBUG and possibly
+		change control to verbose flag.
 */
 
 #define _GNU_SOURCE		/* strptime is a GNU extension */
@@ -66,25 +68,10 @@ static unsigned long epoch = 1900; /* year corresponding to 0x00   */
 #define BUFLEN 128
 
 static int cmos_fd = -1;
-
-/* to enable use of /dev/rtc interface, we would initialize
-   using_dev_rtc to -1.  However, reading /dev/rtc does not wait until
-   the beginning of the next second.  It only returns the current
-   timer value, so it's only accurate to 1 sec which isn't good enough
-   for us.  I see this comment in drivers/char/rtc.c, function
-   rtc_get_rtc_time(), in the kernel sources:
-
-	 * read RTC once any update in progress is done. The update
-	 * can take just over 2ms. We wait 10 to 20ms. There is no need to
-	 * to poll-wait (up to 1s - eeccch) for the falling edge of RTC_UIP.
-	 * If you need to know *exactly* when a second has started, enable
-	 * periodic update complete interrupts, (via ioctl) and then 
-	 * immediately read /dev/rtc which will block until you get the IRQ.
-	 * Once the read clears, read the RTC time (again via ioctl). Easy.
-
-   However it doesn't say how to restore the interrupt setup.  Until I
-   find out about that, I'll continue to use the poll-wait.  */
-static int using_dev_rtc = 0;
+static int using_dev_rtc = -1;	/* 0 = not using /dev/rtc
+				 1 = using /dev/rtc
+				-1 = will use /dev/rtc if available,
+				     but have not tried to open it yet */
 
 struct hack {
   double ref;			/* reference time for time hack */
@@ -142,6 +129,7 @@ struct option longopt[]=
   {"tick", 1, NULL, 't'},
   {"utc", 0, NULL, 'u'},
   {"version", 0, NULL, 'v'},
+  {"verbose", 0, NULL, 'V'},
   {"watch", 0, NULL, 'w'},
   {0,0,0,0}
 };
@@ -156,6 +144,7 @@ int interval = 10;
 int count = 8;
 int marked;
 int universal = 0;
+int verbose = 0;
 int watch;			/* nonzero if time specified on command line */
 int undisturbed_sys = 0;
 int undisturbed_cmos = 0;
@@ -163,25 +152,33 @@ char *log_path = LOG_PATH;
 
 char *timeserver;		/* points to name of timeserver */
 
-void compare(void);
-void failntpdate();
-void reset_time_status(void);
-static double compare_cmos_sys(void);
-struct cmos_adj *get_cmos_adjustment(void);
-void log_times(void);
-int valid_system_rate(double ftime_sys, double ftime_ref, double sigma_ref);
-int valid_cmos_rate(double ftime_cmos, double ftime_ref, double sigma_ref);
-void sethackent(void);
-void endhackent(void);
-struct hack *gethackent(void);
-void puthackent(struct hack *ph);
-time_t mkgmtime(struct tm *tp);
-int compare_tm(struct tm *first, struct tm *second);
+static void usage(void);
+static inline void outb (short port, char val);
+static inline void outb (short port, char val);
+static inline unsigned char inb (short port);
+static void cmos_init ();
+static inline int cmos_read_bcd (int addr);
+static void cmos_read_time (time_t *cmos_timep, double *sysp);
+static void busy_wait(void);
+static void compare(void);
+static void failntpdate();
+static void reset_time_status(void);
+static struct cmos_adj *get_cmos_adjustment(void);
+static void log_times(void);
+static int valid_system_rate(double ftime_sys, double ftime_ref, double sigma_ref);
+static int valid_cmos_rate(double ftime_cmos, double ftime_ref, double sigma_ref);
+static void sethackent(void);
+static void endhackent(void);
+static struct hack *gethackent(void);
+static void puthackent(struct hack *ph);
+static time_t mkgmtime(struct tm *tp);
+static int compare_tm(struct tm *first, struct tm *second);
 static void *xmalloc(int n);
 static void *xrealloc(void *pv, int n);
-void review(void);
-void kalman_update(double *x, int xr, double *p, double *h,
-		   double *z, int zr, double *r);
+static void review(void);
+static void kalman_update(double *x, int xr, double *p, double *h,
+			  double *z, int zr, double *r);
+
 
 void
 usage(void)
@@ -219,6 +216,7 @@ usage(void)
 "Informative Output:\n"
 "           --help                print this help, then exit\n"
 "       -v, --version             print adjtimex program version, then exit\n"
+"       -V, --verbose             increase verbosity\n"
 ;
 
   fputs(msg, stdout);
@@ -228,6 +226,7 @@ usage(void)
 /* return apparent value of USER_HZ in HZ, minimum nominal and maximum
    values for tick in TICK_MIN TICK_MID and TICK_MAX, and maximum
    frequency offset in MAXFREQ */
+static 
 void probe_time(int *hz, int *tick_min, int *tick_mid, int *tick_max,
 		long *maxfreq)
 {
@@ -235,7 +234,14 @@ void probe_time(int *hz, int *tick_min, int *tick_mid, int *tick_max,
   int tick_orig, tick_lo, tick_try, tick_hi, i;
 
   txc.modes = 0;
-  adjtimex(&txc);
+  adjtimex(&txc);		/* fetch original value */
+  txc.modes = ADJ_TICK;
+  if (adjtimex(&txc) == -1) 	/* try setting with no change */
+    {
+      perror("adjtimex");
+      exit(1);
+    }
+
   *maxfreq = txc.tolerance;
   tick_orig = tick_hi = txc.tick;
   tick_lo = tick_hi*2/3;
@@ -279,7 +285,7 @@ main(int argc, char *argv[])
     txc.modes = 0;
 
     while((c = getopt_long_only(argc, argv, 
-				"a::c::l::e:f:h:i:m:o:prPPsPS:RT:t:uvw", 
+				"a::c::l::e:f:h:i:m:o:prPPsPS:RT:t:uvVw", 
 				longopt, NULL)) != -1)
       {
 	switch(c)
@@ -375,6 +381,9 @@ main(int argc, char *argv[])
 	      printf("adjtimex %s\n", VERSION);
 	      exit(0);
 	    }
+	  case 'V':
+	    verbose = 1;
+	    break;
 	  case 'w':
 	    watch = 1;
 	    logging = 1;
@@ -518,21 +527,30 @@ inb (short port)
   return ret;
 }
 
-void
-cmos_init ()
+/* set the global variable cmos_fd to a file descriptor for the CMOS
+   clock */
+static 
+void cmos_init ()
 {
   if (using_dev_rtc < 0)
     {
       cmos_fd = open ("/dev/rtc", O_RDONLY);
       if (cmos_fd >= 0)
 	{
+	  if(verbose)
+	    fprintf (stdout, "opened /dev/rtc for reading\n");
 	  using_dev_rtc = 1;
 	  return;
 	}
+      if(verbose)
+	fprintf (stdout, "cannot open /dev/rtc for reading\n");
       using_dev_rtc = 0;
     }
   else if (using_dev_rtc > 0)
     return;
+
+  if (verbose)
+    fprintf (stdout, "using /dev/port I/O\n");
 
 #ifdef USE_INLINE_ASM_IO
   if (ioperm (0x70, 2, 1))
@@ -548,6 +566,9 @@ cmos_init ()
       perror ("unable to open /dev/port read/write : ");
       exit (1);
     }
+  if(verbose)
+    fprintf (stdout, "opened /dev/port for reading\n");
+
   if (lseek (cmos_fd, 0x70, 0) < 0 || lseek (cmos_fd, 0x71, 0) < 0)
     {
       perror ("unable to seek port 0x70 in /dev/port : ");
@@ -567,42 +588,181 @@ cmos_read_bcd (int addr)
   return (b & 15) + (b >> 4) * 10;
 }
 
+/* return CMOS time in CMOS_TIMEP and sytem time in SYSP.  cmos_init()
+   must have been called before this function. */
 static void
-cmos_read_time (struct tm *tm)
+cmos_read_time (time_t *cmos_timep, double *sysp)
 {
+  int rc;
+  struct tm tm;
+  static int summertime_correction=0;
+  static int sanity_checked=0;
+  time_t cmos_time;
+  struct timeval now;
+
   if (using_dev_rtc > 0)
-    ioctl (cmos_fd, RTC_RD_TIME, tm);
+    {
+      ioctl (cmos_fd, RTC_PIE_OFF, NULL); /* disable periodic interrupts */
+      rc = ioctl (cmos_fd, RTC_UIE_ON, NULL); /* enable update
+					       complete interrupts */
+      if (rc == -1)
+	{
+	  if (verbose)
+	    fprintf(stdout, 
+		    "/dev/rtc doesn't allow user access to update interrupts\n"
+		    " - using busy wait instead\n");
+	  busy_wait();
+	}
+      {
+	unsigned long dummy;
+	int type, count;
+	
+	do {
+	  rc = read(cmos_fd, &dummy, sizeof(dummy));
+	  
+	  if (rc == -1)
+	    {
+	      perror("read() from /dev/rtc to wait for clock tick failed");
+	      exit(1);
+	    }
+	  type = (int)(dummy&0xff);
+	  count = (int)(dummy>>8);
+	} while ((type==0)||(count>1));	/* The low-order byte holds
+		the interrupt type.  The first read may succeed
+		immediately, but in that case the byte is zero, so we
+		know to try again. If there has been more than one
+		interrupt, then presumably periodic interrupts were
+		enabled.  We need to try again for just the update
+		interrupt.  */
+	
+	ioctl (cmos_fd, RTC_RD_TIME, &tm);
+	ioctl (cmos_fd, RTC_UIE_OFF, NULL); /* disable update complete
+					     interrupts */
+	}
+    }
   else
     {
-      long i;
-
-      /* read RTC exactly on falling edge of update flag */
-      /* Wait for rise.... (may take up to 1 second) */
-
-      for (i = 0; i < 10000000; i++)
-	if (CMOS_READ (10) & 0x80)
-	  break;
-
-      /* Wait for fall.... (must try at least 2.228 ms) */
-
-      for (i = 0; i < 1000000; i++)
-	if (!(CMOS_READ (10) & 0x80))
-	  break;
-
+      busy_wait();
       /* The "do" loop is "low-risk programming" */
       /* In theory it should never run more than once */
       do
 	{
-	  tm->tm_sec = cmos_read_bcd (0);
-	  tm->tm_min = cmos_read_bcd (2);
-	  tm->tm_hour = cmos_read_bcd (4);
-	  tm->tm_wday = cmos_read_bcd (6);
-	  tm->tm_mday = cmos_read_bcd (7);
-	  tm->tm_mon = cmos_read_bcd (8);
-	  tm->tm_year = cmos_read_bcd (9);
+	  tm.tm_sec = cmos_read_bcd (0);
+	  tm.tm_min = cmos_read_bcd (2);
+	  tm.tm_hour = cmos_read_bcd (4);
+	  tm.tm_wday = cmos_read_bcd (6);
+	  tm.tm_mday = cmos_read_bcd (7);
+	  tm.tm_mon = cmos_read_bcd (8);
+	  tm.tm_year = cmos_read_bcd (9);
 	}
-      while (tm->tm_sec != cmos_read_bcd (0));
+      while (tm.tm_sec != cmos_read_bcd (0));
+
+      tm.tm_mon--;		/* DOS uses 1 base */
+      tm.tm_wday -= 3;		/* DOS uses 3 - 9 for week days */
+      if ((tm.tm_year += (epoch - 1900)) <= 69)
+	tm.tm_year += 100;
+
     }
+  tm.tm_isdst = -1;		/* don't know whether it's summer time */
+
+
+  /* fetch system time immediately */
+  gettimeofday (&now, NULL);
+  
+  if (universal)
+    cmos_time = mkgmtime(&tm);
+  else
+    cmos_time = mktime(&tm);
+
+  cmos_time += summertime_correction;
+  
+  if (verbose)
+    printf ("CMOS time %s (%s) = %ld\n", asctime (&tm),
+	    summertime_correction?"after adjustment":
+	    (universal?"assuming UTC":"assuming local time"),
+	    cmos_time);
+  
+  if (!sanity_checked)
+    {
+      /* There are clues to whether the CMOS clock is set to
+	 summer time, which could be used as suggested by Alain
+	 Guibert <derogaton at oreka.com>:
+	 
+	 Since version 2.5, hwclock records CMOS timezone UTC or
+	 LOCAL as 1st item of 3rd line of /etc/adjtime. If it's
+	 "UTC", take offset 0 as if --utc was used. Otherwise: Since
+	 version 2.20, hwclock records CMOS timezone offset in 3rd
+	 item of 3rd line of /etc/adjtime. If it's there, take
+	 it. Otherwise if last adjustment date (2nd item of 1st line)
+	 exists and is not zero, take timezone offset at this last
+	 write time. Otherwise take the possibly false current
+	 offset.
+	 
+	 However, /etc/adjtime cannot be relied on.  The user
+	 might have booted Windows, which could have adjusted the
+	 CMOS clock (including a summer time correction) without
+	 updating /etc/adjtime.  Instead, we use a heuristic: if
+	 the CMOS and system times differ by more than six
+	 minutes, try shifting the CMOS time by some multiple of
+	 one hour.
+      */
+      if (now.tv_sec<cmos_time)
+	summertime_correction = -((cmos_time-now.tv_sec+6*60)/(60*60))*(60*60);
+      else
+	summertime_correction = (((now.tv_sec-cmos_time+6*60)/(60*60))*(60*60));
+      if (abs(summertime_correction) > 13*60*60)
+	{
+	  printf("WARNING: CMOS time %ld differs from system time %ld by %3.2f hours\n",
+		 cmos_time, now.tv_sec, (summertime_correction)/3600.);
+	  if(logging)
+	    {
+	      printf("logging suppressed\n");
+	      logging=0;
+	    }
+	}
+      if (verbose && summertime_correction)
+	printf("adjusting CMOS times by %d hour\n", 
+	       summertime_correction/(60*60));
+      cmos_time += summertime_correction;	/* assume start/end of
+						   summer time or local
+						   time/UTC difference */
+      if (abs(cmos_time-now.tv_sec)>6*60) /* still different by more than 6 min? */
+	{
+	  if (cmos_time>now.tv_sec)
+	    printf("WARNING: CMOS time is %3.2f min ahead of system clock\n",
+		   (cmos_time-now.tv_sec)/60.);
+	  else
+	    printf("WARNING: CMOS time is %3.2f min behind system clock\n",
+		   (now.tv_sec-cmos_time)/60.);
+	  if(logging)
+	    {
+	      printf("logging suppressed\n");
+	      logging=0;
+	    }
+	}
+      sanity_checked=1;
+    }
+  *cmos_timep=cmos_time;
+  *sysp = now.tv_sec + .000001*now.tv_usec;
+}
+
+static void
+busy_wait()
+{
+  long i;
+  
+  /* read RTC exactly on falling edge of update flag */
+  /* Wait for rise.... (may take up to 1 second) */
+  
+  for (i = 0; i < 10000000; i++)
+    if (CMOS_READ (10) & 0x80)
+      break;
+  
+  /* Wait for fall.... (must try at least 2.228 ms) */
+  
+  for (i = 0; i < 1000000; i++)
+    if (!(CMOS_READ (10) & 0x80))
+      break;
 }
 
 static inline void 
@@ -623,7 +783,6 @@ void
 compare()
 {
   struct timex txc;
-  struct tm tm;
   time_t cmos_time;
   time_t last_time;
   double cmos_sec, system_sec, dif, dif_prev = 0.;
@@ -633,7 +792,6 @@ compare()
   double not_adjusted;
   int loops = 0;
   extern char *optarg;
-  struct timeval now;
   int wrote_to_log = 0;
   int hz, tick_min, tick_mid, tick_max;
   long maxfreq;
@@ -682,24 +840,8 @@ cmos clock last adjusted at Tue Aug 26 11:43:57 1997 (= 872610237)
     {
       if (count > 0) count--;
 
-      cmos_read_time (&tm);
-
-      /* fetch system time immediately */
-      gettimeofday (&now, NULL);
-
-      tm.tm_mon--;		/* DOS uses 1 base */
-      tm.tm_wday -= 3;		/* DOS uses 3 - 9 for week days */
-      tm.tm_isdst = -1;		/* don't know whether it's daylight */
-      if ((tm.tm_year += (epoch - 1900)) <= 69)
-	tm.tm_year += 100;
-
-      if (universal)
-	cmos_time = mkgmtime(&tm);
-      else
-	cmos_time = mktime (&tm);
-      /* printf ("%s", asctime (&tm)); */
-
-      system_sec = now.tv_sec + .000001*now.tv_usec;
+      cmos_read_time (&cmos_time, &system_sec);
+			  
 
       /* If we're adjusting time parameters, we want to make a log
          entry only for the first two comparisons (before we change
@@ -725,6 +867,7 @@ cmos clock last adjusted at Tue Aug 26 11:43:57 1997 (= 872610237)
 	}
 
 #ifdef DEBUG
+      tm=*gmtime(cmos_time);
       printf ("       current cmos time %.24s %s (= %ld)\n", 
 	      asctime(&tm), tzname[tm.tm_isdst?1:0], (long) cmos_time);
 #endif
@@ -767,7 +910,7 @@ cmos time     system-cmos  error_ppm   tick      freq    tick      freq
 	    printf (
 "cmos time     system-cmos  error_ppm   tick      freq\n");
 	}
-      printf ("%9ld  %11.6f",
+      printf ("%10ld  %13.6f",
 	      (long) cmos_sec,
 	      dif);
       if (++loops > 1)
@@ -840,7 +983,7 @@ void reset_time_status()
   if (settimeofday(&tv2, NULL)) {perror("adjtimex"); exit(1);}
 }  
 
-void log_times()
+static void log_times()
 {
 #ifdef NET_TIME_CLIENT
   struct protoent proto;
@@ -848,7 +991,7 @@ void log_times()
   struct sockaddr sa={AF_INET, "127.0.0.1"};
   struct hostent he;
 #endif
-  double sigma_ref, cmos_ahead;
+  double sigma_ref;
   char ch, buf[64], *s;
   int n, ret;
   struct timeval tv_sys;
@@ -911,35 +1054,69 @@ void log_times()
       FILE *ifile;
       char command[128];
       char buf[BUFLEN];
-      char *str[5];
-      int i, n=0;
-      double d, mean=0, val, var=0, num=0;
+      int i, j;
+      double d, mean=0, val, var=0, num=0; /* for finding statistics */
+      
+      struct stat filestat;
+      char *paths[]={"/usr/bin/ntpdate","/bin/ntpdate",
+		     "/usr/sbin/ntpdate","/sbin/ntpdate"};
 
-#ifdef NTPDATE_STUB
-      ifile = fopen("../ntpdate-sample", "r");
-#else
-      sprintf(command, "ntpdate -d %.32s ", timeserver);
+      for (i=0; i<sizeof(paths)/sizeof(paths[0]); i++)
+	{
+	  stat(paths[i], &filestat);
+	  if (S_ISREG(filestat.st_mode))
+	    goto found_ntpdate;
+	}
+      failntpdate("cannot find ntpdate");
+
+    found_ntpdate:
+      sprintf(command, "%s -q -d %.32s ", paths[i], timeserver);
       ifile = popen(command, "r");
-#endif
-      if (ifile == NULL) failntpdate("call to ntpdate failed");
-
+	      
+      if (ifile == NULL) 
+	failntpdate("call to ntpdate failed");
+	      
       /* read and save the significant lines, which should look like this:
 filter offset: -0.02800 -0.01354 -0.01026 -0.01385
 offset -0.013543
  1 Sep 11:51:23 ntpdate[598]: adjust time server 1.2.3.4 offset -0.013543 sec
  */
+
       while(fgets(buf, BUFLEN, ifile))
-	if (strstr(buf, "offset") && n < 4)
-	  str[n++] = strdup(buf);
-      fclose(ifile);
-      if (n != 3) failntpdate("cannot understand ntpdate output");
+	{
+	  if (!strncmp(buf, "filter offset:", strlen("filter offset:")))
+	    {
+	      /* These lines show the offsets for each of ntpdate's
+		 samples.  Find their variance, which we will use to
+		 indicate the accuracy of the offset we're using.
+		 This is probably conservative, since the offset we're
+		 using is probably not close to the mean. */
+	      s = strstr(buf, ":")+1;
+	      for (j = 0; j < 4; j++)
+		if ((val = strtod(s, &s))) /* diregard offset of
+			      exactly zero - might be okay, but more
+			      likely no conversion was performed */
+		  {
+		    d = val - mean;
+		    num += 1.;
+		    var = (num-1)/num*(var + d*d/num);
+		    mean = ((num-1.)*mean + val)/num;
+		  }
+	    }
+
+	  if (num>0 && !strstr(buf,"adjust time server"))
+	    goto ntpdate_okay;
+	}
+      failntpdate("cannot understand ntpdate output");
+
+    ntpdate_okay:
       gettimeofday(&tv_sys, &tz);
       ftime_sys = tv_sys.tv_sec;
-
-
-      /* ntpdate selects the offset from one of its samples (the one
-         with the shortest round-trip delay?) */
-      ftime_ref = ftime_sys + atof(strstr(str[2], "offset") + 6);
+	      /* ntpdate selects the offset from one of its samples
+		 (the one with the shortest round-trip delay?) */
+      ftime_ref = ftime_sys + atof(strstr(buf, "offset") + 6);
+      pclose(ifile);
+      sigma_ref = sqrt(var);
 
       {
 	time_t now = (time_t)ftime_ref;
@@ -950,22 +1127,6 @@ offset -0.013543
 	       ftime_ref, ftime_sys, ftime_ref - ftime_sys);
       }
 
-      /* The first saved line shows the offsets for each of ntpdate's
-         samples.  Find their variance, which we will use to indicate
-         the accuracy of the offset we're using.  This is probably
-         conservative, since the offset we're using is probably not
-         close to the mean. */
-      s = strstr(str[0], ":");
-      if (s++ == NULL) failntpdate("cannot understand ntpdate output");
-      for (i = 0; i < 4; i++)
-	{
-	  val = strtod(s, &s);
-	  d = val - mean;
-	  num += 1.;
-	  var = (num-1)/num*(var + d*d/num);
-	  mean = ((num-1.)*mean + val)/num;
-	}
-      sigma_ref = sqrt(var);
 
 #ifdef OWN_IMPLEMENTATION
       /* this is not even close to working yet */
@@ -1002,8 +1163,14 @@ offset -0.013543
       sigma_ref = 0;
     }
 
-  cmos_ahead = compare_cmos_sys();
-  ftime_cmos = ftime_sys + cmos_ahead;
+  {
+    time_t cmos_time;
+    double system_sec;
+
+    cmos_init ();
+    cmos_read_time (&cmos_time, &system_sec);
+    ftime_cmos = ftime_sys + cmos_time - system_sec;
+  }
 
   /*
                  -reference-time- --------system-time---------- --cmos-time----
@@ -1033,6 +1200,7 @@ void failntpdate(char *s)
   exit(1);
 }
 
+static 
 int valid_system_rate(double ftime_sys, double ftime_ref, double sigma_ref)
 {
   int n;
@@ -1109,12 +1277,12 @@ int valid_system_rate(double ftime_sys, double ftime_ref, double sigma_ref)
       printf("Checking %s...\n", ADJPATH);
       if (pca->ca_adj_time < prev.log)
 	printf(
-"/sbin/clock has not set system time and adjusted the cmos clock \n"
+"/sbin/hwclock has not set system time and adjusted the cmos clock \n"
 "since %.24s - good.\n", 
 ctime(&prev.log));
       else
 	{
-	  printf("/sbin/clock set system time and adjusted the cmos clock \n"
+	  printf("/sbin/hwclock set system time and adjusted the cmos clock \n"
 		 "at %.24s - bad.\n", 
 		 ctime(&pca->ca_adj_time));
 	  undisturbed_sys = undisturbed_cmos = 0;
@@ -1126,7 +1294,7 @@ ctime(&prev.log));
       default_answer = undisturbed_sys?'y':'n';
       printf("\nAre you sure that, since %.24s,\n", ctime(&prev.log));
       printf("  the system clock has run continuously,\n");
-      printf("  it has not been reset with `date' or `/sbin/clock`,\n");
+      printf("  it has not been reset with `date' or `/sbin/hwclock`,\n");
       printf("  the kernel time variables have not been changed, and\n");
       printf("  the computer has not been suspended? (y/n) [%c] ", 
 	     default_answer);
@@ -1153,6 +1321,7 @@ ctime(&prev.log));
   return undisturbed_sys;
 }
 
+static 
 int valid_cmos_rate(double ftime_cmos, double ftime_ref, double sigma_ref)
 {
   int default_answer;
@@ -1164,7 +1333,7 @@ int valid_cmos_rate(double ftime_cmos, double ftime_ref, double sigma_ref)
     {
       printf("\nAre you sure that, since %.24s,\n", ctime(&prev.log));
       printf("  the real time clock (cmos clock) has run continuously,\n");
-      printf("  it has not been reset with `/sbin/clock',\n");
+      printf("  it has not been reset with `/sbin/hwclock',\n");
       printf("  no operating system other than Linux has been running, and\n");
       printf("  ntpd has not been running? (y/n) [%c] ", default_answer);
       fgets(buf, BUFLEN, stdin);
@@ -1190,7 +1359,7 @@ int valid_cmos_rate(double ftime_cmos, double ftime_ref, double sigma_ref)
   return undisturbed_cmos;
 }
 
-struct cmos_adj *get_cmos_adjustment()
+static struct cmos_adj *get_cmos_adjustment()
 {
   FILE *adj;
   static struct cmos_adj ca;
@@ -1214,153 +1383,11 @@ struct cmos_adj *get_cmos_adjustment()
   return &ca;
 }
 
-/* return the difference in seconds: cmos_time - system_time */
-static double
-compare_cmos_sys()
-{
-  struct tm tm;
-  time_t cmos_time;
-  double system_sec;
-  double dif;
-  int i;
-  extern char *optarg;
-  struct timeval now;
-
-  if (geteuid() != 0)
-    {
-      struct tm bdt;
-      char before[256], after[256];
-      int fd = open("/proc/rtc", O_RDONLY);
-      if (fd == -1)
-	{
-	  fprintf(stderr, "kernel lacks enhanced real time clock support, "
-		  "so only root can read RTC\n");
-	  exit(1);
-	}
-      read(fd, before, sizeof(before));
-      close(fd);
-      do
-	{
-	  fd = open("/proc/rtc", O_RDONLY);
-	  read(fd, after, sizeof(after));
-	  gettimeofday (&now, NULL);
-	  close(fd);
-	} while (!strncmp(before, after, strlen(after)));
-      strptime(after, "rtc_time : %H:%M:%S\nrtc_date : %Y-%m-%d", &bdt);
-
-      if (universal)		/* also set tm_wday and tm_yday */
-	cmos_time = mkgmtime(&bdt);
-      else
-	cmos_time = mktime(&bdt);
-#ifdef DEBUG
-      printf("RTC says date & time are %.24s %s\n",
-	     asctime(&bdt), tzname[bdt.tm_isdst?1:0]);
-#endif
-      system_sec = now.tv_sec + .000001 * now.tv_usec;
-      dif = (double)cmos_time - system_sec;
-      return dif;
-    }
-  else				/* I am superuser */
-    {
-      cmos_init ();
-
-      /* read RTC exactly on falling edge of update flag */
-      /* Wait for rise.... (may take up to 1 second) */
-
-      for (i = 0; i < 10000000; i++)
-	if (CMOS_READ (10) & 0x80)
-	  break;
-
-      /* Wait for fall.... (must try at least 2.228 ms) */
-
-      for (i = 0; i < 1000000; i++)
-	if (!(CMOS_READ (10) & 0x80))
-	  break;
-
-      /* The "do" loop is "low-risk programming" */
-      /* In theory it should never run more than once */
-      do
-	{
-	  tm.tm_sec = cmos_read_bcd (0);
-	  tm.tm_min = cmos_read_bcd (2);
-	  tm.tm_hour = cmos_read_bcd (4);
-	  tm.tm_wday = cmos_read_bcd (6);
-	  tm.tm_mday = cmos_read_bcd (7);
-	  tm.tm_mon = cmos_read_bcd (8);
-	  tm.tm_year = cmos_read_bcd (9);
-	}
-      while (tm.tm_sec != cmos_read_bcd (0));
-
-      /* fetch system time immediately */
-      gettimeofday (&now, NULL);
-
-      tm.tm_mon--;		/* DOS uses 1 base */
-      tm.tm_wday -= 3;		/* DOS uses 3 - 9 for week days */
-      tm.tm_isdst = -1;		/* don't know whether it's daylight */
-      if ((tm.tm_year += (epoch - 1900)) <= 69)
-	tm.tm_year += 100;
-#ifdef DEBUG
-      printf (" mday=%d  mon=%d  wday=%d  year=%d\n",
-	      tm.tm_mday, tm.tm_mon, tm.tm_wday, tm.tm_year);
-      printf ("Cmos time  %d:%02d:%02d\n", tm.tm_hour, tm.tm_min, tm.tm_sec);
-#endif
-    }
-  /*
-   * Mktime assumes we're giving it local time.  If the CMOS clock is in
-   * GMT, we have to set up TZ so mktime knows it.  Tzset gets called
-   * implicitly by the time code, but only the first time.  When
-   * changing the environment variable, better call tzset explicitly.
-   */
-  if (universal)
-    {
-#ifdef ZONESWITCH
-      zone = (char *) getenv ("TZ");	/* save original time zone */
-      (void) putenv ("TZ=");
-      tzset ();
-      cmos_time = mktime (&tm);
-      /* now put back the original zone */
-      if (zone)
-	{
-	  if ((strlen (zone) + 4) > sizeof (zonebuf))
-	    {
-	      fprintf (stderr, "Size of TZ variable is too long\n");
-	      exit (2);
-	    }
-	  strcpy (zonebuf, "TZ=");
-	  strcat (zonebuf, zone);
-	  putenv (zonebuf);
-	}
-      else
-	{			/* wasn't one, so clear it */
-	  putenv ("TZ");
-	}
-      tzset ();
-      printf ("%s", ctime (&cmos_time));
-#else /* !ZONESWITCH */
-      cmos_time = mkgmtime(&tm);
-#endif
-    }  
-  else
-    {
-      cmos_time = mktime (&tm);
-      /* printf ("%s", asctime (&tm)); */
-    }
-
-  system_sec = now.tv_sec + .000001 * now.tv_usec;
-#ifdef DEBUG
-  printf ("Number of seconds since 1/1/1970 is %ld\n",
-	  (long) cmos_time);
-#endif
-
-  dif = (double)cmos_time - system_sec;
-
-  return dif;
-}
-
 
 static FILE *lfile;		/* pointer to log file, or NULL if it
 				   has not been opened yet */
 
+static 
 void sethackent(void)
 {
   endhackent();
@@ -1378,6 +1405,7 @@ void sethackent(void)
     }
 }
 
+static 
 void endhackent(void)
 {
   if (lfile) fclose(lfile);
@@ -1387,6 +1415,7 @@ void endhackent(void)
 /* read next entry in clock comparison log, fill a struct hack from
    it, and return a pointer to it.  Ignore lines starting with `#'.
    Return NULL when there are no more lines to read.  */
+static 
 struct hack *gethackent(void)
 {
   char buf[256], sys_flag, cmos_flag, junk[26];
@@ -1420,6 +1449,7 @@ struct hack *gethackent(void)
 }
 
 /* append an entry to the clock comparison log.  */
+static 
 void puthackent(struct hack *ph)
 {
   struct tm bdt;
@@ -1439,33 +1469,43 @@ void puthackent(struct hack *ph)
       if (digits < 0) digits = 0;
     }
 
-#ifdef DEBUG
-  fprintf(stdout, "\nlog entry:\n");
-  fprintf(stdout, "%s %.*f %.*f %13.3f %5d %7d %s %13.3f %s\n",
-	  timestring, 
-	  digits, ph->ref, digits, ph->sigma_ref,
-	  ph->sys, ph->tick, ph->freq, ph->sys_ok?"y":"n",
-	  ph->cmos, ph->cmos_ok?"y":"n");
-#endif /* DEBUG */
-
-  lfile = fopen(log_path, "a+");
-  if (!lfile)
+  if (verbose)
     {
-      fprintf(stderr, "cannot open %s for writing\n", log_path);
-      return;
+      fprintf(stdout, "\nlog entry:\n");
+      fprintf(stdout, "%s %.*f %.*f %13.3f %5d %7d %s %13.3f %s\n",
+	      timestring, 
+	      digits, ph->ref, digits, ph->sigma_ref,
+	      ph->sys, ph->tick, ph->freq, ph->sys_ok?"y":"n",
+	      ph->cmos, ph->cmos_ok?"y":"n");
     }
-  fprintf(lfile, "%s %.*f %.*f %13.3f %5d %7d %s %13.3f %s\n",
-	  timestring, 
-	  digits, ph->ref, digits, ph->sigma_ref,
-	  ph->sys, ph->tick, ph->freq, ph->sys_ok?"y":"n",
-	  ph->cmos, ph->cmos_ok?"y":"n");
-  fclose(lfile);
-  lfile = NULL;
+
+  if (!logging)
+      fprintf(stdout, "logging suppressed\n");
+
+  else
+    {
+      lfile = fopen(log_path, "a+");
+      if (!lfile)
+	{
+	  fprintf(stderr, "cannot open %s for writing\n", log_path);
+	  return;
+	}
+      fprintf(lfile, "%s %.*f %.*f %13.3f %5d %7d %s %13.3f %s\n",
+	      timestring, 
+	      digits, ph->ref, digits, ph->sigma_ref,
+	      ph->sys, ph->tick, ph->freq, ph->sys_ok?"y":"n",
+	      ph->cmos, ph->cmos_ok?"y":"n");
+      fclose(lfile);
+      lfile = NULL;
+      if (verbose)
+	fprintf(stdout, "written to %s\n", log_path);
+    }
 }
 
 /* convert a broken-down time representing UTC to calendar time
     representation (time_t), and return it.  As a side effect, set the
     tm_wday and tm_yday members of the broken-down time. (like mktime) */
+static 
 time_t mkgmtime(struct tm *tp)
 {
   time_t lt;			/* local time */
@@ -1495,6 +1535,7 @@ time_t mkgmtime(struct tm *tp)
   return lt;
 }
 
+static 
 int compare_tm(struct tm *first, struct tm *second)
 {
   if (first->tm_year < second->tm_year) return -1;
@@ -1530,6 +1571,7 @@ static void *xrealloc(void *pv, int n)
   review log file and find least-square estimates of drifts.  If
   "adjusting" is nonzero, set sytem time parameters to the
   least-squares estimates. */
+static 
 void review()
 {
   int i, n, nmax = 0, digits;
@@ -1725,7 +1767,7 @@ void review()
   digits = -(int)floor(log(.5*sigma_ppm)/log(10.));
   if (digits < 0) digits = 0;
   printf("least-squares solution:\n"
-	 "  cmos_error = %.*f +- %.*f ppm",
+	 "   cmos_error = %.*f +- %.*f ppm\n",
 	 digits, x[0], digits, sigma_ppm);
   if (sigma_ppm < 100)
     printf("      suggested adjustment = %6.4f sec/day\n",
@@ -1734,14 +1776,14 @@ void review()
     printf("      (no suggestion)\n");
   {
     struct cmos_adj *pca = get_cmos_adjustment();
-    printf("                                           "
-	   "current adjustment = %6.4f sec/day\n", pca->ca_factor);
+    printf("        current adjustment = %6.4f sec/day\n",
+	   pca->ca_factor);
   }
 
   sigma_ppm = sqrt(p[3]);
   digits = -(int)floor(log(.5*sigma_ppm)/log(10.));
   if (digits < 0) digits = 0;
-  printf("   sys_error = %.*f +- %.*f ppm",
+  printf("   sys_error = %.*f +- %.*f ppm\n",
 	 digits, x[1], digits, sigma_ppm);
   if (sigma_ppm < hz)
     {
@@ -1751,7 +1793,7 @@ void review()
       else if (error_ppm < -hz)
 	tick_delta = (-error_ppm + hz/2)/hz;
       error_ppm += tick_delta*hz;
-      printf("      suggested tick = %5ld  freq = %7.0f\n",
+      printf("      suggested tick = %5ld  freq = %9.0f\n",
 	     tick_mid + tick_delta, -error_ppm*SHIFT);
     }
   else
@@ -1759,8 +1801,8 @@ void review()
   {
     txc.modes = 0;
     adjtimex(&txc);
-    printf("                                           "
-	   "current tick = %5ld  freq = %7ld\n", txc.tick, txc.freq );
+    printf("        current tick = %5ld  freq = %9ld\n",
+	   txc.tick, txc.freq );
   }
   printf(
 "note: clock variations and unstated data errors may mean that the\n"
@@ -1777,8 +1819,7 @@ void review()
 	}
       if (resetting)
 	reset_time_status();
-      printf("                                               "
-	     "new tick = %5ld  freq = %7ld\n", txc.tick, txc.freq );
+      printf("new tick = %5ld  freq = %7ld\n", txc.tick, txc.freq );
     }
 
   for (i = 0; i < n; i++)
@@ -1798,6 +1839,7 @@ void review()
    because it is not required in this case (i.e. the state transition
    matrix is a unit matrix).  See, for example: Blackman, "Multitarget
    Tracking with Radar Applications" */
+static 
 void kalman_update(double *x,	/* state vector */
 		   int xr,	/* rows in x (must be 1 or 2) */
 		   double *p,	/* covariance matrix for x (has xr

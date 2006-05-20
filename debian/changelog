@@ -1,3 +1,17 @@
+adjtimex (1.21-1) unstable; urgency=low
+
+  * New upstream release.  use /dev/rtc if available (closes:#196692). Use
+    heuristic to correct for DST changes or lacking --utc flag
+    (closes:#308396). check return code in probe_time() so if root
+    privileges are needed (e.g. "adjtimex -r") and lacking, command will
+    fail rather than printing bogus results. (closes:#364060)
+
+  * debian/postinst: start with invoke-rc.d if available (closes:#367746)
+  
+  * debian/control: update to policy 3.7.2
+
+ -- James R. Van Zandt <jrv@debian.org>  Sat, 20 May 2006 08:33:05 -0400
+
 adjtimex (1.20-7) unstable; urgency=low
 
   * debian/README.Debian: correct references to files, which are no longer

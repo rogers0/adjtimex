@@ -1,3 +1,12 @@
+adjtimex (1.21-2) unstable; urgency=low
+
+  * Makefile: correct version number to 1.21 (error in importing upstream
+    sources)
+    
+  * debian/control: depend on po-debconf
+
+ -- James R. Van Zandt <jrv@debian.org>  Fri,  6 Oct 2006 20:41:00 -0400
+
 adjtimex (1.21-1) unstable; urgency=low
 
   * New upstream release.  use /dev/rtc if available (closes:#196692). Use

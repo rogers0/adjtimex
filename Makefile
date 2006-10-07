@@ -2,11 +2,10 @@
 #### Start of system configuration section.             -*-makefile-*- ####
  srcdir = .
 
-VERSION=1.20
+VERSION=1.21
 
-CFLAGS = -g -O2 -Wall
-prefix = /usr
-man1dir=${prefix}/share/man/man1
+CFLAGS = -g -Wall # -O2
+prefix = /usr/local
 exec_prefix = ${prefix}
 bindir=/sbin
 

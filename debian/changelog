@@ -1,3 +1,13 @@
+adjtimex (1.21.1-1) unstable; urgency=low
+
+  * New upstream release.
+
+  * adjtimex.c: don't declare adjtimex syscall (should already be getting
+    the declaration from sys/timex.h) Thanks to Andreas Jochens
+    <aj@andaco.de> (closes:#390989)
+  
+ -- James R. Van Zandt <jrv@debian.org>  Sat,  7 Oct 2006 08:04:52 -0400
+
 adjtimex (1.21-2) unstable; urgency=low
 
   * Makefile: correct version number to 1.21 (error in importing upstream

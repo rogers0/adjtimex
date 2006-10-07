@@ -37,15 +37,6 @@
 #include <sys/ioctl.h>
 #include <linux/rtc.h>
 
-#ifdef __alpha__
-extern int adjtimex(struct timex *);
-#else
-#ifdef __ia64__
-extern int adjtimex(struct timex *);
-#else
-_syscall1(int, adjtimex, struct timex *, txcp)
-#endif
-#endif
 int F_print = 0;
 
 #ifndef LOG_PATH

@@ -1,3 +1,10 @@
+adjtimex (1.21.1-2) unstable; urgency=low
+
+  * Update French translation of debconf templates, thanks to Christian
+    Perrier <bubulle@debian.org> (closes:Bug#403472)
+
+ -- James R. Van Zandt <jrv@debian.org>  Sun,  7 Jan 2007 18:10:32 -0500
+
 adjtimex (1.21.1-1) unstable; urgency=low
 
   * New upstream release.

@@ -1,3 +1,4 @@
+# translation of fr.po to French
 #
 #    Translators, if you are not familiar with the PO format, gettext
 #    documentation is worth reading, especially sections dedicated to
@@ -11,25 +12,27 @@
 #
 #    Developers do not need to manually edit POT or PO files.
 #
+# Christian Perrier <bubulle@debian.org>, 2006.
 msgid ""
 msgstr ""
-"Project-Id-Version: adjtimex 1.15.1-1\n"
+"Project-Id-Version: fr\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-20 20:18-0400\n"
-"PO-Revision-Date: 2003-08-02 09:30+0100\n"
+"PO-Revision-Date: 2006-12-17 14:01+0100\n"
 "Last-Translator: Christian Perrier <bubulle@debian.org>\n"
-"Language-Team: adjtimex <debian-l10n-french@lists.debian.org>\n"
+"Language-Team: French <debian-l10n-french@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-15\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
 
 #. Type: boolean
 #. Description
 #: ../templates:4
 msgid "Should adjtimex be run at installation and at every startup?"
 msgstr ""
-"Faut-il lancer adjtimex lors de l'installation et à chaque démarrage du "
-"système ?"
+"Faut-il lancer adjtimex lors de l'installation et Ã  chaque dÃ©marrage du "
+"systÃ¨meÂ ?"
 
 #. Type: boolean
 #. Description
@@ -39,16 +42,16 @@ msgid ""
 "values in /etc/default/adjtimex. Don't accept if you just want to use "
 "adjtimex to inspect the current parameters."
 msgstr ""
-"Adjtimex peut être lancé au démarrage du système afin de régler les "
-"paramètres d'horloge du noyau en fonction des valeurs contenues dans /etc/"
-"default/adjtimex. N'acceptez pas si vous souhaitez vous servir d'adjtimex "
-"pour simplement consulter les paramètres actuels."
+"Adjtimex peut Ãªtre lancÃ© au dÃ©marrage du systÃ¨me afin de rÃ©gler les "
+"paramÃ¨tres d'horloge du noyau en fonction des valeurs contenues dans /etc/"
+"default/adjtimex. Ne choisissez pas cette option si vous souhaitez "
+"simplement vous servir d'adjtimex pour consulter les paramÃ¨tres actuels."
 
 #. Type: boolean
 #. Description
 #: ../templates:12
 msgid "Should adjtimexconfig be run at installation time?"
-msgstr "Faut-il lancer adjtimexconfig lors de l'installation ?"
+msgstr "Faut-il lancer adjtimexconfig lors de l'installationÂ ?"
 
 #. Type: boolean
 #. Description
@@ -61,12 +64,12 @@ msgid ""
 "will be restored on every boot, when /etc/init.d/adjtimex runs."
 msgstr ""
 "Le script adjtimexconfig utilise adjtimex afin de trouver les valeurs "
-"appropriées pour les variables du noyau concernant le battement (« tick ») "
-"et la fréquence d'horloge. Cela permettra à l'horloge du système d'être à "
-"peu près en accord avec l'horloge matérielle (parfois appelée « horloge "
-"CMOS »). Ces valeurs seront alors conservées dans le fichier de "
-"configuration /etc/default/adjtimex ce qui permettra de les restaurer à "
-"chaque démarrage quand /etc/init.d/adjtimex s'exécutera. "
+"appropriÃ©es pour les variables du noyau concernant le battement (Â«Â tickÂ Â») "
+"et la frÃ©quence d'horloge. Cela permettra Ã  l'horloge du systÃ¨me d'Ãªtre Ã  "
+"peu prÃ¨s en accord avec l'horloge matÃ©rielle (parfois appelÃ©e Â«Â horloge "
+"CMOSÂ Â»). Ces valeurs seront alors conservÃ©es dans le fichier de "
+"configuration /etc/default/adjtimex ce qui permettra de les restaurer Ã  "
+"chaque dÃ©marrage quand /etc/init.d/adjtimex s'exÃ©cutera. "
 
 #. Type: boolean
 #. Description
@@ -77,8 +80,8 @@ msgid ""
 "other ways (see the adjtimex man page) and install them in /etc/default/"
 "adjtimex."
 msgstr ""
-"La durée d'exécution du script est de 70 secondes. Vous pouvez également "
-"utiliser adjtimexconfig vous-même plus tard ou déterminer les valeurs des "
-"variables du noyau d'une autre manière (il en existe plusieurs : voir la "
-"page de manuel d'adjtimex). Ces valeurs devront ensuite être placées dans /"
+"La durÃ©e d'exÃ©cution du script est de 70 secondes. Vous pouvez Ã©galement "
+"utiliser adjtimexconfig vous-mÃªme plus tard ou dÃ©terminer les valeurs des "
+"variables du noyau d'une autre maniÃ¨re (il en existe plusieursÂ : voir la "
+"page de manuel d'adjtimex). Ces valeurs devront ensuite Ãªtre placÃ©es dans /"
 "etc/default/adjtimex."

@@ -13,8 +13,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: adjtimex 1.20-5\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-09-20 20:18-0400\n"
+"Report-Msgid-Bugs-To: jrv@debian.org\n"
+"POT-Creation-Date: 2007-08-06 21:41-0400\n"
 "PO-Revision-Date: 2005-10-11 16:31+0200\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <sv@li.org>\n"
@@ -24,13 +24,13 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:4
+#: ../templates:1001
 msgid "Should adjtimex be run at installation and at every startup?"
 msgstr "Ska adjtimex köras vid installation och vid varje uppstart?"
 
 #. Type: boolean
 #. Description
-#: ../templates:4
+#: ../templates:1001
 msgid ""
 "adjtimex can run at system startup to set the kernel time parameters to the "
 "values in /etc/default/adjtimex. Don't accept if you just want to use "
@@ -42,13 +42,13 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:12
+#: ../templates:2001
 msgid "Should adjtimexconfig be run at installation time?"
 msgstr "Ska adjtimexconfig köras vid installationstid?"
 
 #. Type: boolean
 #. Description
-#: ../templates:12
+#: ../templates:2001
 msgid ""
 "The adjtimexconfig script will use adjtimex to find values for the kernel "
 "variables tick and frequency that will make the system clock approximately "
@@ -64,7 +64,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:12
+#: ../templates:2001
 msgid ""
 "The script takes 70 sec to run. Alternatively, you can run adjtimexconfig "
 "yourself at a later time, or determine the kernel variables one of several "

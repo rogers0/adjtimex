@@ -1,3 +1,15 @@
+adjtimex (1.21.1-3) unstable; urgency=low
+
+  * update German translation of debconf templates, thanks to Erik Schanze
+    <eriks@debian.org> and Helge Kreutzmann
+    <debian@helgefjell.de>(closes:#436080)
+  
+  * debian/rules don't ignore failure of "make distclean"
+  
+  * debian/adjtimex.init: make LSB compliant
+
+ -- James R. Van Zandt <jrv@debian.org>  Mon, 06 Aug 2007 21:39:47 -0400
+
 adjtimex (1.21.1-2) unstable; urgency=low
 
   * Update French translation of debconf templates, thanks to Christian

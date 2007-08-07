@@ -1,22 +1,14 @@
-#
-#    Translators, if you are not familiar with the PO format, gettext
-#    documentation is worth reading, especially sections dedicated to
-#    this format, e.g. by running:
-#         info -n '(gettext)PO Files'
-#         info -n '(gettext)Header Entry'
-#
-#    Some information specific to po-debconf are available at
-#            /usr/share/doc/po-debconf/README-trans
-#         or http://www.debian.org/intl/l10n/po-debconf/README-trans
-#
-#    Developers do not need to manually edit POT or PO files.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-09-20 20:18-0400\n"
+"Report-Msgid-Bugs-To: jrv@debian.org\n"
+"POT-Creation-Date: 2007-08-06 21:41-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,13 +18,13 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:4
+#: ../templates:1001
 msgid "Should adjtimex be run at installation and at every startup?"
 msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:4
+#: ../templates:1001
 msgid ""
 "adjtimex can run at system startup to set the kernel time parameters to the "
 "values in /etc/default/adjtimex. Don't accept if you just want to use "
@@ -41,13 +33,13 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:12
+#: ../templates:2001
 msgid "Should adjtimexconfig be run at installation time?"
 msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:12
+#: ../templates:2001
 msgid ""
 "The adjtimexconfig script will use adjtimex to find values for the kernel "
 "variables tick and frequency that will make the system clock approximately "
@@ -58,7 +50,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:12
+#: ../templates:2001
 msgid ""
 "The script takes 70 sec to run. Alternatively, you can run adjtimexconfig "
 "yourself at a later time, or determine the kernel variables one of several "

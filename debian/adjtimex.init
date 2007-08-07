@@ -2,6 +2,18 @@
 #
 # Run ADJTIMEX at startup.
 
+### BEGIN INIT INFO
+# Provides:          adjtimex
+# Required-Start:    
+# Required-Stop:     
+# Should-Start:      
+# Should-Stop:       
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: set the kernel time variables
+# Description:       set the kernel time variables
+### END INIT INFO
+
 test -x /sbin/adjtimex  || exit 0
 
 # default values
@@ -21,7 +33,7 @@ case "$1" in
     /sbin/adjtimex -tick "$TICK" -frequency "$FREQ"
     echo "done."
     ;;
-  stop)
+  stop|status)
     ;;
   *)
     echo "/etc/init.d/adjtimex: unknown command $1" >&2

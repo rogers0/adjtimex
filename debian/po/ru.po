@@ -14,8 +14,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: template_adjtimex_1.20-5\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-09-20 20:18-0400\n"
+"Report-Msgid-Bugs-To: jrv@debian.org\n"
+"POT-Creation-Date: 2007-08-06 21:41-0400\n"
 "PO-Revision-Date: 2005-11-07 19:24+0300\n"
 "Last-Translator: Yuri Kozlov <kozlov.y@gmail.com>\n"
 "Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
@@ -26,13 +26,13 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:4
+#: ../templates:1001
 msgid "Should adjtimex be run at installation and at every startup?"
 msgstr "Должен adjtimex быть запущен сейчас и каждый раз при старте системы?"
 
 #. Type: boolean
 #. Description
-#: ../templates:4
+#: ../templates:1001
 msgid ""
 "adjtimex can run at system startup to set the kernel time parameters to the "
 "values in /etc/default/adjtimex. Don't accept if you just want to use "
@@ -40,18 +40,17 @@ msgid ""
 msgstr ""
 "adjtimex можно запускать при старте системы для установки значений "
 "параметров времени ядра из файла /etc/default/adjtimex. Не соглашайтесь, "
-"если просто хотите использовать adjtimex для проверки текущих "
-"параметров."
+"если просто хотите использовать adjtimex для проверки текущих параметров."
 
 #. Type: boolean
 #. Description
-#: ../templates:12
+#: ../templates:2001
 msgid "Should adjtimexconfig be run at installation time?"
 msgstr "Должен adjtimexconfig быть запущен сейчас?"
 
 #. Type: boolean
 #. Description
-#: ../templates:12
+#: ../templates:2001
 msgid ""
 "The adjtimexconfig script will use adjtimex to find values for the kernel "
 "variables tick and frequency that will make the system clock approximately "
@@ -63,19 +62,19 @@ msgstr ""
 "ядра импульса сигнала и частоты, которые помогают согласовывать системные "
 "часы с аппаратными часами (так называемые часы CMOS). Затем он сохраняет эти "
 "значения в конфигурационный файл /etc/default/adjtimex, для того чтобы "
-"восстанавливать их при каждой загрузке с помощью сценария /etc/init.d/adjtimex."
+"восстанавливать их при каждой загрузке с помощью сценария /etc/init.d/"
+"adjtimex."
 
 #. Type: boolean
 #. Description
-#: ../templates:12
+#: ../templates:2001
 msgid ""
 "The script takes 70 sec to run. Alternatively, you can run adjtimexconfig "
 "yourself at a later time, or determine the kernel variables one of several "
 "other ways (see the adjtimex man page) and install them in /etc/default/"
 "adjtimex."
 msgstr ""
-"Длительность работы сценария -- 70 секунд. В качестве альтернативы вы можете запустить "
-"adjtimexconfig вручную позже, или определить переменные ядра одним из нескольких "
-"других способов (смотрите страницу руководства по adjtimex) и сохранить их в "
-"файл /etc/default/adjtimex."
-
+"Длительность работы сценария -- 70 секунд. В качестве альтернативы вы можете "
+"запустить adjtimexconfig вручную позже, или определить переменные ядра одним "
+"из нескольких других способов (смотрите страницу руководства по adjtimex) и "
+"сохранить их в файл /etc/default/adjtimex."

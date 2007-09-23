@@ -1,3 +1,12 @@
+2007-09-23  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+	* adjtimex.c (log_times): fix these bugs in ntpdate output
+	interpretation (per Debian bug#438718):
+        adjtimex has a bug in evaluating the output of ntpdate, because
+        1. it assumes ntpdate outputs "adjust time server", but ntpdate may output "step time server" also
+        2. it doesnt stop at last line but as soon as it has found "filter offset:" lines,
+          and because of this it will not find the "offset ..." information in the last line.
+
 2006-10-07  James R. Van Zandt  <jrv@vanzandt.comcast.net>
 
 	* adjtimex.c: don't declare adjtimex syscall (should already be

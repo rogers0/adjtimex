@@ -1095,7 +1095,7 @@ offset -0.013543
 		  }
 	    }
 
-	  if (num>0 && !strstr(buf,"adjust time server"))
+	  if (num>0 && (strstr(buf,"adjust time server") || strstr(buf,"step time server")))
 	    goto ntpdate_okay;
 	}
       failntpdate("cannot understand ntpdate output");

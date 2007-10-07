@@ -119,6 +119,7 @@ struct option longopt[]=
   {"timeconstant", 1, NULL, 'T'},
   {"tick", 1, NULL, 't'},
   {"utc", 0, NULL, 'u'},
+  {"directisa", 0, NULL, 'd'},
   {"version", 0, NULL, 'v'},
   {"verbose", 0, NULL, 'V'},
   {"watch", 0, NULL, 'w'},
@@ -150,7 +151,7 @@ static inline unsigned char inb (short port);
 static void cmos_init ();
 static inline int cmos_read_bcd (int addr);
 static void cmos_read_time (time_t *cmos_timep, double *sysp);
-static void busy_wait(void);
+static void busy_wait(struct timeval *timestamp);
 static void compare(void);
 static void failntpdate();
 static void reset_time_status(void);
@@ -199,10 +200,11 @@ usage(void)
 "       -c, --compare[=count]     compare system and CMOS clocks\n"
 "       -i, --interval tim        set clock comparison interval (sec)\n"
 "       -l, --log[=file]          log current times to file\n"
-"           --host timeserver     query the timeserver\n"
+"       -h, --host timeserver     query the timeserver\n"
 "       -w, --watch               get current time from user\n"
 "       -r, --review[=file]       review clock log file, estimate drifts\n"
 "       -u, --utc                 the CMOS clock is set to UTC\n"
+"       -d, --directisa           access the CMOS clock directly\n"
 "\n"
 "Informative Output:\n"
 "           --help                print this help, then exit\n"
@@ -276,7 +278,7 @@ main(int argc, char *argv[])
     txc.modes = 0;
 
     while((c = getopt_long_only(argc, argv, 
-				"a::c::l::e:f:h:i:m:o:prPPsPS:RT:t:uvVw", 
+				"a::c::l::e:f:h:i:m:o:prPPsPS:RT:t:udvVw", 
 				longopt, NULL)) != -1)
       {
 	switch(c)
@@ -366,6 +368,9 @@ main(int argc, char *argv[])
 	    break;
 	  case 'u':
 	    universal = 1;
+	    break;
+	  case 'd':
+	    using_dev_rtc = 0;
 	    break;
 	  case 'v':
 	    {
@@ -602,22 +607,23 @@ cmos_read_time (time_t *cmos_timep, double *sysp)
 	    fprintf(stdout, 
 		    "/dev/rtc doesn't allow user access to update interrupts\n"
 		    " - using busy wait instead\n");
-	  busy_wait();
+	  busy_wait(&now);
 	}
       {
-	unsigned long dummy;
+	unsigned long interrupt_info;
 	int type, count;
 	
 	do {
-	  rc = read(cmos_fd, &dummy, sizeof(dummy));
-	  
+	  rc = read(cmos_fd, &interrupt_info, sizeof(interrupt_info));
+	  gettimeofday(&now, NULL);
+
 	  if (rc == -1)
 	    {
 	      perror("read() from /dev/rtc to wait for clock tick failed");
 	      exit(1);
 	    }
-	  type = (int)(dummy&0xff);
-	  count = (int)(dummy>>8);
+	  type = (int)(interrupt_info & 0xff);
+	  count = (int)(interrupt_info >> 8);
 	} while ((type==0)||(count>1));	/* The low-order byte holds
 		the interrupt type.  The first read may succeed
 		immediately, but in that case the byte is zero, so we
@@ -633,11 +639,11 @@ cmos_read_time (time_t *cmos_timep, double *sysp)
     }
   else
     {
-      busy_wait();
       /* The "do" loop is "low-risk programming" */
       /* In theory it should never run more than once */
       do
 	{
+	  busy_wait(&now);
 	  tm.tm_sec = cmos_read_bcd (0);
 	  tm.tm_min = cmos_read_bcd (2);
 	  tm.tm_hour = cmos_read_bcd (4);
@@ -648,17 +654,14 @@ cmos_read_time (time_t *cmos_timep, double *sysp)
 	}
       while (tm.tm_sec != cmos_read_bcd (0));
 
-      tm.tm_mon--;		/* DOS uses 1 base */
-      tm.tm_wday -= 3;		/* DOS uses 3 - 9 for week days */
+      tm.tm_mon--;		/* RTC uses 1 base */
+      tm.tm_wday--;		/* RTC uses 1 - 7 for day of the week, 1=Sunday */
       if ((tm.tm_year += (epoch - 1900)) <= 69)
 	tm.tm_year += 100;
 
     }
   tm.tm_isdst = -1;		/* don't know whether it's summer time */
 
-
-  /* fetch system time immediately */
-  gettimeofday (&now, NULL);
   
   if (universal)
     cmos_time = mkgmtime(&tm);
@@ -677,7 +680,7 @@ cmos_read_time (time_t *cmos_timep, double *sysp)
     {
       /* There are clues to whether the CMOS clock is set to
 	 summer time, which could be used as suggested by Alain
-	 Guibert <derogaton at oreka.com>:
+	 Guibert <alguibert at free.fr>:
 	 
 	 Since version 2.5, hwclock records CMOS timezone UTC or
 	 LOCAL as 1st item of 3rd line of /etc/adjtime. If it's
@@ -737,8 +740,10 @@ cmos_read_time (time_t *cmos_timep, double *sysp)
   *sysp = now.tv_sec + .000001*now.tv_usec;
 }
 
+
+/* busywait for UIP fall and timestamp this event */
 static void
-busy_wait()
+busy_wait(struct timeval *timestamp)
 {
   long i;
   
@@ -752,8 +757,10 @@ busy_wait()
   /* Wait for fall.... (must try at least 2.228 ms) */
   
   for (i = 0; i < 1000000; i++)
-    if (!(CMOS_READ (10) & 0x80))
+    if (!(CMOS_READ (10) & 0x80)) {
+      gettimeofday(timestamp, NULL);
       break;
+    }
 }
 
 static inline void 
@@ -775,12 +782,9 @@ compare()
 {
   struct timex txc;
   time_t cmos_time;
-  time_t last_time;
   double cmos_sec, system_sec, dif, dif_prev = 0.;
-  FILE *adj;
-  double factor;
+  struct cmos_adj *pca = get_cmos_adjustment();
   double cmos_adjustment;
-  double not_adjusted;
   int loops = 0;
   extern char *optarg;
   int wrote_to_log = 0;
@@ -789,19 +793,6 @@ compare()
 
   probe_time(&hz, &tick_min, &tick_mid, &tick_max, &maxfreq);
 
-
-      /* Read adjustment parameters first */
-  if ((adj = fopen (ADJPATH, "r")) == NULL)
-    {
-      perror (ADJPATH);
-      exit (2);
-    }
-  if (fscanf (adj, "%lf %ld %lf", &factor, &last_time, &not_adjusted) < 0)
-    {
-      perror (ADJPATH);
-      exit (2);
-    }
-  fclose (adj);
 #ifdef DEBUG
   /*
 cmos clock last adjusted at Tue Aug 26 11:43:57 1997 (= 872610237)
@@ -811,17 +802,17 @@ cmos clock last adjusted at Tue Aug 26 11:43:57 1997 (= 872610237)
     struct tm bdt;
     if (universal)
       {
-	bdt = *gmtime(&last_time);
+	bdt = *gmtime(&pca->ca_adj_time);
 	(void)mkgmtime(&bdt);	/* set tzname */
       }
     else
       {
-	bdt = *localtime(&last_time);
+	bdt = *localtime(&pca->ca_adj_time);
 	(void)mktime(&bdt);	/* set tzname */
       }
     printf ("cmos clock last adjusted %.24s %s "
 	    "(= %ld)\n", 
-	    ctime(&last_time), tzname[tm.tm_isdst?1:0], (long) last_time);
+	    ctime(&pca->ca_adj_time), tzname[tm.tm_isdst?1:0], (long) pca->ca_adj_time);
   }
 #endif
 
@@ -862,22 +853,22 @@ cmos clock last adjusted at Tue Aug 26 11:43:57 1997 (= 872610237)
       printf ("       current cmos time %.24s %s (= %ld)\n", 
 	      asctime(&tm), tzname[tm.tm_isdst?1:0], (long) cmos_time);
 #endif
-      cmos_adjustment = ((double) (cmos_time - last_time))
-	* factor / SECONDSPERDAY
-	+ not_adjusted;
+      cmos_adjustment = ((double) (cmos_time - pca->ca_adj_time))
+	* pca->ca_factor / SECONDSPERDAY
+	+ pca->ca_remainder;
       cmos_sec = cmos_time + cmos_adjustment;
 #ifdef DEBUG
       printf (
 "           time since last adjustment %10.6f days (= %9d sec)\n",
-	      (int) (cmos_time - last_time) / (double)SECONDSPERDAY,
-	      (int) (cmos_time - last_time));
+	      (int) (cmos_time - pca->ca_adj_time) / (double)SECONDSPERDAY,
+	      (int) (cmos_time - pca->ca_adj_time));
       printf (
 "                               factor %10.6f sec/day\n",
-	      factor);
+	      pca->ca_factor);
       printf (
 "                           adjustment %10.6f + %7.6f = %7.6f sec\n",
-	       ((double) (cmos_time - last_time))*factor/SECONDSPERDAY,
-	       not_adjusted, cmos_adjustment);
+	       ((double) (cmos_time - pca->ca_adj_time))*pca->ca_factor/SECONDSPERDAY,
+	       pca->ca_remainder, cmos_adjustment);
 #endif
       dif = system_sec - cmos_sec;
 
@@ -1350,26 +1341,31 @@ int valid_cmos_rate(double ftime_cmos, double ftime_ref, double sigma_ref)
   return undisturbed_cmos;
 }
 
+
+/*
+ * Read informations from /etc/adjtime file.
+ * If file doesn't exist, return default zero values.
+ */
 static struct cmos_adj *get_cmos_adjustment()
 {
   FILE *adj;
   static struct cmos_adj ca;
-  if ((adj = fopen (ADJPATH, "r")) == NULL)
+
+  ca.ca_factor = ca.ca_adj_time = ca.ca_remainder = 0;
+  if ((adj = fopen (ADJPATH, "r")) != NULL)
     {
-      perror (ADJPATH);
-      exit (2);
+      if (fscanf (adj, "%lf %ld %lf",
+		&ca.ca_factor,
+		&ca.ca_adj_time,
+		&ca.ca_remainder) < 0)
+	{
+	  perror (ADJPATH);
+	  exit (2);
+	}
+      fclose (adj);
     }
-  if (fscanf (adj, "%lf %ld %lf", 
-	      &ca.ca_factor, 
-	      &ca.ca_adj_time, 
-	      &ca.ca_remainder) < 0)
-    {
-      perror (ADJPATH);
-      exit (2);
-    }
-  fclose (adj);
 #ifdef DEBUG
-  printf ("CMOS clock was last adjusted %s", ctime(&ca.ca_adj_time));
+  printf ("CMOS clock was last adjusted %s\n", ctime(&ca.ca_adj_time));
 #endif
   return &ca;
 }

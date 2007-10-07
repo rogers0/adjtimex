@@ -1,3 +1,25 @@
+adjtimex (1.23-1) unstable; urgency=low
+
+  * New upstream release
+
+  * adjtimex.c (compare): In case of absence of /etc/adjtime, do not fail,
+    and do not force users to manually create it with 0.0
+    content. Instead, proceed assuming zero values (meaning RTC does not
+    drift). Also replace redundant code by a call to
+    get_cmos_adjustment(). README: Rewrite USAGE paragraph. Remove point
+    about creating zero adjfile. Document new behaviour without
+    adjfile. Remove reference to the long outdated clock(8). Update URL
+    for hwclock(8).  (Thanks to Alain Guibert <alguibert@free.fr>,
+    closes:bug#445448)
+
+  * adjtimex.c (busy_wait): timestamp more closely the RTC clock beat
+    (thanks to Alain Guibert <alguibert at free.fr>, see Debian
+    bug#443814). (usage): --directisa switch forces adjtimex to poll the
+    update-in-process (UIP) flag of the CMOS clock (thanks to Alain
+    Guibert <alguibert at free.fr>, closes:bug#443773).
+
+ -- James R. Van Zandt <jrv@debian.org>  Sat, 06 Oct 2007 21:57:04 -0400
+
 adjtimex (1.22-1) unstable; urgency=low
 
   * New upstream release: fix these bugs in ntpdate output

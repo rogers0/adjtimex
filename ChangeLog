@@ -1,11 +1,50 @@
+2007-10-06  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+	* Makefile.in (VERSION): version 1.23
+
+	* adjtimex.c (cmos_read_time): rename dummy to interrupt_info now
+	that this read() value is actually used. (thanks to Alain Guibert
+	<alguibert@free.fr>)
+
+	* README: Rewrite USAGE paragraph. Remove point about creating
+	zero adjfile. Document new behaviour without adjfile. Remove
+	reference to the long outdated clock(8). Update URL for
+	hwclock(8). (Thanks to Alain Guibert <alguibert@free.fr>)
+
+	* adjtimex.c (cmos_read_time): The day-of-week value in the RTC
+	free cycles from 1 to 7. This number is not synced with other RTC
+	date values, but is only simply incremented at midnight. The day
+	meant is in the eye of the reader, which nearly always just
+	ignores the value. Most common assumption is that 1 means
+	Sunday. (Thanks to Alain Guibert <alguibert@free.fr>)
+
+	* adjtimex.c (compare): In case of absence of /etc/adjtime, do not
+	fail, and do not force users to manually create it with 0.0
+	content. Instead, proceed assuming zero values (meaning RTC does
+	not drift). Also replace redundant code by a call to
+	get_cmos_adjustment().  (Thanks to Alain Guibert
+	<alguibert@free.fr>
+
+
+2007-10-05  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+	* adjtimex.c (busy_wait): timestamp more closely the RTC clock
+	beat (thanks to Alain Guibert <alguibert at free.fr>, see Debian
+	bug#443814).
+	(usage): --directisa switch forces adjtimex to poll the
+	update-in-process (UIP) flag of the CMOS clock (thanks to Alain
+	Guibert <alguibert at free.fr>, see Debian bug#443773).
+
 2007-09-23  James R. Van Zandt  <jrv@vanzandt.comcast.net>
 
 	* adjtimex.c (log_times): fix these bugs in ntpdate output
 	interpretation (per Debian bug#438718):
         adjtimex has a bug in evaluating the output of ntpdate, because
-        1. it assumes ntpdate outputs "adjust time server", but ntpdate may output "step time server" also
-        2. it doesnt stop at last line but as soon as it has found "filter offset:" lines,
-          and because of this it will not find the "offset ..." information in the last line.
+        1. it assumes ntpdate outputs "adjust time server", but ntpdate
+	may output "step time server" also
+        2. it doesnt stop at last line but as soon as it has found "filter
+	  offset:" lines, and because of this it will not find the "offset
+	  ..." information in the last line.
 
 2006-10-07  James R. Van Zandt  <jrv@vanzandt.comcast.net>
 
@@ -72,7 +111,7 @@
 	* adjtimex.c (compare): Adjust CMOS times by + or - 60 min, if
 	that brings them closer to the system time.  If they still differ
 	by more than 6 min, then print a warning and suppress logging.
-	(Thanks to Alain Guibert <derogaton at oreka.com> for noting that
+	(Thanks to Alain Guibert <alguibert at free.fr> for noting that
 	summer time start/end can impact the log.)
 
 2006-05-21  James R. Van Zandt  <jrv at debian.org>
@@ -92,8 +131,8 @@
 
 	* adjtimex.c (compare): in "compare" or "adjust", return
 	immediately after printing last result (instead of sleeping an
-	extra $interval seconds) (Thanks to Alain Guibert <derogaton at
-	oreka.com>)
+	extra $interval seconds) (Thanks to Alain Guibert <alguibert at
+	free.fr>)
 
 2004-09-11  James R. Van Zandt  <jrv at debian.org>
 
@@ -119,12 +158,12 @@
 	* adjtimex.c (usage): Don't split strings across lines.
 	(main): --reset switch enables resetting of status (no longer
 	default action, because it's not needed by recent kernels) (thanks
-	to Alain Guibert <derogaton at oreka.com>)
+	to Alain Guibert <alguibert at free.fr>)
 
 2004-04-09  James R. Van Zandt  <jrv at debian.org>
 
 	* adjtimex.c (longopt): --status switch sets clock status
-	(courtesy of Alain Guibert <derogaton at oreka.com>
+	(courtesy of Alain Guibert <alguibert at free.fr>
 	
 2004-04-04  James R. Van Zandt  <jrv at debian.org>
 

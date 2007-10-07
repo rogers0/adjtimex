@@ -115,6 +115,8 @@ follow.
 \-\-review[=\fIfile\fP]
 \-u
 \-\-utc
+\-d
+\-\-directisa
 .TP
 \fBInformative Output\fP
 \-\-help
@@ -263,6 +265,21 @@ Set the interval in seconds between clock comparisons for the
 \fB\-\-compare\fP and \fB\-\-adjust\fP options.
 .IP "\fB\-u\fP, \fB\-\-utc\fP"
 The CMOS clock is set to UTC (universal time) rather than local time.
+.IP "\fB\-d\fP, \fB\-\-directisa\fP"
+To read the CMOS clock accurately, \fBadjtimex\fP usually accesses the
+clock via the /dev/rtc device driver of the kernel, and makes use of its
+CMOS update-ended interrupt to detect the beginning of seconds. When the
+/dev/rtc driver is absent, or when the interrupt is not available,
+\fBadjtimex\fP can sometimes automatically fallback to a direct access
+method. This method detects the start of seconds by polling the
+update\-in\-progress (UIP) flag of the CMOS clock. You can force this
+direct access to the CMOS chip with the \fB\-\-directisa\fP switch.
+
+Note that the /dev/rtc interrupt method is more accurate, less sensible
+to perturbations due to system load, cleaner, cheaper, and is generally
+better than the direct access method. It is advisable to not use the
+\fB\-\-directisa\fP switch, unless the CMOS chip or the motherboard
+don't properly provide the necessary interrupt.
 .IP "\fB\-l\fP[\fIfile\fP], \fB\-\-log\fP[\fB=\fP\fIfile\fP]"
 Save the current values of the system and CMOS clocks, and optionally
 a reference time, to \fIfile\fP (default \fI/var/log/clocks.log\fP).

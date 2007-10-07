@@ -1,7 +1,7 @@
 Begin3
 Title:		adjtimex - display or set the kernel time variables
 Version:	1.22
-Entered-date:	23SEP07
+Entered-date:	05OCT07
 Description:	Adjusts the system clock
 Keywords:	time, system clock, hardware clock
 Author:		ssd@nevets.oau.org (Steven S. Dick) 

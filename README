@@ -54,13 +54,13 @@ change the time.
 
 USAGE
 
-Create /etc/adjtime, which is used by clock(8) and hwclock(8) to
-correct for systematic error in the RTC.  Set it up as explained in
-the man page for each program.  clock is included (along with a lot of
-other useful utilities) in Rik Faith's collection:
-sunsite.unc.edu:pub/Linux/system/Misc/util-linux-1.10.tar.gz If your
-RTC is already accurate enough to suit you, just create a file
-/etc/adjtime containing as the first and only line: '0.0 0 0.0'.
+The file /etc/adjtime is used to correct for systematic error in the
+RTC.  Set it up as explained in the man page for hwclock(8).  Otherwise,
+without /etc/adjtime, adjtimex assumes that the RTC is already perfect.
+The latest version of hwclock(8) from Bryan Henderson can be found at
+<URL:http://giraffe-data.com/software/about_hwclock.html>.  An older
+version is included (along with a lot of other useful utilities) in the
+util-linux collection.
 
 I'll explain the manual procedure first.
 

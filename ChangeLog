@@ -1,3 +1,42 @@
+2008-04-04  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+	* Makefile (VERSION): version 1.24
+
+	* adjtimex.c: Reorganize cmos_read_time() to properly integrate
+	the fallback case for when /dev/rtc has no interrupts. Make this
+	fallback actually work. fixes partially(?) Debian bug #460065 as
+	by proposed solution #1 (Thanks to Alain Guibert
+	<alguibert@free.fr>) (closes:Bug#471203)
+
+	(cmos_read_time): Fix Y2K bug: read century from byte 50, instead
+	of assuming we're in the range 1969-2068.
+
+	(busywait_second_change) When /dev/rtc interrupt is
+	not available, fallbacks to loops around ioctl(RTC_RD_TIME) until
+	the RTC second changes. Patch applies to adjtimex 1.23 above first
+	no-interrupt-fallback.patch fixes partially(?) Debian bug #460065
+	as by proposed solution #3 (Thanks to: Alain Guibert
+	<alguibert@free.fr>)
+
+	(cmos_read_time) If /dev/rtc does not exist then automatically
+	fallback to /dev/rtc0, so it works even without symlink. (Thanks
+	to: Alain Guibert <alguibert@free.fr>)
+	
+2008-04-03  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+	* adjtimex.c (main): fix typo in options handling (thanks to
+	Miroslav Lichvar <mlichvar@redhat.com>)
+
+2008-02-07  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+	* adjtimex.c (log_times): Convert some fprintf writes to perror,
+	add "adjtimex: " to several perror messages.
+
+2008-02-01  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+	* adjtimex.c: (cmos_read_time): use select() to avoid blocking even
+	if /dev/rtc never becomes readable.
+
 2007-10-06  James R. Van Zandt  <jrv@vanzandt.comcast.net>
 
 	* Makefile.in (VERSION): version 1.23

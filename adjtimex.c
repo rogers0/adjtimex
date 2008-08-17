@@ -31,6 +31,7 @@
 #include <sys/types.h>
 #include <syscall.h>
 #include <time.h>
+#include <signal.h>
 #include <unistd.h>
 #include <utmp.h>
 #include <fcntl.h>
@@ -65,6 +66,8 @@ static int using_dev_rtc = -1;	/* 0 = not using /dev/rtc
 				 1 = using /dev/rtc
 				-1 = will use /dev/rtc if available,
 				     but have not tried to open it yet */
+static int nointerrupt = 0;	/* 0 = try to detect RTC tick via interrupt
+				   1 = via another method */
 
 struct hack {
   double ref;			/* reference time for time hack */
@@ -122,6 +125,7 @@ struct option longopt[]=
   {"tick", 1, NULL, 't'},
   {"utc", 0, NULL, 'u'},
   {"directisa", 0, NULL, 'd'},
+  {"nointerrupt", 0, NULL, 'n'},
   {"version", 0, NULL, 'v'},
   {"verbose", 0, NULL, 'V'},
   {"watch", 0, NULL, 'w'},
@@ -209,6 +213,7 @@ usage(void)
 "       -r, --review[=file]       review clock log file, estimate drifts\n"
 "       -u, --utc                 the CMOS clock is set to UTC\n"
 "       -d, --directisa           access the CMOS clock directly\n"
+"       -n, --nointerrupt         bypass the CMOS clock interrupt access method\n"
 "\n"
 "Informative Output:\n"
 "           --help                print this help, then exit\n"
@@ -376,6 +381,9 @@ main(int argc, char *argv[])
 	  case 'd':
 	    using_dev_rtc = 0;
 	    break;
+	  case 'n':
+	    nointerrupt = 1;
+	    break;
 	  case 'v':
 	    {
 	      printf("adjtimex %s\n", VERSION);
@@ -530,39 +538,54 @@ inb (short port)
 /*
  * Main initialisation of CMOS clock access methods, for all modes.
  * Set the global variable cmos_device to the first available RTC device
- * driver filename between /dev/rtc and /dev/rtc0, and set cmos_fd to
+ * driver filename (/dev/rtc, /dev/rtc0, etc.), and set cmos_fd to
  * a file descriptor for it.
  * Failing that, select and initialize direct I/O ports mode.
  */
 static
 void cmos_init ()
 {
+/*
+ following explanation taken from hwclock sources:
+ /dev/rtc is conventionally chardev 10/135
+ ia64 uses /dev/efirtc, chardev 10/136
+ devfs (obsolete) used /dev/misc/... for miscdev
+ new RTC framework + udev uses dynamic major and /dev/rtc0.../dev/rtcN
+*/
+  char *fls[] = {
+#ifdef __ia64__
+    "/dev/efirtc",
+    "/dev/misc/efirtc",
+#endif
+    "/dev/rtc",
+    "/dev/rtc0",
+    "/dev/misc/rtc",
+    NULL
+  };
+  char **p=fls;
+
   if (using_dev_rtc < 0)
     {
-      cmos_device = "/dev/rtc";
-      cmos_fd = open (cmos_device, O_RDONLY);
-      if (cmos_fd >= 0)
+      while ((cmos_device=*p++))
 	{
+	  cmos_fd = open (cmos_device, O_RDONLY);
+	  if (cmos_fd >= 0)
+	    {
+	      if(verbose)
+		fprintf (stdout, "opened %s for reading\n", cmos_device);
+	      using_dev_rtc = 1;
+	      return;
+	    }
 	  if(verbose)
-	    fprintf (stdout, "opened %s for reading\n", cmos_device);
-	  using_dev_rtc = 1;
-	  return;
+	    {
+	      int saveerr=errno;
+	      fprintf (stdout, "adjtimex: cannot open %s for reading\n", 
+		       cmos_device);
+	      errno = saveerr;
+	      perror("adjtimex");
+	    }
 	}
-      if(verbose)
-	fprintf (stdout, "cannot open %s for reading\n", cmos_device);
 
-      /* falback on /dev/rtc0 */
-      cmos_device = "/dev/rtc0";
-      cmos_fd = open (cmos_device, O_RDONLY);
-      if (cmos_fd >= 0)
-	{
-	  if(verbose)
-	    fprintf (stdout, "opened %s for reading\n", cmos_device);
-	  using_dev_rtc = 1;
-	  return;
-	}
-      if(verbose)
-	fprintf (stdout, "cannot open %s for reading\n", cmos_device);
       using_dev_rtc = 0;
     }
   else if (using_dev_rtc > 0)
@@ -587,7 +610,7 @@ void cmos_init_directisa ()
 
   if (ioperm (0x70, 2, 1))
     {
-      fprintf (stderr, "clock: unable to get I/O port access\n");
+      fprintf (stderr, "adjtimex: unable to get I/O port access\n");
       exit (1);
     }
 #else
@@ -601,7 +624,7 @@ void cmos_init_directisa ()
     port_fd = open ("/dev/port", O_RDWR);
   if (port_fd < 0)
     {
-      perror ("unable to open /dev/port read/write : ");
+      perror ("adjtimex: unable to open /dev/port read/write");
       exit (1);
     }
   if (verbose)
@@ -609,7 +632,7 @@ void cmos_init_directisa ()
 
   if (lseek (port_fd, 0x70, 0) < 0 || lseek (port_fd, 0x71, 0) < 0)
     {
-      perror ("unable to seek port 0x70 in /dev/port : ");
+      perror ("adjtimex: unable to seek port 0x70 in /dev/port");
       exit (1);
     }
 #endif
@@ -626,6 +649,41 @@ cmos_read_bcd (int addr)
   return (b & 15) + (b >> 4) * 10;
 }
 
+static int timeout;	/* An alarm signal has occurred */
+
+static void
+alarm_handler (int const dummy) {
+  timeout = 1;
+}
+
+/*
+ * starts (or cancels) a 2 second timeout period
+ * the global boolean timeout indicates that the timeout has been reached
+ */
+static void
+alarm_timeout (int onoff) {
+  static struct sigaction oldaction;
+
+  if (onoff)
+    {
+      struct sigaction action;
+
+      action.sa_handler = &alarm_handler;
+      sigemptyset(&action.sa_mask);
+      action.sa_flags = 0;
+      sigaction(SIGALRM, &action, &oldaction);	/* Install our signal handler */
+
+      timeout = 0;	/* reset global timeout flag */
+      alarm(2);		/* generate SIGALARM 2 seconds from now */
+    }
+  else
+    {
+      alarm(0);					/* cancel alarm */
+      sigaction(SIGALRM, &oldaction, NULL);	/* remove our signal handler */
+    }
+}
+
+
 /* return CMOS time in CMOS_TIMEP and sytem time in SYSP.  cmos_init()
    must have been called before this function. */
 static void
@@ -638,60 +696,130 @@ cmos_read_time (time_t *cmos_timep, double *sysp)
   time_t cmos_time;
   struct timeval now;
   int noint_fallback = 1;	/* detect tick by 0 => uip, 1 => time change */
+  int got_tick = 0;
+  int got_time = 0;
+  int saveerr;
 
   if (using_dev_rtc > 0)	/* access the CMOS clock thru /dev/rtc */
     {
-      ioctl (cmos_fd, RTC_PIE_OFF, NULL); /* disable periodic interrupts */
-      rc = ioctl (cmos_fd, RTC_UIE_ON, NULL); /* enable update
-					       complete interrupts */
-      if (rc == -1)	/* no interrupts? fallback to busywait */
+      if (!nointerrupt)		/* get RTC tick via update interrupt */
 	{
-	  if (verbose)
-	    fprintf(stdout, 
-		    "%s doesn't allow user access to update interrupts\n"
-		    " - using busy wait instead\n", cmos_device);
+	  ioctl (cmos_fd, RTC_PIE_OFF, NULL); /* disable periodic interrupts */
+	  rc = ioctl (cmos_fd, RTC_UIE_ON, NULL); /* enable update
+						     complete interrupts */
+	  if (rc == -1)	/* no interrupts? fallback to busywait */
+	    {
+	      if (verbose)
+		fprintf(stdout, 
+			"%s doesn't allow user access to update interrupts\n"
+			" - using busy wait instead\n", cmos_device);
+	      nointerrupt = 1;
+	    }
+ 	  else		/* wait for update-ended interrupt */
+	    {
+	      unsigned long interrupt_info;
+	      int type_uie, count;
 
+	      if (verbose)
+		fprintf (stdout, "waiting for CMOS update-ended interrupt\n");
+
+	      alarm_timeout(1);	/* arm a 2 seconds timeout */
+
+	      do {
+		rc = read(cmos_fd, &interrupt_info, sizeof(interrupt_info));
+		saveerr = errno;
+		gettimeofday(&now, NULL);
+
+		if (rc == -1)
+		  {
+		    if (saveerr == EINTR && timeout) /* timeout waiting for interrupt? fallback to busywait */
+		      {
+			if (verbose)
+			  fprintf(stdout,
+				  "timeout waiting for a CMOS update interrupt from %s\n"
+				  " - using busy wait instead\n", cmos_device);
+			nointerrupt = 1;
+		      }
+		    else	/* read(/dev/rtc) failed for another reason (not a timeout) */
+		      {
+			char message[128];
+			snprintf(message, sizeof(message),
+				"adjtimex: "
+				"read() from %s to wait for clock tick failed",
+				cmos_device);
+			perror(message);
+			exit(1);
+		      }
+		  }
+
+		type_uie = (int)(interrupt_info & 0x80);
+		count = (int)(interrupt_info >> 8);
+	      } while (((type_uie == 0) || (count > 1)) && !nointerrupt);
+	      /* The low-order byte holds
+		 the interrupt type.  The first read may succeed
+		 immediately, but in that case the byte is zero, so we
+		 know to try again. If there has been more than one
+		 interrupt, then presumably periodic interrupts were
+		 enabled.  We need to try again for just the update
+		 interrupt.  */
+
+	      if ((type_uie) && (count == 1))
+		got_tick = 1;
+
+	      alarm_timeout(0);		/* disable timeout */
+
+	    }	    /* end of successfull RTC_UIE_ON case */
+	}	/* end of interrupt tryouts */
+
+
+      /* At this stage, we either just detected the clock tick via an
+	 update interrupt, or detected nothing yet (interrupts were
+	 bypassed, unavailable, or timeouted). Fallback to busywaiting
+	 for the tick. */
+
+      if (!got_tick)
+	{
 	  if (noint_fallback)
-	    busywait_second_change(&tm, &now);
+	    {
+	      busywait_second_change(&tm, &now);
+	      got_time = 1;
+	    }
 	  else
 	    busywait_uip_fall(&now);
+	  got_tick = 1;
 	}
-      else		/* wait for update-ended interrupt */
+
+
+      /* At this stage, we just detected the clock tick, by any method.
+	 Now get this just beginning RTC second, unless we already have it */
+
+      if (!got_time)
 	{
-	  unsigned long interrupt_info;
-	  int type, count;
+	  rc = ioctl (cmos_fd, RTC_RD_TIME, &tm);
 
-	  if (verbose)
-	    fprintf (stdout, "waiting for CMOS update-ended interrupt\n");
+	  /* RTC_RD_TIME can fail when the device driver detects
+	     that the RTC isn't running or contains invalid data.
+	     Such failure has been detected earlier, unless: We used
+	     noint_fallback=1 to get busywait_uip_fall() as fallback.
+	     Or: UIE interrupts do beat, but RTC is invalid. */
+	  if (rc == -1)
+	    {
+	      char message[128];
+	      snprintf(message, sizeof(message),
+			"adjtimex: "
+			"ioctl(%s, RTC_RD_TIME) to read the CMOS clock failed",
+			cmos_device);
+	      perror(message);
+	      exit(1);
+	    }
+	}
 
-	  do {
-	    rc = read(cmos_fd, &interrupt_info, sizeof(interrupt_info));
-	    gettimeofday(&now, NULL);
 
-	    if (rc == -1)
-	      {
-		char message[128];
-		snprintf(message, sizeof(message),
-			"read() from %s to wait for clock tick failed", cmos_device);
-		perror(message);
-		exit(1);
-	      }
-	    type = (int)(interrupt_info & 0xff);
-	    count = (int)(interrupt_info >> 8);
-	  } while ((type==0)||(count>1));	/* The low-order byte holds
-		the interrupt type.  The first read may succeed
-		immediately, but in that case the byte is zero, so we
-		know to try again. If there has been more than one
-		interrupt, then presumably periodic interrupts were
-		enabled.  We need to try again for just the update
-		interrupt.  */
-
-	} /* the CMOS clock tick just happened, and has been timestamped */
-
-      /* now get this just beginning RTC second */
-      ioctl (cmos_fd, RTC_RD_TIME, &tm);
-      ioctl (cmos_fd, RTC_UIE_OFF, NULL); /* disable update complete
-					     interrupts */
+      /* disable update complete interrupts
+	 It could seem more natural to do this above, just after we
+	 actually got the interrupt. But better do it here at the end,
+	 after all time-critical operations including the RTC_RD_TIME. */
+      ioctl (cmos_fd, RTC_UIE_OFF, NULL);
     }
   else		/* access the CMOS clock thru I/O ports */
     {
@@ -706,10 +834,10 @@ cmos_read_time (time_t *cmos_timep, double *sysp)
 	  tm.tm_wday = cmos_read_bcd(6)-1;/* RTC uses 1 - 7 for day of the week, 1=Sunday */
 	  tm.tm_mday = cmos_read_bcd (7);
 	  tm.tm_mon = cmos_read_bcd(8)-1; /* RTC uses 1 base */
-	  /* we assume we're not running on a PS/2, where century is in byte 55 */
+	  /* we assume we're not running on a PS/2, where century is
+	     in byte 55 */
 	  tm.tm_year = cmos_read_bcd(9)+100*cmos_read_bcd(50)-1900;
-	}
-      while (tm.tm_sec != cmos_read_bcd (0));
+	} while (tm.tm_sec != cmos_read_bcd (0));
     }
   tm.tm_isdst = -1;		/* don't know whether it's summer time */
 
@@ -792,7 +920,21 @@ cmos_read_time (time_t *cmos_timep, double *sysp)
 }
 
 
-/* busywait for UIP fall and timestamp this event */
+/*
+ * busywait for UIP fall and timestamp this event
+ *
+ * Maintainance note: In order to detect its fall, we first have to
+ * detect the update-in-progress flag up state. This UIP up state lasts
+ * for 2 ms each second. Detecting a 2 ms event, when other processes
+ * can steal us one or several 10 ms timeslices, this is something that
+ * can very easely fail. We *can* miss a second tick, or even several in
+ * a row, under heavy system load. Missing ticks is not a severe problem
+ * for adjtimex, as long as we timestamp accurately the tick we'll
+ * finally catch. However there is a timeout issue: we can't just arm an
+ * alarm_timeout() for 2 seconds, as when waiting for UIE interrupts and
+ * in busywait_second_change(), because it would make us hard fail after
+ * only one or two missed ticks.
+ */
 static void
 busywait_uip_fall(struct timeval *timestamp)
 {
@@ -833,7 +975,7 @@ busywait_uip_fall(struct timeval *timestamp)
  *
  * Important note: an ioctl(RTC_RD_TIME) call that happens while the RTC
  * is updating itself (UIP up, a 2 milliseconds long event) will block.
- * Properly block until UIP release on recent Linux kernels since 2.6.16.
+ * Properly block until UIP release on recent Linux kernels since 2.6.13.
  * However all older Linux kernels had a misfeature: they blocked much
  * longer than necessary, up to 20 ms longer in the worst case.
  * The method used here cannot detect precisely the CMOS clock tick on
@@ -845,18 +987,54 @@ static void
 busywait_second_change(struct tm *cmos, struct timeval *timestamp)
 {
   struct tm begin;
+  int rc;
 
   if (verbose)
     fprintf (stdout, "waiting for CMOS time change\n");
 
-  /* pick the time, then loop until it changes */
-  ioctl (cmos_fd, RTC_RD_TIME, &begin);
+  alarm_timeout(1);	/* arm a 2 seconds timeout */
+
+  /* pick a reference time */
+  rc = ioctl (cmos_fd, RTC_RD_TIME, &begin);
+
+  /* RTC_RD_TIME can fail when the device driver detects
+     that the RTC isn't running or contains invalid data */
+  if (rc == -1)
+    {
+      char message[128];
+      snprintf(message, sizeof(message),
+		"adjtimex: "
+		"ioctl(%s, RTC_RD_TIME) to read the CMOS clock failed",
+		cmos_device);
+      perror(message);
+      exit(1);
+    }
+
+  /* loop until time changes */
   do
     {
       ioctl (cmos_fd, RTC_RD_TIME, cmos);
     }
-  while (cmos->tm_sec == begin.tm_sec);
+  while ((cmos->tm_sec == begin.tm_sec) && !timeout);
   gettimeofday(timestamp, NULL);
+
+  alarm_timeout(0);	/* disable timeout */
+
+  /* Sometimes the RTC isn't running, but the device driver didn't
+     notice. Then the RTC_RD_TIME call succeeds, but provides us some
+     static wrong time. That's why we needed an alarm timeout */
+
+  /* timeout without a change? */
+  if (cmos->tm_sec == begin.tm_sec)
+    {
+      fprintf(stderr,
+		"adjtimex: timeout waiting for CMOS time change on %s\n"
+		"The CMOS clock appears to be stopped:\n"
+		"Please try to set and restart it with hwclock --systohc\n",
+		cmos_device);
+      exit (1);
+    }
+
 }
 
 static inline void 

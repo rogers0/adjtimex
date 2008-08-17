@@ -3,7 +3,7 @@ Section: admin
 Priority: optional
 Maintainer: James R. Van Zandt <jrv@debian.org>
 Build-Depends: debhelper (>= 5), po-debconf
-Standards-Version: 3.7.3
+Standards-Version: 3.8.0
 
 Package: adjtimex
 Architecture: any

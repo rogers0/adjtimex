@@ -2,9 +2,9 @@
 #### Start of system configuration section.             -*-makefile-*- ####
  srcdir = .
 
-VERSION=1.23
+VERSION=1.26
 
-CFLAGS = -g -O2 -Wall
+CFLAGS = -Wall -g -O2 -Wall
 prefix = /usr
 man1dir=${prefix}/share/man/man1
 exec_prefix = ${prefix}
@@ -25,15 +25,15 @@ SRC = adjtimex.c adjtimex.8 mat.c mat.h install-sh configure.in		\
  configure Makefile.in README README.ru adjtimex.lsm adjtimex.lsm.in	\
  COPYING COPYRIGHT ChangeLog
 
-all: adjtimex adjtimex.lsm
+all: adjtimex adjtimex.lsm Makefile
 
 adjtimex: adjtimex.c mat.o
 	$(CC) $(CFLAGS) -I. -DVERSION=\"$(VERSION)\" -o adjtimex adjtimex.c  \
 		mat.o -lm
 
-adjtimex.lsm: adjtimex.lsm.in Makefile.in
-	sed -e 's/@VERSION@/$(VERSION)/'		\
-	  -e "s/@DATE@/`date +%d%b%y|tr [a-z] [A-Z]`/"	\
+adjtimex.lsm: adjtimex.lsm.in Makefile
+	sed -e 's/@VERSION@/$(VERSION)/'	\
+	  -e "s/@DATE@/`date +%Y-%m-%d`/"	\
 	  adjtimex.lsm.in >adjtimex.lsm
 
 mat.o: mat.c
@@ -68,3 +68,6 @@ dist: $(SRC)
 	chmod -R a+rX $$distname;					      \
 	tar -chz -f $$distname.tar.gz $$distname;			      \
 	rm -fr $$distname
+
+Makefile: Makefile.in
+	./configure

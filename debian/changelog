@@ -1,3 +1,27 @@
+adjtimex (1.26-1) unstable; urgency=low
+
+  * New upstream release. Fix a possible hang with the Intersil ISL1208,
+    one of those new non-PC-compatible RTCs. Cleanly exits with an error
+    message, instead of either hang or returning garbage. (Thanks to Alain
+    Guibert).
+  
+  * debian/control: bump Debian policy version to 3.8.0 (no changes needed)
+  
+  * debian/rules: use "filter" instead of "findstring" to parse
+    DEB_BUILD_OPTIONS.
+
+ -- James R. Van Zandt <jrv@debian.org>  Sun, 17 Aug 2008 17:52:14 -0400
+
+adjtimex (1.25-1) unstable; urgency=low
+
+  * New upstream release.  Set an alarm to avoid blocking even if /dev/rtc
+    never becomes readable, then fall back to busywait. New --nointerrupt
+    option to force busywait without first waiting for the interrupt
+    timeout (thanks to Alain Guibert). (closes:Bug#477637,Bug#474337).
+    Update man page (closes:Bug#435956).
+
+ -- James R. Van Zandt <jrv@debian.org>  Fri, 08 Aug 2008 19:43:38 -0400
+
 adjtimex (1.24-1) unstable; urgency=low
 
   * New upstream release

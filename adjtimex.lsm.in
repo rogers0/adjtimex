@@ -1,13 +1,23 @@
-Begin3
+Begin4
 Title:		adjtimex - display or set the kernel time variables
 Version:	@VERSION@
 Entered-date:	@DATE@
-Description:	Adjusts the system clock
+Description:	Display or set the kernel time variables.
+This program gives you raw access to the kernel time variables.  For
+a machine connected to the Internet, or equipped with a precision
+oscillator or radio clock, the best way to keep the system clock
+correct is with ntpd.  However, for a standalone or intermittently
+connected machine, you may use adjtimex instead to at least correct
+for systematic drift.  adjtimex can optionally adjust the system
+clock using the CMOS clock as a reference, and can log times for
+long-term estimation of drift rates.
 Keywords:	time, system clock, hardware clock
 Author:		ssd@nevets.oau.org (Steven S. Dick) 
-Maintained-by:  jrv@removeme.comcast.net (Jim Van Zandt)
-Primary-site:	sunsite.unc.edu /pub/Linux/utils/administration
-		47k adjtimex-@VERSION@.tar.gz
+Maintained-by:  jrvz@removeme.comcast.net (Jim Van Zandt)
+Primary-site:	metalab.unc.edu /pub/Linux/system/admin/time
+		59k adjtimex-@VERSION@.tar.gz
+Alternate-site: 
+Original-site:
 Platforms:	Linux
 Copying-policy:	GPL
 End

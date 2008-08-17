@@ -1,3 +1,36 @@
+2008-08-17  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+	* Makefile.in (VERSION): Write ISO8601 format data to .lsm file.
+	Include commands to build Makefile (i.e. ./configure).  version
+	1.26
+
+	* adjtimex.c (cmos_read_time): Fix a possible hang with the
+	Intersil ISL1208, one of those new non-PC-compatible RTCs.
+	Cleanly exits with an error message, instead of either hang or
+	returning garbage. (Thanks to Alain Guibert).
+
+	* adjtimex.lsm.in: Revise description, update file size.
+
+2008-08-07  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+	* Makefile.in (VERSION): version 1.25
+
+	* adjtimex.8: document new --nointerrupt option
+
+2008-08-07  James R. Van Zandt  <jrvz@comcast.net>
+
+	* adjtimex.8: Kernels through 2.6 are still using the same
+	adjtimex status values.  Mention new /dev file names.
+
+	* adjtimex.c (cmos_init): try alternate ia64 and devfs device
+	names (courtesy of hwclock sources).
+
+	* adjtimex.c (cmos_read_time): Set an alarm to avoid blocking even
+	if /dev/rtc never becomes readable, then fall back to
+	busywait_second_change(). New --nointerrupt option to force
+	busywait without waiting for the interrupt timeout (thanks to
+	Alain Guibert).
+
 2008-04-04  James R. Van Zandt  <jrv@vanzandt.comcast.net>
 
 	* Makefile (VERSION): version 1.24

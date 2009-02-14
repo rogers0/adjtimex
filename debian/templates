@@ -9,7 +9,7 @@ _Description: Should adjtimex be run at installation and at every startup?
 Template: adjtimex/compare_rtc
 Type: boolean
 Default: true
-_Description: Should adjtimexconfig be run at installation time?
+_Description: Should adjtimexconfig be run when adjtimex is installed or upgraded?
  The adjtimexconfig script will use adjtimex to find values for the kernel
  variables tick and frequency that will make the system clock approximately
  agree with the hardware clock (also known as the CMOS clock).  It then

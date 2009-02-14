@@ -103,7 +103,7 @@ case "$1" in
 
 	db_get adjtimex/compare_rtc
 	if [ "$RET" = "true" ]; then
-	    /usr/sbin/adjtimexconfig
+	    adjtimexconfig
 	fi
 
 	;;

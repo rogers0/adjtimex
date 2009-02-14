@@ -1,3 +1,16 @@
+adjtimex (1.26-2) unstable; urgency=low
+
+  * debian/templates: Clarify wording: ask about running "when installed
+    or upgraded" not just "at installation time" (thanks to Uwe Storbeck
+    <uwe@ibr.ch> and Michael Meskes <meskes@debian.org>,
+    Closes:Bug#514987)
+  
+  * debian/postinst: don't prepend path to command running adjtimexconfig
+    to silence lintian complaint.  (The package management system already
+    puts /usr/sbin in path, because that's where install-info is.)
+
+ -- James R. Van Zandt <jrv@debian.org>  Sat, 14 Feb 2009 11:46:24 -0500
+
 adjtimex (1.26-1) unstable; urgency=low
 
   * New upstream release. Fix a possible hang with the Intersil ISL1208,

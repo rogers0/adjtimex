@@ -1,12 +1,12 @@
 # Vietnamese Translation for adjtimex.
 # Copyright © 2005 Free Software Foundation, Inc.
 # Clytie Siddall <clytie@riverland.net.au>, 2005.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: adjtimex 1.20-4\n"
-"Report-Msgid-Bugs-To: jrv@debian.org\n"
-"POT-Creation-Date: 2007-08-06 21:41-0400\n"
+"Report-Msgid-Bugs-To: adjtimex@packages.debian.org\n"
+"POT-Creation-Date: 2009-02-14 11:47-0500\n"
 "PO-Revision-Date: 2005-05-04 15:44+0930\n"
 "Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
 "Language-Team: Vietnamese <gnomevi-list@lists.sourceforge.net>\n"
@@ -38,7 +38,9 @@ msgstr ""
 #. Type: boolean
 #. Description
 #: ../templates:2001
-msgid "Should adjtimexconfig be run at installation time?"
+#, fuzzy
+#| msgid "Should adjtimexconfig be run at installation time?"
+msgid "Should adjtimexconfig be run when adjtimex is installed or upgraded?"
 msgstr "Bạn có muốn chạy tập lệnh adjtimexconfig khi cài đặt không?"
 
 #. Type: boolean

@@ -16,8 +16,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: fr\n"
-"Report-Msgid-Bugs-To: jrv@debian.org\n"
-"POT-Creation-Date: 2007-08-06 21:41-0400\n"
+"Report-Msgid-Bugs-To: adjtimex@packages.debian.org\n"
+"POT-Creation-Date: 2009-02-14 11:47-0500\n"
 "PO-Revision-Date: 2006-12-17 14:01+0100\n"
 "Last-Translator: Christian Perrier <bubulle@debian.org>\n"
 "Language-Team: French <debian-l10n-french@lists.debian.org>\n"
@@ -50,7 +50,9 @@ msgstr ""
 #. Type: boolean
 #. Description
 #: ../templates:2001
-msgid "Should adjtimexconfig be run at installation time?"
+#, fuzzy
+#| msgid "Should adjtimexconfig be run at installation time?"
+msgid "Should adjtimexconfig be run when adjtimex is installed or upgraded?"
 msgstr "Faut-il lancer adjtimexconfig lors de l'installation ?"
 
 #. Type: boolean
@@ -64,12 +66,12 @@ msgid ""
 "will be restored on every boot, when /etc/init.d/adjtimex runs."
 msgstr ""
 "Le script adjtimexconfig utilise adjtimex afin de trouver les valeurs "
-"appropriées pour les variables du noyau concernant le battement (« tick ») "
-"et la fréquence d'horloge. Cela permettra à l'horloge du système d'être à "
-"peu près en accord avec l'horloge matérielle (parfois appelée « horloge "
-"CMOS »). Ces valeurs seront alors conservées dans le fichier de "
-"configuration /etc/default/adjtimex ce qui permettra de les restaurer à "
-"chaque démarrage quand /etc/init.d/adjtimex s'exécutera. "
+"appropriées pour les variables du noyau concernant le battement (« tick ») et "
+"la fréquence d'horloge. Cela permettra à l'horloge du système d'être à peu "
+"près en accord avec l'horloge matérielle (parfois appelée « horloge CMOS »). "
+"Ces valeurs seront alors conservées dans le fichier de configuration /etc/"
+"default/adjtimex ce qui permettra de les restaurer à chaque démarrage quand /"
+"etc/init.d/adjtimex s'exécutera. "
 
 #. Type: boolean
 #. Description

@@ -3,8 +3,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: adjtimex 1.20-5\n"
-"Report-Msgid-Bugs-To: jrv@debian.org\n"
-"POT-Creation-Date: 2007-08-06 21:41-0400\n"
+"Report-Msgid-Bugs-To: adjtimex@packages.debian.org\n"
+"POT-Creation-Date: 2009-02-14 11:47-0500\n"
 "PO-Revision-Date: 2005-10-27 01:11+0100\n"
 "Last-Translator: Marco Ferra <mferra@sdf.lonestar.org>\n"
 "Language-Team: Portuguese <traduz@debianpt.org>\n"
@@ -36,7 +36,9 @@ msgstr ""
 #. Type: boolean
 #. Description
 #: ../templates:2001
-msgid "Should adjtimexconfig be run at installation time?"
+#, fuzzy
+#| msgid "Should adjtimexconfig be run at installation time?"
+msgid "Should adjtimexconfig be run when adjtimex is installed or upgraded?"
 msgstr "Deve o adjtimexconfig correr enquanto o instala?"
 
 #. Type: boolean

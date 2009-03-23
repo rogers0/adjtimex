@@ -1,3 +1,15 @@
+adjtimex (1.27-1) unstable; urgency=low
+
+  * New upstream release.  If using update interrupt, sanity check the
+    delay.  Sometimes the status includes an update complete flag, but it
+    actually didn't wait.  Fall back to another method of reading RTC
+    (closes:Bug#517732) Calculate RTC correction as PPM of RTC time
+    (Thanks to Alain Guibert, closes:Bug#308863).
+    
+  * debian/control: add ${misc:Depends} per lintian warning.
+  
+ -- James R. Van Zandt <jrv@debian.org>  Sun, 22 Mar 2009 21:54:51 -0400
+
 adjtimex (1.26-2) unstable; urgency=low
 
   * debian/templates: Clarify wording: ask about running "when installed

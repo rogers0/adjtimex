@@ -1,5 +1,5 @@
 .\"{{{  Title                      Emacs major mode should be: -*- nroff -*-
-.TH ADJTIMEX 8 "August 7, 2008"
+.TH ADJTIMEX 8 "March 11, 2009"
 .\"}}}
 .\"{{{  Name
 .SH NAME
@@ -262,6 +262,9 @@ By itself, same as \fB\-\-compare\fP, except the recommended values are
 actually installed after every third comparison.  With \fB\-\-review\fP,
 the tick and frequency are set to the least\-squares estimates.  (In
 the latter case, any \fIcount\fP value is ignored.)
+.IP "\fB\-\-force\-adjust\fP"
+Override the sanity check that prevents changing the clock rate by
+more than 500 ppm.
 .IP "\fB\-i\fP \fItim\fP, \fB\-\-interval\fP \fItim\fP"
 Set the interval in seconds between clock comparisons for the
 \fB\-\-compare\fP and \fB\-\-adjust\fP options.

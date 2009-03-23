@@ -1,7 +1,7 @@
 Begin4
 Title:		adjtimex - display or set the kernel time variables
-Version:	1.26
-Entered-date:	2009-02-14
+Version:	1.27
+Entered-date:	2009-03-22
 Description:	Display or set the kernel time variables.
 This program gives you raw access to the kernel time variables.  For
 a machine connected to the Internet, or equipped with a precision
@@ -15,7 +15,7 @@ Keywords:	time, system clock, hardware clock
 Author:		ssd@nevets.oau.org (Steven S. Dick) 
 Maintained-by:  jrvz@removeme.comcast.net (Jim Van Zandt)
 Primary-site:	metalab.unc.edu /pub/Linux/system/admin/time
-		59k adjtimex-1.26.tar.gz
+		59k adjtimex-1.27.tar.gz
 Alternate-site: 
 Original-site:
 Platforms:	Linux

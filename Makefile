@@ -2,7 +2,7 @@
 #### Start of system configuration section.             -*-makefile-*- ####
  srcdir = .
 
-VERSION=1.26
+VERSION=1.27
 
 CFLAGS = -Wall -g -O2 -Wall
 prefix = /usr

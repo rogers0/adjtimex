@@ -7,7 +7,7 @@ Standards-Version: 3.8.0
 
 Package: adjtimex
 Architecture: any
-Depends: ${shlibs:Depends}, debconf | debconf-2.0
+Depends:  ${misc:Depends}, ${shlibs:Depends}, debconf | debconf-2.0
 Suggests: ntpdate
 Description: Utility to display or set the kernel time variables
  This program gives you raw access to the kernel time variables.  For

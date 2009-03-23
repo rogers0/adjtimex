@@ -1,34 +1,33 @@
-#
+# 
 #    Translators, if you are not familiar with the PO format, gettext
 #    documentation is worth reading, especially sections dedicated to
 #    this format, e.g. by running:
 #         info -n '(gettext)PO Files'
 #         info -n '(gettext)Header Entry'
-#
+# 
 #    Some information specific to po-debconf are available at
 #            /usr/share/doc/po-debconf/README-trans
 #         or http://www.debian.org/intl/l10n/po-debconf/README-trans
-#
+# 
 #    Developers do not need to manually edit POT or PO files.
-#
-#, fuzzy
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: adjtimex 1.26-2\n"
 "Report-Msgid-Bugs-To: adjtimex@packages.debian.org\n"
 "POT-Creation-Date: 2009-02-14 11:47-0500\n"
-"PO-Revision-Date: 2003-11-21 00:02+0900\n"
-"Last-Translator: Hideki Yamane <henrich@samba.gr.jp>\n"
+"PO-Revision-Date: 2009-03-07 00:02+0900\n"
+"Last-Translator: Hideki Yamane (Debian-JP) <henrich@debian.or.jp>\n"
 "Language-Team: Japanese <debian-japanese@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=EUC-JP\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #. Type: boolean
 #. Description
 #: ../templates:1001
 msgid "Should adjtimex be run at installation and at every startup?"
-msgstr "adjtimex ¤ò¥¤¥ó¥¹¥È¡¼¥ë»ş¤ª¤è¤ÓËè²ó¤Îµ¯Æ°»ş¤ËÆ°ºî¤µ¤»¤Ş¤¹¤«?"
+msgstr "adjtimex ã‚’ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«æ™‚ãŠã‚ˆã³æ¯å›ã®èµ·å‹•æ™‚ã«å‹•ä½œã•ã›ã¾ã™ã‹?"
 
 #. Type: boolean
 #. Description
@@ -38,17 +37,17 @@ msgid ""
 "values in /etc/default/adjtimex. Don't accept if you just want to use "
 "adjtimex to inspect the current parameters."
 msgstr ""
-"adjtimex ¤ò¥·¥¹¥Æ¥à¤Îµ¯Æ°»ş¤ËÆ°ºî¤µ¤»¤Æ¥«¡¼¥Í¥ë¤Î»ş´Ö¥Ñ¥é¥á¡¼¥¿¤ò /etc/"
-"default/adjtimex ¤ÎÃÍ¤ËÀßÄê¤¹¤ë¤³¤È¤¬²ÄÇ½¤Ç¤¹¡£ adjtimex ¤ò¸½ºß¤Î¥Ñ¥é¥á¡¼¥¿¤Î"
-"Ä´ºº¤Ë¤À¤±¤Ë»È¤¤¤¿¤¤¤È¤¤¤¦¾ì¹ç¤ÏÆ°ºî¤ò¤µ¤»¤Ê¤¤¤Ç¤¯¤À¤µ¤¤¡£"
+"adjtimex ã‚’ã‚·ã‚¹ãƒ†ãƒ ã®èµ·å‹•æ™‚ã«å‹•ä½œã•ã›ã¦ã‚«ãƒ¼ãƒãƒ«ã®æ™‚é–“ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’ /etc/"
+"default/adjtimex ã®å€¤ã«è¨­å®šã™ã‚‹ã“ã¨ãŒå¯èƒ½ã§ã™ã€‚ adjtimex ã‚’ç¾åœ¨ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®"
+"èª¿æŸ»ã«ã ã‘ã«ä½¿ã„ãŸã„ã¨ã„ã†å ´åˆã¯å‹•ä½œã‚’ã•ã›ãªã„ã§ãã ã•ã„ã€‚"
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
-#, fuzzy
-#| msgid "Should adjtimexconfig be run at installation time?"
 msgid "Should adjtimexconfig be run when adjtimex is installed or upgraded?"
-msgstr "adjtimexconfig ¤ò¥¤¥ó¥¹¥È¡¼¥ë»ş¤ËÆ°ºî¤µ¤»¤Ş¤¹¤«?"
+msgstr ""
+"adjtimexconfig ã‚’ adjtimex ã‚’ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã€ã‚ã‚‹ã„ã¯ã‚¢ãƒƒãƒ—ã‚°ãƒ¬ãƒ¼ãƒ‰ã—ãŸæ™‚ã«å®Ÿè¡Œ"
+"ã—ã¾ã™ã‹?"
 
 #. Type: boolean
 #. Description
@@ -60,11 +59,11 @@ msgid ""
 "these values in the configuration file /etc/default/adjtimex so the settings "
 "will be restored on every boot, when /etc/init.d/adjtimex runs."
 msgstr ""
-"adjtimexconfig ¥¹¥¯¥ê¥×¥È¤Ï adjtimex ¤ò»ÈÍÑ¤·¤Æ¡¢¥·¥¹¥Æ¥à¥¯¥í¥Ã¥¯¤ò¥Ï¡¼¥É¥¦¥§"
-"¥¢¥¯¥í¥Ã¥¯ (CMOS ¥¯¥í¥Ã¥¯¤È¤·¤Æ¤âÃÎ¤é¤ì¤Æ¤¤¤Ş¤¹) ¤È¤ª¤ª¤è¤½Æ±´ü¤¹¤ë¤è¤¦¤Ë¥«¡¼"
-"¥Í¥ëÊÑ¿ô tick ¤È frequency ¤ËÍ¿¤¨¤ëÃÍ¤ò¸«¤Ä¤±¤Ş¤¹¡£¤½¤·¤Æ¡¢¤³¤ÎÃÍ¤òÀßÄê¥Õ¥¡¥¤"
-"¥ë /etc/default/adjtimex ¤ËÊİÂ¸¤¹¤ë¤³¤È¤ÇËè²óµ¯Æ°»ş¤Ë /etc/init.d/adjtimex ¤¬"
-"Æ°ºî¤¹¤ëºİ¤ËÀßÄê¤¬Éü¸µ¤µ¤ì¤Ş¤¹¡£"
+"adjtimexconfig ã‚¹ã‚¯ãƒªãƒ—ãƒˆã¯ adjtimex ã‚’ä½¿ç”¨ã—ã¦ã€ã‚·ã‚¹ãƒ†ãƒ ã‚¯ãƒ­ãƒƒã‚¯ã‚’ãƒãƒ¼ãƒ‰ã‚¦ã‚§"
+"ã‚¢ã‚¯ãƒ­ãƒƒã‚¯ (CMOS ã‚¯ãƒ­ãƒƒã‚¯ã¨ã—ã¦ã‚‚çŸ¥ã‚‰ã‚Œã¦ã„ã¾ã™) ã¨ãŠãŠã‚ˆãåŒæœŸã™ã‚‹ã‚ˆã†ã«ã‚«ãƒ¼"
+"ãƒãƒ«å¤‰æ•° tick ã¨ frequency ã«ä¸ãˆã‚‹å€¤ã‚’è¦‹ã¤ã‘ã¾ã™ã€‚ãã—ã¦ã€ã“ã®å€¤ã‚’è¨­å®šãƒ•ã‚¡ã‚¤"
+"ãƒ« /etc/default/adjtimex ã«ä¿å­˜ã™ã‚‹ã“ã¨ã§æ¯å›èµ·å‹•æ™‚ã« /etc/init.d/adjtimex ãŒ"
+"å‹•ä½œã™ã‚‹éš›ã«è¨­å®šãŒå¾©å…ƒã•ã‚Œã¾ã™ã€‚"
 
 #. Type: boolean
 #. Description
@@ -75,6 +74,6 @@ msgid ""
 "other ways (see the adjtimex man page) and install them in /etc/default/"
 "adjtimex."
 msgstr ""
-"¥¹¥¯¥ê¥×¥È¤ÏÆ°ºî¤Ë 70 ÉÃ¤«¤«¤ê¤Ş¤¹¡£ÊÌ²ò¤È¤·¤Æ¤Ï adjtimexconfig ¤ò¸å¤Û¤É¼Â¹Ô"
-"¤¹¤ë¡¢¤Ş¤¿¤ÏÂ¾¤ÎÊıË¡¤Ç¥«¡¼¥Í¥ëÊÑ¿ô¤ò·è¤á¤Æ (adjtimex ¤Î man ¥Ú¡¼¥¸¤ò»²¾È)  /"
-"etc/default/adjtimex ¤Ø¤ÎÀßÄê¤ò¹Ô¤¦¤Ê¤É¤¬²ÄÇ½¤Ç¤¹¡£"
+"ã‚¹ã‚¯ãƒªãƒ—ãƒˆã¯å‹•ä½œã« 70 ç§’ã‹ã‹ã‚Šã¾ã™ã€‚åˆ¥è§£ã¨ã—ã¦ã¯ adjtimexconfig ã‚’å¾Œã»ã©å®Ÿè¡Œ"
+"ã™ã‚‹ã€ã¾ãŸã¯ä»–ã®æ–¹æ³•ã§ã‚«ãƒ¼ãƒãƒ«å¤‰æ•°ã‚’æ±ºã‚ã¦ (adjtimex ã® man ãƒšãƒ¼ã‚¸ã‚’å‚ç…§)  /"
+"etc/default/adjtimex ã¸ã®è¨­å®šã‚’è¡Œã†ãªã©ãŒå¯èƒ½ã§ã™ã€‚"

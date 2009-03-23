@@ -1,3 +1,49 @@
+2009-03-22  James R. Van Zandt  <jrvz@comcast.net>
+
+	* Makefile.in (VERSION): version 1.27
+
+	* adjtimex.c (review): HELP is an enum instead of a #define.
+
+	* adjtimex.c: Add some training calls to gettimeofday, so
+	following calls will be more accurate (thanks to Alain Guibert
+	<alguibert+bts@free.fr>).
+
+2009-03-14  James R. Van Zandt  <jrvz@comcast.net>
+
+	* adjtimex.c (review): Compute CMOS frequency error in PPM of CMOS
+	time (thanks to Alain Guibert <alguibert+bts@free.fr>).
+	(review): Compute sys_time or the relative error between CMOS and
+	sys_time in PPM of sys_time.
+
+2009-03-14  Alain Guibert <alguibert@free.fr>
+
+	* adjtimex.c (compare, log_times): The first call to
+	gettimeofday() in a process takes longer than usual, and the
+	timestamp taken is a little bit late (up to 200 microseconds).
+	Let's consume this bad call, so that the important timestamps
+	are all coherant at the top of accuracy.
+
+	* (log_times): We don't need the kernel's internal timezone.
+	Let's stop requesting it.
+
+2009-03-11  James R. Van Zandt  <jrvz@comcast.net>
+
+	* adjtimex.8: Document --force-adjust option.
+
+	* adjtimex.c (longopt): --force-adjust overrides +-500 ppm sanity
+	check.  verbose is now a counter, -V increases verbosity.  Require
+	more than one option for several printouts.  Print
+	invalid option characters.  If stating local time, explicitly say
+	with or without summertime adjustment.
+
+2009-03-10  James R. Van Zandt  <jrvz@comcast.net>
+
+	* adjtimex.c (cmos_read_time): use select() instead of a timer to
+	avoid blocking even if /dev/rtc never becomes readable.  (That
+	code was misplaced at some point in the last year.)  If using
+	update interrupt, sanity check the delay.  Sometimes the status
+	includes an update complete flag, but it actually didn't wait.
+
 2008-08-17  James R. Van Zandt  <jrv@vanzandt.comcast.net>
 
 	* Makefile.in (VERSION): Write ISO8601 format data to .lsm file.

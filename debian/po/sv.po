@@ -15,42 +15,53 @@ msgstr ""
 "Project-Id-Version: adjtimex 1.20-5\n"
 "Report-Msgid-Bugs-To: adjtimex@packages.debian.org\n"
 "POT-Creation-Date: 2009-02-14 11:47-0500\n"
-"PO-Revision-Date: 2005-10-11 16:31+0200\n"
-"Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
+"PO-Revision-Date: 2009-04-07 19:46+0100\n"
+"Last-Translator: Martin Bagge <brother@bsnet.se>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #. Type: boolean
 #. Description
 #: ../templates:1001
 msgid "Should adjtimex be run at installation and at every startup?"
-msgstr "Ska adjtimex kˆras vid installation och vid varje uppstart?"
+msgstr "Ska adjtimex k√∂ras vid installation och vid varje uppstart?"
 
 #. Type: boolean
 #. Description
 #: ../templates:1001
+#, fuzzy
+#| msgid ""
+#| "Running adjtimex at system startup will set the kernel time parameters to "
+#| "the values in /etc/default/adjtimex."
 msgid ""
 "adjtimex can run at system startup to set the kernel time parameters to the "
 "values in /etc/default/adjtimex. Don't accept if you just want to use "
 "adjtimex to inspect the current parameters."
 msgstr ""
-"adjtimex kan kˆra vid systemets uppstart fˆr att s‰tta k‰rntidsparametrar "
-"till v‰rdena i /etc/default/adjtimex. Acceptera inte om du bara vill anv‰nda "
-"adjtimex fˆr att inspektera de nuvarande parametrarna."
+"adjtimex kan k√∂ra vid systemets uppstart f√∂r att s√§tta k√§rntidsparametrar "
+"till v√§rdena i /etc/default/adjtimex."
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
 #, fuzzy
-#| msgid "Should adjtimexconfig be run at installation time?"
+#| msgid "Run adjtimexconfig when adjtimex is installed or upgraded?"
 msgid "Should adjtimexconfig be run when adjtimex is installed or upgraded?"
-msgstr "Ska adjtimexconfig kˆras vid installationstid?"
+msgstr "Ska adjtimexconfig n√§r adjtimex installeras eller uppgraderas?"
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
+#, fuzzy
+#| msgid ""
+#| "The adjtimexconfig script will use adjtimex to find values for the kernel "
+#| "variables \"tick\" and \"frequency\" that will make the system clock "
+#| "approximately agree with the hardware clock (also known as the CMOS "
+#| "clock).  It then saves these values in the configuration file /etc/"
+#| "default/adjtimex so the settings will be restored on every boot, when /"
+#| "etc/init.d/adjtimex runs."
 msgid ""
 "The adjtimexconfig script will use adjtimex to find values for the kernel "
 "variables tick and frequency that will make the system clock approximately "
@@ -58,22 +69,40 @@ msgid ""
 "these values in the configuration file /etc/default/adjtimex so the settings "
 "will be restored on every boot, when /etc/init.d/adjtimex runs."
 msgstr ""
-"Skriptet adjtimexconfig kommer att anv‰nda adjtimex fˆr att hitta v‰rden fˆr "
-"k‰rnvariablerna tick och frequency som gˆr att systemklockan kommer ˆverens "
-"med hÂrdvaruklockan (ocksÂ kallad CMOS-klockan).  Den sparar sedan dessa "
-"v‰rden i konfigurationsfilen /etc/default/adjtimex sÂ att inst‰llningarna "
-"kommer att anv‰ndas vid varje uppstart, n‰r /etc/init.d/adjtimex kˆrs."
+"Skriptet adjtimexconfig kommer att anv√§nda adjtimex f√∂r att hitta v√§rden f√∂r "
+"k√§rnvariablerna \"tick\" och \"frequency\" som g√∂r att systemklockan kommer "
+"√∂verens med h√•rdvaruklockan (ocks√• kallad CMOS-klockan).  Den sparar sedan "
+"dessa v√§rden i konfigurationsfilen /etc/default/adjtimex s√• att "
+"inst√§llningarna kommer att anv√§ndas vid varje uppstart, n√§r /etc/init.d/"
+"adjtimex k√∂rs."
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
+#, fuzzy
+#| msgid ""
+#| "The script takes 70 seconds to run, so running it for every upgrade may "
+#| "be a waste of time. Alternatively, you can run adjtimexconfig manually "
+#| "when needed, or determine the kernel variables by using other methods and "
+#| "set them manually in /etc/default/adjtimex."
 msgid ""
 "The script takes 70 sec to run. Alternatively, you can run adjtimexconfig "
 "yourself at a later time, or determine the kernel variables one of several "
 "other ways (see the adjtimex man page) and install them in /etc/default/"
 "adjtimex."
 msgstr ""
-"Skriptet tar 70 sekunder att kˆras. Alternativt kan du kˆra adjtimexconfig "
-"sj‰lv vid en senare tid eller best‰mma variabler fˆr k‰rnan pÂ ett eller "
-"flera s‰tt (se adjtimes manualsida) och installera dom i /etc/default/"
-"adjtimex)."
+"Skriptet tar 70 sekunder att k√∂ra vilket inneb√§r att det kan vara sl√∂seri "
+"med tid att k√∂ra vid varje uppgradering. Alternativt kan du k√∂ra "
+"adjtimexconfig sj√§lv n√§r det beh√∂vs eller best√§mma variabler f√∂r k√§rnan p√• "
+"andra s√§tt och ange dessa i /etc/default/adjtimex."
+
+#~| msgid ""
+#~| "adjtimex can run at system startup to set the kernel time parameters to "
+#~| "the values in /etc/default/adjtimex. Don't accept if you just want to "
+#~| "use adjtimex to inspect the current parameters."
+#~ msgid ""
+#~ "You should not choose this option if you just want to use adjtimex to "
+#~ "inspect the current parameters."
+#~ msgstr ""
+#~ "V√§lj inte detta alternativ om du bara vill anv√§nda adjtimex f√∂r att "
+#~ "inspektera de nuvarande parametrarna."

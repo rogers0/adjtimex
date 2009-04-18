@@ -1,3 +1,18 @@
+2009-04-18  James R. Van Zandt  <jrvz@comcast.net>
+
+	* Makefile.in (VERSION): version 1.27.1
+	Add rules for running autoconf, autoheader, and ./configure.
+	(adjtimex): Depend on Makefile, so it's recompiled if the version
+	number changes.
+	(SRC): include config.h.in
+
+	* adjtimex.c (struct rtc_time): Provide workaround if linux/rtc.h
+	is missing.
+
+	* configure.in: Check for linux/rtc.h, but not limits.h (no longer
+	used), sys/time.h, or unistd.h (there is no workaround implemented).
+	
+
 2009-03-22  James R. Van Zandt  <jrvz@comcast.net>
 
 	* Makefile.in (VERSION): version 1.27
@@ -43,6 +58,7 @@
 	code was misplaced at some point in the last year.)  If using
 	update interrupt, sanity check the delay.  Sometimes the status
 	includes an update complete flag, but it actually didn't wait.
+	Fall back to another method of reading RTC.
 
 2008-08-17  James R. Van Zandt  <jrv@vanzandt.comcast.net>
 

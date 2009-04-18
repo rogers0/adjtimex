@@ -34,7 +34,7 @@ config.status: configure
 	dh_testdir
 	# configure the package.
 	./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
-
+	touch config.h
 
 build: build-stamp
 
@@ -55,7 +55,7 @@ clean:
 	# clean up after the build process.
 	debconf-updatepo
 	[ ! -f Makefile ] || $(MAKE) veryclean
-	rm -rf adjtimex *.o config.*
+	rm -rf adjtimex *.o config.cache config.log config.status
 	-test -r /usr/share/misc/config.sub && \
 	  cp -f /usr/share/misc/config.sub config.sub
 	-test -r /usr/share/misc/config.guess && \

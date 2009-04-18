@@ -1,25 +1,26 @@
-# 2005-10-27 - Marco Ferra <mferra@sdf.lonestar.org> (initial translation)
-# 2009, Carlos Lisboa <carloslisboa@gmail.com>
+# ITALIAN TRANSLATION OF ADJTIMEX'S.PO-DEBCONF FILE
+# COPYRIGHT (C) 2009 THE ADJTIMEX'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the adjtimex package.
 #
+# Vincenzo Campanella <vinz65@gmail.com>, 2009.
 msgid ""
 msgstr ""
-"Project-Id-Version: adjtimex 1.20-5\n"
+"Project-Id-Version: adjtimex 1.26-3\n"
 "Report-Msgid-Bugs-To: adjtimex@packages.debian.org\n"
 "POT-Creation-Date: 2009-02-14 11:47-0500\n"
-"PO-Revision-Date: 2009-04-15 22:00+0100\n"
-"Last-Translator: Carlos Lisboa <carloslisboa@gmail.com>\n"
-"Language-Team: Portuguese <traduz@debianpt.org>\n"
+"PO-Revision-Date: 2009-04-01 14:15+0200\n"
+"Last-Translator: Vincenzo Campanella <vinz65@gmail.com>\n"
+"Language-Team: Italian <tp@lists.linux.it>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
 
 #. Type: boolean
 #. Description
 #: ../templates:1001
 msgid "Should adjtimex be run at installation and at every startup?"
-msgstr ""
-"Deve o adjtimex correr enquanto o instala e depois sempre que o sistema "
-"inicia?"
+msgstr "Eseguire adjtimex all'installazione e con ogni avvio del sistema?"
 
 #. Type: boolean
 #. Description
@@ -33,8 +34,8 @@ msgid ""
 "values in /etc/default/adjtimex. Don't accept if you just want to use "
 "adjtimex to inspect the current parameters."
 msgstr ""
-"Correr o adjtimex no arranque do sistema irá colocar os parâmetros de tempo "
-"do kernel para os valores em /etc/default/adjtimex."
+"L'esecuzione di adjtimex all'avvio del sistema imposter i parametri di tempo "
+"del kernel ai valori contenuti in /etc/default/adjtimex."
 
 #. Type: boolean
 #. Description
@@ -42,7 +43,7 @@ msgstr ""
 #, fuzzy
 #| msgid "Run adjtimexconfig when adjtimex is installed or upgraded?"
 msgid "Should adjtimexconfig be run when adjtimex is installed or upgraded?"
-msgstr "Correr o adjtimexconfig quando o adjtimex é instalado ou actualizado?"
+msgstr "Eseguire adjtimexconfig quando adjtimex viene installato o aggiornato?"
 
 #. Type: boolean
 #. Description
@@ -62,12 +63,12 @@ msgid ""
 "these values in the configuration file /etc/default/adjtimex so the settings "
 "will be restored on every boot, when /etc/init.d/adjtimex runs."
 msgstr ""
-"O script adjtimexconfig irá usar adjtimex para encontrar valores para as "
-"variáveis do kernel \"tick\" e \"frequency\" que irão tornar o relógio do "
-"sistema em concordância com o relógio de hardware (também conhecido por "
-"relógio CMOS). Irá então guardar os valores no ficheiro de configuração /etc/"
-"default/adjtimex para que as configurações sejam restauradas em cada "
-"arranque, quando o /etc/init.d/adjtimex é corrido."
+"Lo script adjtimexconfig user adjtimex per trovare i valori delle variabili "
+"del kernel tick e frequency per fare in modo che l'orario del sistema "
+"coincida approssimativamente a quello dell'orologio dell'hardware (anche "
+"conosciuto come orologio CMOS). Questi valori vengono poi salvati nel file "
+"di configurazione /etc/default/adjtimex, in modo che le impostazioni vengano "
+"ripristinate a ogni avvio, quando /etc/init.d/adjtimex viene eseguito."
 
 #. Type: boolean
 #. Description
@@ -84,15 +85,15 @@ msgid ""
 "other ways (see the adjtimex man page) and install them in /etc/default/"
 "adjtimex."
 msgstr ""
-"Este script demora 70 segundos a correr, podendo ser um desperdício de tempo "
-"corrê-lo em cada actualização. Como alternativa, pode correr o "
-"adjtimexconfig manualmente quando necessário, ou determine as variáveis do "
-"kernel usando outro método e configure-as manualmente em /etc/default/"
-"adjtimex."
+"Lo script necessita di 70 secondi per essere eseguito, per cui lanciarlo a "
+"ogni aggiornamento potrebbe essere uno spreco di tempo. In alternativa  "
+"possibile eseguire manualmente adjtimexconfig quando  necessario, oppure "
+"determinare le variabili del kernel usando altri metodi e impostandole "
+"manualmente in /etc/default/adjtimex."
 
 #~ msgid ""
 #~ "You should not choose this option if you just want to use adjtimex to "
 #~ "inspect the current parameters."
 #~ msgstr ""
-#~ "Não deve escolher esta opção se apenas deseja usar o adjtimex para "
-#~ "verificar os parâmetros actuais."
+#~ "Non si dovrebbe scegliere questa opzione se si prevede di usare adjtimex "
+#~ "solo per verificare i parametri attuali."

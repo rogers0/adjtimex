@@ -4,9 +4,9 @@ VPATH = .
 
 VERSION=1.27.1
 
-CFLAGS = -g -O2 -Wall
-prefix = /usr/local
-man1dir=${datarootdir}/man/man1
+CFLAGS = -Wall -g -O2 -Wall
+prefix = /usr
+man1dir=${prefix}/share/man/man1
 exec_prefix = ${prefix}
 bindir=/sbin
 datadir = ${datarootdir}

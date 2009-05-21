@@ -1,3 +1,12 @@
+adjtimex (1.27.1-2) unstable; urgency=low
+
+  * Debconf templates and debian/control reviewed by the debian-l10n-
+    english team as part of the Smith review project. Closes: #519431
+  * Update translation:
+    French (Closes:Bug#520986)
+
+ -- James R. Van Zandt <jrv@debian.org>  Wed, 20 May 2009 22:03:38 -0400
+
 adjtimex (1.27.1-1) unstable; urgency=low
 
   * New upstream release.  Provide workaround if linux/rtc.h

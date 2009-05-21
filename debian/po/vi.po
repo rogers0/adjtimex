@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: adjtimex 1.20-4\n"
 "Report-Msgid-Bugs-To: adjtimex@packages.debian.org\n"
-"POT-Creation-Date: 2009-02-14 11:47-0500\n"
+"POT-Creation-Date: 2009-03-17 07:38+0100\n"
 "PO-Revision-Date: 2005-05-04 15:44+0930\n"
 "Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
 "Language-Team: Vietnamese <gnomevi-list@lists.sourceforge.net>\n"
@@ -17,18 +17,22 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:1001
+#: ../templates:2001
 msgid "Should adjtimex be run at installation and at every startup?"
 msgstr ""
 "Bạn có muốn chạy trình adjtimex khi cài đặt và mọi khi khởi động không?"
 
 #. Type: boolean
 #. Description
-#: ../templates:1001
+#: ../templates:2001
+#, fuzzy
+#| msgid ""
+#| "adjtimex can run at system startup to set the kernel time parameters to "
+#| "the values in /etc/default/adjtimex. Don't accept if you just want to use "
+#| "adjtimex to inspect the current parameters."
 msgid ""
-"adjtimex can run at system startup to set the kernel time parameters to the "
-"values in /etc/default/adjtimex. Don't accept if you just want to use "
-"adjtimex to inspect the current parameters."
+"Running adjtimex at system startup will set the kernel time parameters to "
+"the values in /etc/default/adjtimex."
 msgstr ""
 "Trình adjtimex (adjust time: điều chỉnh thời gian) thì có thể chạy khi khởi "
 "động hệ thống, để lập những tham số thời gian của hạt nhân thành những giá "
@@ -39,19 +43,46 @@ msgstr ""
 #. Description
 #: ../templates:2001
 #, fuzzy
+#| msgid ""
+#| "adjtimex can run at system startup to set the kernel time parameters to "
+#| "the values in /etc/default/adjtimex. Don't accept if you just want to use "
+#| "adjtimex to inspect the current parameters."
+msgid ""
+"You should not choose this option if you just want to use adjtimex to "
+"inspect the current parameters."
+msgstr ""
+"Trình adjtimex (adjust time: điều chỉnh thời gian) thì có thể chạy khi khởi "
+"động hệ thống, để lập những tham số thời gian của hạt nhân thành những giá "
+"trị trong /etc/default/adjtimex. Đừng hiệu lực tùy chọn này nếu bạn chỉ muốn "
+"sử dụng trình adjtimex để kiểm tra những tham số hiện thời."
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+#, fuzzy
 #| msgid "Should adjtimexconfig be run at installation time?"
-msgid "Should adjtimexconfig be run when adjtimex is installed or upgraded?"
+msgid "Run adjtimexconfig when adjtimex is installed or upgraded?"
 msgstr "Bạn có muốn chạy tập lệnh adjtimexconfig khi cài đặt không?"
 
 #. Type: boolean
 #. Description
-#: ../templates:2001
+#. Translators: do not translate "tick" and "frequency"
+#: ../templates:3001
+#, fuzzy
+#| msgid ""
+#| "The adjtimexconfig script will use adjtimex to find values for the kernel "
+#| "variables tick and frequency that will make the system clock "
+#| "approximately agree with the hardware clock (also known as the CMOS "
+#| "clock).  It then saves these values in the configuration file /etc/"
+#| "default/adjtimex so the settings will be restored on every boot, when /"
+#| "etc/init.d/adjtimex runs."
 msgid ""
 "The adjtimexconfig script will use adjtimex to find values for the kernel "
-"variables tick and frequency that will make the system clock approximately "
-"agree with the hardware clock (also known as the CMOS clock).  It then saves "
-"these values in the configuration file /etc/default/adjtimex so the settings "
-"will be restored on every boot, when /etc/init.d/adjtimex runs."
+"variables \"tick\" and \"frequency\" that will make the system clock "
+"approximately agree with the hardware clock (also known as the CMOS clock).  "
+"It then saves these values in the configuration file /etc/default/adjtimex "
+"so the settings will be restored on every boot, when /etc/init.d/adjtimex "
+"runs."
 msgstr ""
 "Tập lệnh adjtimexconfig (adjust time configuration: điều chỉnh cấu hình thời "
 "gian) thì sẽ dùng trinh adjtimex để tìm giá trị cho biến hạt nhân «tick» và "
@@ -62,12 +93,18 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:2001
+#: ../templates:3001
+#, fuzzy
+#| msgid ""
+#| "The script takes 70 sec to run. Alternatively, you can run adjtimexconfig "
+#| "yourself at a later time, or determine the kernel variables one of "
+#| "several other ways (see the adjtimex man page) and install them in /etc/"
+#| "default/adjtimex."
 msgid ""
-"The script takes 70 sec to run. Alternatively, you can run adjtimexconfig "
-"yourself at a later time, or determine the kernel variables one of several "
-"other ways (see the adjtimex man page) and install them in /etc/default/"
-"adjtimex."
+"The script takes 70 seconds to run, so running it for every upgrade may be a "
+"waste of time. Alternatively, you can run adjtimexconfig manually when "
+"needed, or determine the kernel variables by using other methods and set "
+"them manually in /etc/default/adjtimex."
 msgstr ""
 "Tập lệnh này chạy được 70 giây. Hoặc bạn có thể tự chạy tập lệnh "
 "adjtimexconfig vào lúc sau, hoặc quyết định những biến hạt nhân một của vài "

@@ -1,3 +1,16 @@
+adjtimex (1.27.1-3) unstable; urgency=low
+
+  * Update translations:
+    Japanese (thanks to: Hideki Yamane, henrich @ debian.or.jp. 
+    Closes:Bug#525233)
+    Swedish (thanks to: Martin Bagge <brother@bsnet.se>.  Closes:Bug#525924)
+    Spanish (thanks to: Francisco Javier Cuadrado <fcocuadrado@gmail.com>, 
+    Closes:Bug#528621)
+    Russian (thanks to: Yuri Kozlov <yuray@komyakino.ru>, Closes:Bug#529047)
+    Czech (thanks to: Martin Sin <martin.sin@zshk.cz>, Closes:Bug#529652)
+
+ -- James R. Van Zandt <jrv@debian.org>  Tue, 26 May 2009 20:47:42 -0400
+
 adjtimex (1.27.1-2) unstable; urgency=low
 
   * Debconf templates and debian/control reviewed by the debian-l10n-
@@ -16,17 +29,17 @@ adjtimex (1.27.1-1) unstable; urgency=low
   * debian/control: bump version to 3.8.1 (no changes needed)
 
   * Update translations:
-    Basque (Thanks to: pi+debian@beobide.net [207] Closes:Bug#523079)
+    Japanese (Thanks to: henrich@debian.or.jp [188] Closes:Bug#522188)
     Czech (Thanks to: martin.sin@zshk.cz [219] Closes:Bug#522193)
+    Swedish (Thanks to: brother@bsnet.se [194] Closes:Bug#522979)
+    Basque (Thanks to: pi+debian@beobide.net [207] Closes:Bug#523079)
+    Italian (Thanks to: vinz65@gmail.com [197] Closes:Bug#523419)
+    Spanish (Thanks to: fcocuadrado@gmail.com [193] Closes:Bug#523915)
+    Russian (Thanks to: yuray@komyakino.ru [223] Closes:Bug#524069)
+    German (Thanks to: schanzi_@gmx.de [226] Closes:Bug#524224)
+    Portuguese (Thanks to: carloslisboa@gmail.com [170] Closes:Bug#524283)
     Danish (Thanks to: debian@overbygaard.dk [209] Closes:Bug#524368)
     Galician (Thanks to: mvillarino@gmail.com [216] Closes:Bug#524397)
-    German (Thanks to: schanzi_@gmx.de [226] Closes:Bug#524224)
-    Italian (Thanks to: vinz65@gmail.com [197] Closes:Bug#523419)
-    Japanese (Thanks to: henrich@debian.or.jp [188] Closes:Bug#522188)
-    Portuguese (Thanks to: carloslisboa@gmail.com [170] Closes:Bug#524283)
-    Russian (Thanks to: yuray@komyakino.ru [223] Closes:Bug#524069)
-    Spanish (Thanks to: fcocuadrado@gmail.com [193] Closes:Bug#523915)
-    Swedish (Thanks to: brother@bsnet.se [194] Closes:Bug#522979)
 
  -- James R. Van Zandt <jrv@debian.org>  Sat, 18 Apr 2009 16:35:22 -0400
 

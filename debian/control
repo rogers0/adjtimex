@@ -10,11 +10,11 @@ Architecture: any
 Depends:  ${misc:Depends}, ${shlibs:Depends}, debconf | debconf-2.0
 Suggests: ntpdate
 Description: kernel time variables configuration utility
- This package provides a utility to manipulate the kernel time variables.  For
- a machine connected to the Internet, or equipped with a precision
- oscillator or radio clock, the best way to keep the system clock
- accurate is using NTP (Network Time Protocol).  However, for a standalone or intermittently
- connected machine, you may use adjtimex instead to at least correct
- for systematic drift.  It can optionally adjust the system
- clock using the CMOS clock as a reference, and can log times for
- long-term estimation of drift rates.
+ This package provides a utility to manipulate the kernel time
+ variables.  For a machine connected to the Internet, or equipped with
+ a precision oscillator or radio clock, the best way to keep the
+ system clock accurate is using NTP (Network Time Protocol).  However,
+ for a standalone or intermittently connected machine, you may use
+ adjtimex instead to at least correct for systematic drift.  It can
+ optionally adjust the system clock using the CMOS clock as a
+ reference, and can log times for long-term estimation of drift rates.

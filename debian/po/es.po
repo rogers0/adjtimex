@@ -29,10 +29,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: adjtimex 1.26-3\n"
+"Project-Id-Version: adjtimex 1.27.1-1\n"
 "Report-Msgid-Bugs-To: adjtimex@packages.debian.org\n"
 "POT-Creation-Date: 2009-03-17 07:38+0100\n"
-"PO-Revision-Date: 2009-04-03 14:09+0100\n"
+"PO-Revision-Date: 2009-05-11 20:39+0100\n"
 "Last-Translator: Francisco Javier Cuadrado <fcocuadrado@gmail.com>\n"
 "Language-Team: Debian l10n Spanish <debian-l10n-spanish@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -48,13 +48,19 @@ msgstr "¿Se debe ejecutar adjtimex ahora y en cada arranque?"
 #. Type: boolean
 #. Description
 #: ../templates:2001
+#, fuzzy
+#| msgid ""
+#| "adjtimex can run at system startup to set the kernel time parameters to "
+#| "the values in /etc/default/adjtimex. Don't accept if you just want to use "
+#| "adjtimex to inspect the current parameters."
 msgid ""
 "Running adjtimex at system startup will set the kernel time parameters to "
 "the values in /etc/default/adjtimex."
 msgstr ""
-"Al ejecutar adjtimex durante el arranque del sistema se asignarán los "
-"valores del archivo «/etc/default/adjtimex» a los parámetros del tiempo del "
-"núcleo."
+"adjtimex se puede ejecutar al inicio del sistema para ajustar los parámetros "
+"del tiempo del núcleo a los valores del archivo «/etc/default/adjtimex». No "
+"acepte si sólo quiere utilizar adjtimex para inspeccionar los parámetros "
+"actuales."
 
 #. Type: boolean
 #. Description
@@ -69,13 +75,24 @@ msgstr ""
 #. Type: boolean
 #. Description
 #: ../templates:3001
+#, fuzzy
+#| msgid "Should adjtimexconfig be run when adjtimex is installed or upgraded?"
 msgid "Run adjtimexconfig when adjtimex is installed or upgraded?"
-msgstr "¿Desea ejecutar adjtimexconfig cuando adjtimex se instale o actualice?"
+msgstr ""
+"¿Se debería ejecutar adjtimexconfig cuando adjtimex se instale o actualice?"
 
 #. Type: boolean
 #. Description
 #. Translators: do not translate "tick" and "frequency"
 #: ../templates:3001
+#, fuzzy
+#| msgid ""
+#| "The adjtimexconfig script will use adjtimex to find values for the kernel "
+#| "variables tick and frequency that will make the system clock "
+#| "approximately agree with the hardware clock (also known as the CMOS "
+#| "clock).  It then saves these values in the configuration file /etc/"
+#| "default/adjtimex so the settings will be restored on every boot, when /"
+#| "etc/init.d/adjtimex runs."
 msgid ""
 "The adjtimexconfig script will use adjtimex to find values for the kernel "
 "variables \"tick\" and \"frequency\" that will make the system clock "
@@ -95,14 +112,19 @@ msgstr ""
 #. Type: boolean
 #. Description
 #: ../templates:3001
+#, fuzzy
+#| msgid ""
+#| "The script takes 70 sec to run. Alternatively, you can run adjtimexconfig "
+#| "yourself at a later time, or determine the kernel variables one of "
+#| "several other ways (see the adjtimex man page) and install them in /etc/"
+#| "default/adjtimex."
 msgid ""
 "The script takes 70 seconds to run, so running it for every upgrade may be a "
 "waste of time. Alternatively, you can run adjtimexconfig manually when "
 "needed, or determine the kernel variables by using other methods and set "
 "them manually in /etc/default/adjtimex."
 msgstr ""
-"El script tarda 70 segundos para ejecutarse, de modo que ejecutarlo en cada "
-"actualización es una pérdida de tiempo. De forma alternativa, puede ejecutar "
-"manualmente ajdtimexconfig cuando lo necesite, o determinar las variables "
-"del núcleo utilizando otros métodos y ajustándolas manualmente en el archivo "
-"«/etc/default/adjtimex»."
+"El script tarda 70 segundos para ejecutarse. De forma alternativa, puede "
+"ejecutar manualmente ajdtimexconfig más tarde, o determinar las variables "
+"del núcleo utilizando otros métodos (vea la página del manual de adjtimex) e "
+"instalándolas en el archivo «/etc/default/adjtimex»."

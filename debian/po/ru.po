@@ -14,10 +14,10 @@
 # Yuri Kozlov <yuray@komyakino.ru>, 2009.
 msgid ""
 msgstr ""
-"Project-Id-Version: adjtimex 1.26-3\n"
+"Project-Id-Version: adjtimex 1.27.1-1\n"
 "Report-Msgid-Bugs-To: adjtimex@packages.debian.org\n"
 "POT-Creation-Date: 2009-03-17 07:38+0100\n"
-"PO-Revision-Date: 2009-04-02 20:50+0400\n"
+"PO-Revision-Date: 2009-05-17 17:28+0400\n"
 "Last-Translator: Yuri Kozlov <yuray@komyakino.ru>\n"
 "Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -31,38 +31,60 @@ msgstr ""
 #. Description
 #: ../templates:2001
 msgid "Should adjtimex be run at installation and at every startup?"
-msgstr "Должен adjtimex быть запущен сейчас и каждый раз при старте системы?"
+msgstr "Запустить adjtimex сейчас и каждый раз при старте системы?"
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
+#, fuzzy
+#| msgid ""
+#| "adjtimex can run at system startup to set the kernel time parameters to "
+#| "the values in /etc/default/adjtimex. Don't accept if you just want to use "
+#| "adjtimex to inspect the current parameters."
 msgid ""
 "Running adjtimex at system startup will set the kernel time parameters to "
 "the values in /etc/default/adjtimex."
 msgstr ""
-"Запуск adjtimex при старте системы устанавливает значения параметров времени "
-"ядра из файла /etc/default/adjtimex."
+"adjtimex можно запускать при старте системы для настройки значений "
+"параметров времени ядра из файла /etc/default/adjtimex. Не соглашайтесь, "
+"если просто хотите использовать adjtimex для проверки текущих параметров."
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
+#, fuzzy
+#| msgid ""
+#| "adjtimex can run at system startup to set the kernel time parameters to "
+#| "the values in /etc/default/adjtimex. Don't accept if you just want to use "
+#| "adjtimex to inspect the current parameters."
 msgid ""
 "You should not choose this option if you just want to use adjtimex to "
 "inspect the current parameters."
 msgstr ""
-"Ответьте отрицательно, если просто хотите использовать adjtimex для проверки "
-"текущих параметров."
+"adjtimex можно запускать при старте системы для настройки значений "
+"параметров времени ядра из файла /etc/default/adjtimex. Не соглашайтесь, "
+"если просто хотите использовать adjtimex для проверки текущих параметров."
 
 #. Type: boolean
 #. Description
 #: ../templates:3001
+#, fuzzy
+#| msgid "Should adjtimexconfig be run when adjtimex is installed or upgraded?"
 msgid "Run adjtimexconfig when adjtimex is installed or upgraded?"
-msgstr "Запустить adjtimexconfig при установке или обновлении adjtimex?"
+msgstr "Запускать adjtimexconfig при установке или обновлении adjtimex?"
 
 #. Type: boolean
 #. Description
 #. Translators: do not translate "tick" and "frequency"
 #: ../templates:3001
+#, fuzzy
+#| msgid ""
+#| "The adjtimexconfig script will use adjtimex to find values for the kernel "
+#| "variables tick and frequency that will make the system clock "
+#| "approximately agree with the hardware clock (also known as the CMOS "
+#| "clock).  It then saves these values in the configuration file /etc/"
+#| "default/adjtimex so the settings will be restored on every boot, when /"
+#| "etc/init.d/adjtimex runs."
 msgid ""
 "The adjtimexconfig script will use adjtimex to find values for the kernel "
 "variables \"tick\" and \"frequency\" that will make the system clock "
@@ -71,24 +93,29 @@ msgid ""
 "so the settings will be restored on every boot, when /etc/init.d/adjtimex "
 "runs."
 msgstr ""
-"Сценарий adjtimexconfig использует adjtimex для поиска значений переменных "
-"ядра \"tick\" и \"frequency\", которые помогают согласовывать системные часы "
-"с аппаратными часами (так называемые часы CMOS). Затем он сохраняет эти "
-"значения в файл настройки /etc/default/adjtimex, для того, чтобы "
-"восстанавливать их при каждом запуске компьютера с помощью сценария /etc/"
-"init.d/adjtimex."
+"Сценарий adjtimexconfig использует adjtimex при поиске значений переменных "
+"ядра такта и частоты, которые помогают согласовывать системные часы с "
+"аппаратными часами (так называемые часы CMOS). Затем он сохраняет эти "
+"значения в файл настройки /etc/default/adjtimex, для того чтобы "
+"восстанавливать их с помощью сценария /etc/init.d/adjtimex при каждом "
+"запуске системы."
 
 #. Type: boolean
 #. Description
 #: ../templates:3001
+#, fuzzy
+#| msgid ""
+#| "The script takes 70 sec to run. Alternatively, you can run adjtimexconfig "
+#| "yourself at a later time, or determine the kernel variables one of "
+#| "several other ways (see the adjtimex man page) and install them in /etc/"
+#| "default/adjtimex."
 msgid ""
 "The script takes 70 seconds to run, so running it for every upgrade may be a "
 "waste of time. Alternatively, you can run adjtimexconfig manually when "
 "needed, or determine the kernel variables by using other methods and set "
 "them manually in /etc/default/adjtimex."
 msgstr ""
-"Длительность работы сценария -- 70 секунд, поэтому его работа при каждом "
-"обновлении может занять некоторое время. В качестве альтернативы вы можете "
-"запускать djtimexconfig вручную при необходимости, или определить переменные "
-"ядра одним из нескольких других способов, и задать их в файле /etc/default/"
-"adjtimex."
+"Длительность работы сценария -- 70 секунд. В качестве альтернативы вы можете "
+"запустить adjtimexconfig вручную позже, или определить переменные ядра одним "
+"из нескольких других способов (смотрите справочную страницу по adjtimex) и "
+"сохранить их в файл /etc/default/adjtimex."

@@ -13,10 +13,10 @@
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: adjtimex 1.27.1-1\n"
+"Project-Id-Version: adjtimex 1.27.1-3\n"
 "Report-Msgid-Bugs-To: adjtimex@packages.debian.org\n"
 "POT-Creation-Date: 2009-03-17 07:38+0100\n"
-"PO-Revision-Date: 2009-04-23 05:02+0900\n"
+"PO-Revision-Date: 2009-07-24 18:05+0900\n"
 "Last-Translator: Hideki Yamane (Debian-JP) <henrich@debian.or.jp>\n"
 "Language-Team: Japanese <debian-japanese@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -32,40 +32,26 @@ msgstr "adjtimex をインストール時および毎回の起動時に動作さ
 #. Type: boolean
 #. Description
 #: ../templates:2001
-#, fuzzy
-#| msgid ""
-#| "adjtimex can run at system startup to set the kernel time parameters to "
-#| "the values in /etc/default/adjtimex. Don't accept if you just want to use "
-#| "adjtimex to inspect the current parameters."
 msgid ""
 "Running adjtimex at system startup will set the kernel time parameters to "
 "the values in /etc/default/adjtimex."
 msgstr ""
 "システムの起動時にカーネルでの時間のパラメータを /etc/default/adjtimex の値に"
-"設定するように adjtimex を動作させることができます。現在のパラメータを確認す"
-"るためにだけに使いたい場合は有効にしないでください。"
+"設定するように adjtimex を動作させることができます。"
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
-#, fuzzy
-#| msgid ""
-#| "adjtimex can run at system startup to set the kernel time parameters to "
-#| "the values in /etc/default/adjtimex. Don't accept if you just want to use "
-#| "adjtimex to inspect the current parameters."
 msgid ""
 "You should not choose this option if you just want to use adjtimex to "
 "inspect the current parameters."
 msgstr ""
 "システムの起動時にカーネルでの時間のパラメータを /etc/default/adjtimex の値に"
-"設定するように adjtimex を動作させることができます。現在のパラメータを確認す"
-"るためにだけに使いたい場合は有効にしないでください。"
+"設定するように adjtimex を動作させることができます。"
 
 #. Type: boolean
 #. Description
 #: ../templates:3001
-#, fuzzy
-#| msgid "Should adjtimexconfig be run when adjtimex is installed or upgraded?"
 msgid "Run adjtimexconfig when adjtimex is installed or upgraded?"
 msgstr ""
 "adjtimexconfig を adjtimex をインストール、あるいはアップグレードした時に実行"
@@ -75,14 +61,6 @@ msgstr ""
 #. Description
 #. Translators: do not translate "tick" and "frequency"
 #: ../templates:3001
-#, fuzzy
-#| msgid ""
-#| "The adjtimexconfig script will use adjtimex to find values for the kernel "
-#| "variables tick and frequency that will make the system clock "
-#| "approximately agree with the hardware clock (also known as the CMOS "
-#| "clock).  It then saves these values in the configuration file /etc/"
-#| "default/adjtimex so the settings will be restored on every boot, when /"
-#| "etc/init.d/adjtimex runs."
 msgid ""
 "The adjtimexconfig script will use adjtimex to find values for the kernel "
 "variables \"tick\" and \"frequency\" that will make the system clock "
@@ -100,19 +78,13 @@ msgstr ""
 #. Type: boolean
 #. Description
 #: ../templates:3001
-#, fuzzy
-#| msgid ""
-#| "The script takes 70 sec to run. Alternatively, you can run adjtimexconfig "
-#| "yourself at a later time, or determine the kernel variables one of "
-#| "several other ways (see the adjtimex man page) and install them in /etc/"
-#| "default/adjtimex."
 msgid ""
 "The script takes 70 seconds to run, so running it for every upgrade may be a "
 "waste of time. Alternatively, you can run adjtimexconfig manually when "
 "needed, or determine the kernel variables by using other methods and set "
 "them manually in /etc/default/adjtimex."
 msgstr ""
-"スクリプトは動作に 70 秒もかかります。アップグレードの度に毎回実行するのは時"
-"間の無駄です。別解としては adjtimexconfig を後ほど実行する、または他の方法で"
+"スクリプトは動作に 70 秒もかかるのでアップグレードの度に毎回実行するのは時間"
+"の無駄です。別解としては adjtimexconfig を後ほど実行する、または他の方法で"
 "カーネル変数を決めて、手動で /etc/default/adjtimex への設定を行う、などが可能"
 "です。"

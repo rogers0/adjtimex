@@ -1,3 +1,16 @@
+adjtimex (1.28-1) unstable; urgency=low
+
+  * New upstream release: (compare): Correctly apply +-500 ppm sanity
+    check (Thanks to Jacques luder <j.luder@laposte.net>)
+
+  * Update debconf template translations: 
+    Swedish (thanks to: Martin Bagge <brother@bsnet.se>,
+    Closes:Bug#533567)
+    Russian (thanks to: Yuri Kozlov <yuray@komyakino.ru>,
+    Closes:Bug#532068)
+
+ -- James R. Van Zandt <jrv@debian.org>  Sat, 07 Nov 2009 11:59:29 -0500
+
 adjtimex (1.27.1-4) unstable; urgency=low
 
   * Update translations: 

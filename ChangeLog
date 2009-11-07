@@ -1,3 +1,10 @@
+2009-11-07  James R. Van Zandt  <jrvz@comcast.net>
+
+	* Makefile.in (VERSION): version 1.28
+
+	* adjtimex.c (compare): Correctly apply +-500 ppm sanity check
+	(Thanks to Jacques luder <j.luder@laposte.net>)
+
 2009-04-18  James R. Van Zandt  <jrvz@comcast.net>
 
 	* Makefile.in (VERSION): version 1.27.1

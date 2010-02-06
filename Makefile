@@ -2,7 +2,7 @@
  srcdir = .
 VPATH = .
 
-VERSION=1.27.1
+VERSION=1.28
 
 CFLAGS = -Wall -g -O2 -Wall
 prefix = /usr

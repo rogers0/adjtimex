@@ -1,3 +1,13 @@
+adjtimex (1.28-2) unstable; urgency=low
+
+  * Move Swedish and Russian template translations to the correct directory
+    (thanks to Martin Bagge <brother@bsnet.se> for pointing out the
+    problem).
+
+  * debian/control: bump standards version to 3.8.3 (no changes needed)
+  
+ -- James R. Van Zandt <jrv@debian.org>  Fri, 05 Feb 2010 21:42:54 -0500
+
 adjtimex (1.28-1) unstable; urgency=low
 
   * New upstream release: (compare): Correctly apply +-500 ppm sanity

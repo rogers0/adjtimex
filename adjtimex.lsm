@@ -1,7 +1,7 @@
 Begin4
 Title:		adjtimex - display or set the kernel time variables
 Version:	1.28
-Entered-date:	2009-11-07
+Entered-date:	2010-02-05
 Description:	Display or set the kernel time variables.
 This program gives you raw access to the kernel time variables.  For
 a machine connected to the Internet, or equipped with a precision

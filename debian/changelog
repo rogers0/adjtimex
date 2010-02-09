@@ -1,3 +1,15 @@
+adjtimex (1.28-3) unstable; urgency=low
+
+  * Update debconf template translations:
+    Swedish (Thanks to Martin Bagge <brother@bsnet.se>, Closes:Bug#562932) 
+    Russian (thanks to Yuri Kozlov <yuray@komyakino.ru>, Closes:Bug#563347)
+    Finnish (thanks to Esko =?UTF-8?Q?Araj=C3=A4rvi?= <edu@iki.fi>, 
+    Closes:Bug#564508)
+
+  * debian/control: bump standards version to 3.8.4 (no changes needed)
+
+ -- James R. Van Zandt <jrv@debian.org>  Mon, 08 Feb 2010 20:19:44 -0500
+
 adjtimex (1.28-2) unstable; urgency=low
 
   * Move Swedish and Russian template translations to the correct directory

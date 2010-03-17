@@ -1,3 +1,10 @@
+adjtimex (1.28-4) unstable; urgency=low
+
+  * Update debconf template translations:
+    Swedish (Thanks to Martin Bagge <brother@bsnet.se>, Closes:Bug#572579) 
+
+ -- James R. Van Zandt <jrv@debian.org>  Wed, 17 Mar 2010 19:51:06 -0400
+
 adjtimex (1.28-3) unstable; urgency=low
 
   * Update debconf template translations:

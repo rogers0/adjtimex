@@ -1,3 +1,19 @@
+adjtimex (1.29-1) unstable; urgency=low
+
+  * New upstream release: Document the --force-adjust
+    option. --force-adjust suppresses warning printouts. Relax sanity
+    check to +- 1 percent.
+
+  * debian/adjtimexconfig: Use --force-adjust option, so adjustment is
+    applied even if system clock is way off.  (Thanks to Santiago Vila
+    <sanvila@unex.es> for helping to diagnose the problem.
+    Closes:Bug#557949, #559882)
+  
+  * debian/adjtimex.init: fix LSB comment header: require $local_fs, start
+    in S
+
+ -- James R. Van Zandt <jrv@debian.org>  Fri, 16 Apr 2010 20:08:49 -0400
+
 adjtimex (1.28-4) unstable; urgency=low
 
   * Update debconf template translations:

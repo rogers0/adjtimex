@@ -1,3 +1,15 @@
+2010-04-16  James R. Van Zandt  <jrvz@comcast.net>
+
+	* Makefile.in (VERSION): version 1.29
+
+	* adjtimex.man: Document the --force-adjust option.
+
+2010-04-15  James R. Van Zandt  <jrvz@comcast.net>
+
+	* adjtimex.c (compare): --force-adjust suppresses warning
+	printouts.
+	(compare): relax sanity check to +- 1 percent.
+
 2009-11-07  James R. Van Zandt  <jrvz@comcast.net>
 
 	* Makefile.in (VERSION): version 1.28

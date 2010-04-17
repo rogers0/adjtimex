@@ -4,12 +4,12 @@
 
 ### BEGIN INIT INFO
 # Provides:          adjtimex
-# Required-Start:    
+# Required-Start:    $local_fs
 # Required-Stop:     
 # Should-Start:      
 # Should-Stop:       
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
+# Default-Start:     S
+# Default-Stop:
 # Short-Description: set the kernel time variables
 # Description:       set the kernel time variables
 ### END INIT INFO

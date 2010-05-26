@@ -88,6 +88,10 @@ EOF
 case "$1" in
     configure)
 
+# A previous installation may have left a corrupt conffile.
+# The regexp matches only blank lines, comments, and integer assignments:
+	egrep -qv '^([:space:]*(#.*)?|[:space:]*[a-zA-Z][a-zA-Z0-9]*[:space:]*=[:space:]*[0-9]+[:space:]*)$' $conffile && rm -f $conffile
+
 	create_adjtimex_conf
 
 	db_get adjtimex/run_daemon

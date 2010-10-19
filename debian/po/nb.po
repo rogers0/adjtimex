@@ -1,29 +1,27 @@
-# Copyright (C) 2009
-# This file is distributed under the same license as the adjtimex package.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
 #
-# Esko Arajärvi <edu@iki.fi>, 2010.
+# Bjørn Steensrud <bjornst@skogkatt.homelinux.org>, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: adjtimex@packages.debian.org\n"
 "POT-Creation-Date: 2009-03-17 07:38+0100\n"
-"PO-Revision-Date: 2010-01-09 22:59+0200\n"
-"Last-Translator: Esko Arajärvi <edu@iki.fi>\n"
-"Language-Team: Finnish <debian-l10n-finnish@lists.debian.org>\n"
-"Language: fi\n"
+"PO-Revision-Date: 2010-10-15 14:50+0200\n"
+"Last-Translator: Bjørn Steensrud <bjornst@skogkatt.homelinux.org>\n"
+"Language-Team: Norwegian Bokmål <i18n-nb@lister.ping.uio.no>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Lokalize 1.0\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
 msgid "Should adjtimex be run at installation and at every startup?"
-msgstr ""
-"Tulisiko adjtimex ajaa asennuksen yhteydessä ja aina kun järjestelmä "
-"käynnistetään?"
+msgstr "Skal adjtimex kjøres ved installasjon og hver gang systemet startes?"
 
 #. Type: boolean
 #. Description
@@ -32,8 +30,8 @@ msgid ""
 "Running adjtimex at system startup will set the kernel time parameters to "
 "the values in /etc/default/adjtimex."
 msgstr ""
-"Jos adjtimex ajetaan käynnistettäessä järjestelmä, ytimen aikaparametrit "
-"asetetaan tiedostossa /etc/default/adjtimex annettuihin arvoihin."
+"Om adjtimex kjøres ved oppstart blir kjernens tidsparametre satt til "
+"verdiene i /etc/default/adjtimex."
 
 #. Type: boolean
 #. Description
@@ -42,14 +40,14 @@ msgid ""
 "You should not choose this option if you just want to use adjtimex to "
 "inspect the current parameters."
 msgstr ""
-"Älä valitse tätä vaihtoehtoa, jos haluat käyttää adjtimexiä vain nykyisten "
-"parametriarvojen tarkasteluun."
+"Du bør ikke velge dette hvis du bare vil bruke adjtimex til å se hva de "
+"gjeldende parametrene er."
 
 #. Type: boolean
 #. Description
 #: ../templates:3001
 msgid "Run adjtimexconfig when adjtimex is installed or upgraded?"
-msgstr "Tulisiko adjtimexconfig ajaa, kun adjtimex asennetaan tai päivitetään?"
+msgstr "Skal adjtimexconfig kjøres når adjtimex installeres eller oppgraderes?"
 
 #. Type: boolean
 #. Description
@@ -63,11 +61,11 @@ msgid ""
 "so the settings will be restored on every boot, when /etc/init.d/adjtimex "
 "runs."
 msgstr ""
-"Komentosarja adjtimexconfig etsii ohjelman adjtimex avulla ytimen "
-"muuttujille ”tick” ja ”frequency” arvot, joilla järjestelmän kello näyttää "
-"suunnilleen samaa kuin laitteiston kello (CMOS-kello). Se tallentaa nämä "
-"arvot asetustiedostoon /etc/default/adjtimex, jolloin ne palautetaan "
-"järjestelmän käynnistyessä, kun /etc/init.d/adjtimex ajetaan."
+"Skriptet adjtimexconfig vil bruke adjtimex til å finne verdier for kjerne- "
+"variablene «tick» og «frequency» som vil få systemklokka til å gå omtrent "
+"lik maskinklokka (også kalt CMOS-klokka). Deretter lagres disse verdiene i "
+"oppsettsfila /etc/default/adjtimex, slik at de blir tilbakestilt ved hver "
+"oppstart nåt /etc/init.d/adjtimex kjører."
 
 #. Type: boolean
 #. Description
@@ -78,7 +76,7 @@ msgid ""
 "needed, or determine the kernel variables by using other methods and set "
 "them manually in /etc/default/adjtimex."
 msgstr ""
-"Komentosarjan ajaminen kestää 70 sekuntia, joten sen ajaminen jokaisen "
-"päivityksen yhteydessä saattaa olla ajanhukkaa. Voit vaihtoehtoisesti ajaa "
-"adjtimexconfigin käsin tarvittaessa tai määrittää ytimen muuttujien arvot "
-"muilla keinoin ja asettaa ne käsin tiedostoon /etc/default/adjtimex."
+"Skriptet tar 70 sekunder å kjøre, så det kan være bortkastet tid å kjøre det "
+"ved hver oppgradering. Du kan ellers kjøre adjtimexconfig manuelt når det "
+"trengs, eller bestemme kjernevariablene på annen måte og sette dem inn "
+"manuelt i /etc/default/adjtimex."

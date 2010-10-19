@@ -1,3 +1,12 @@
+adjtimex (1.29-2.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Fix pending l10n issues. Debconf translations:
+    - Czech (Martin Sin).  Closes: #589289
+    - Bokmål, Norwegian (Bjørn Steensrud).  Closes: #600279
+
+ -- Christian Perrier <bubulle@debian.org>  Tue, 19 Oct 2010 07:14:50 +0200
+
 adjtimex (1.29-2) unstable; urgency=low
 
   * debian/postinst: check conffile for corruption (Closes:Bug#571633,

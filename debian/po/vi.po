@@ -1,82 +1,58 @@
 # Vietnamese Translation for adjtimex.
-# Copyright © 2005 Free Software Foundation, Inc.
-# Clytie Siddall <clytie@riverland.net.au>, 2005.
+# Copyright © 2010 Free Software Foundation, Inc.
+# Clytie Siddall <clytie@riverland.net.au>, 2005-2010.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: adjtimex 1.20-4\n"
+"Project-Id-Version: adjtimex 1.29-2.1\n"
 "Report-Msgid-Bugs-To: adjtimex@packages.debian.org\n"
 "POT-Creation-Date: 2009-03-17 07:38+0100\n"
-"PO-Revision-Date: 2005-05-04 15:44+0930\n"
+"PO-Revision-Date: 2010-10-27 14:39+1030\n"
 "Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
-"Language-Team: Vietnamese <gnomevi-list@lists.sourceforge.net>\n"
+"Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: LocFactoryEditor 1.8\n"
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
 msgid "Should adjtimex be run at installation and at every startup?"
-msgstr ""
-"Bạn có muốn chạy trình adjtimex khi cài đặt và mọi khi khởi động không?"
+msgstr "adjtimex có nên chạy vào lúc cài đặt và khi nào khởi động không?"
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
-#, fuzzy
-#| msgid ""
-#| "adjtimex can run at system startup to set the kernel time parameters to "
-#| "the values in /etc/default/adjtimex. Don't accept if you just want to use "
-#| "adjtimex to inspect the current parameters."
 msgid ""
 "Running adjtimex at system startup will set the kernel time parameters to "
 "the values in /etc/default/adjtimex."
 msgstr ""
-"Trình adjtimex (adjust time: điều chỉnh thời gian) thì có thể chạy khi khởi "
-"động hệ thống, để lập những tham số thời gian của hạt nhân thành những giá "
-"trị trong /etc/default/adjtimex. Đừng hiệu lực tùy chọn này nếu bạn chỉ muốn "
-"sử dụng trình adjtimex để kiểm tra những tham số hiện thời."
+"Chạy adjtimex vào lúc khởi chạy hệ thống thì lập các tham số thời gian của "
+"hạt nhân thành những giá trị trong tập tin « /etc/default/adjtimex »."
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
-#, fuzzy
-#| msgid ""
-#| "adjtimex can run at system startup to set the kernel time parameters to "
-#| "the values in /etc/default/adjtimex. Don't accept if you just want to use "
-#| "adjtimex to inspect the current parameters."
 msgid ""
 "You should not choose this option if you just want to use adjtimex to "
 "inspect the current parameters."
 msgstr ""
-"Trình adjtimex (adjust time: điều chỉnh thời gian) thì có thể chạy khi khởi "
-"động hệ thống, để lập những tham số thời gian của hạt nhân thành những giá "
-"trị trong /etc/default/adjtimex. Đừng hiệu lực tùy chọn này nếu bạn chỉ muốn "
-"sử dụng trình adjtimex để kiểm tra những tham số hiện thời."
+"Không nên bật tuỳ chọn này nếu bạn chỉ muốn sử dụng adjtimex để kiểm tra "
+"những tham số hiện thời."
 
 #. Type: boolean
 #. Description
 #: ../templates:3001
-#, fuzzy
-#| msgid "Should adjtimexconfig be run at installation time?"
 msgid "Run adjtimexconfig when adjtimex is installed or upgraded?"
-msgstr "Bạn có muốn chạy tập lệnh adjtimexconfig khi cài đặt không?"
+msgstr "Chạy adjtimexconfig khi adjtimex được cài đặt hay nâng cấp ?"
 
 #. Type: boolean
 #. Description
 #. Translators: do not translate "tick" and "frequency"
 #: ../templates:3001
-#, fuzzy
-#| msgid ""
-#| "The adjtimexconfig script will use adjtimex to find values for the kernel "
-#| "variables tick and frequency that will make the system clock "
-#| "approximately agree with the hardware clock (also known as the CMOS "
-#| "clock).  It then saves these values in the configuration file /etc/"
-#| "default/adjtimex so the settings will be restored on every boot, when /"
-#| "etc/init.d/adjtimex runs."
 msgid ""
 "The adjtimexconfig script will use adjtimex to find values for the kernel "
 "variables \"tick\" and \"frequency\" that will make the system clock "
@@ -85,31 +61,22 @@ msgid ""
 "so the settings will be restored on every boot, when /etc/init.d/adjtimex "
 "runs."
 msgstr ""
-"Tập lệnh adjtimexconfig (adjust time configuration: điều chỉnh cấu hình thời "
-"gian) thì sẽ dùng trinh adjtimex để tìm giá trị cho biến hạt nhân «tick» và "
-"«frequency» để khớp đồng hồ hệ thống xấp xi với đồng hồ phần cứng (cũng được "
-"biết như là đồng hồ CMOS). Như thế thì nó lưu nhưng giá trị này trong tập "
-"tin cấu hình /etc/default/adjtimex vì vậy sẽ phục hồi cách thiết lập ấy mọi "
-"khi khởi động, khi chạy /etc/init.d/adjtimex."
+"Văn lệnh cấu hình adjtimexconfig thì sử dụng adjtimex để tìm giá trị cho hai "
+"biến hạt nhân « tick » và « frequency », để làm cho đồng hồ hệ thống tương "
+"ứng xấp xỉ với đồng hồ phần cứng (cũng được gọi như là đồng hồ CMOS). Văn "
+"lệnh này lưu các giá trị đó vào tập tin cấu hình « /etc/default/adjtimex », "
+"để phục hồi thiết lập khi nào việc khởi động chạy « /etc/init.d/adjtimex »."
 
 #. Type: boolean
 #. Description
 #: ../templates:3001
-#, fuzzy
-#| msgid ""
-#| "The script takes 70 sec to run. Alternatively, you can run adjtimexconfig "
-#| "yourself at a later time, or determine the kernel variables one of "
-#| "several other ways (see the adjtimex man page) and install them in /etc/"
-#| "default/adjtimex."
 msgid ""
 "The script takes 70 seconds to run, so running it for every upgrade may be a "
 "waste of time. Alternatively, you can run adjtimexconfig manually when "
 "needed, or determine the kernel variables by using other methods and set "
 "them manually in /etc/default/adjtimex."
 msgstr ""
-"Tập lệnh này chạy được 70 giây. Hoặc bạn có thể tự chạy tập lệnh "
-"adjtimexconfig vào lúc sau, hoặc quyết định những biến hạt nhân một của vài "
-"cách khác (hãy xem trang hướng dẫn: lệnh\n"
-"man adjtimex\n"
-"mà «man» là trình hiển thị trang hướng dẫn), và cài đặt chúng vào /etc/"
-"default/adjtimex."
+"Văn lệnh này chạy trong khoảng 70 giây thì có thể là bạn không muốn chạy nó "
+"vào mỗi lúc nâng cấp. Bạn cũng có thể chạy adjtimexconfig bằng tay khi cần "
+"thiết, hoặc quyết định những biến hạt nhân bằng phương pháp khác và lập bằng "
+"tay trong tập tin « /etc/default/adjtimex »."

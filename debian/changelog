@@ -1,3 +1,15 @@
+adjtimex (1.29-2.2) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Make the package multiarch-ready: add build-arch and build-indep
+    build targets
+  * Fix pending l10n issues. Debconf translations:
+    - Vietnamese (Clytie Siddall).  Closes: #601529
+    - Brazilian Portuguese (Flamarion Jorge).  Closes: #610409
+    - Dutch (Michiel Sikkes).  Closes: #625744
+
+ -- Christian Perrier <bubulle@debian.org>  Mon, 04 Jul 2011 07:06:43 +0200
+
 adjtimex (1.29-2.1) unstable; urgency=low
 
   * Non-maintainer upload.

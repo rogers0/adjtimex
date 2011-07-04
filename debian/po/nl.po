@@ -1,24 +1,17 @@
-#
-#    Translators, if you are not familiar with the PO format, gettext
-#    documentation is worth reading, especially sections dedicated to
-#    this format, e.g. by running:
-#         info -n '(gettext)PO Files'
-#         info -n '(gettext)Header Entry'
-#
-#    Some information specific to po-debconf are available at
-#            /usr/share/doc/po-debconf/README-trans
-#         or http://www.debian.org/intl/l10n/po-debconf/README-trans
-#
-#    Developers do not need to manually edit POT or PO files.
+# Dutch translation of adjtimex debconf templates.
+# Copyright (C) 2003-2011 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the adjtimex package.
+# Michiel Sikkes <michiel@sikkes.xs4all.nl>, 2003.
+# Jeroen Schot <schot@a-eskwadraat.nl>, 2011.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: adjtimex\n"
+"Project-Id-Version: adjtimex_1.29-2.1\n"
 "Report-Msgid-Bugs-To: adjtimex@packages.debian.org\n"
 "POT-Creation-Date: 2009-03-17 07:38+0100\n"
-"PO-Revision-Date: 2003-10-04 16:05+0100\n"
+"PO-Revision-Date: 2011-05-05 17:49+0200\n"
 "Last-Translator: Michiel Sikkes <michiel@sikkes.xs4all.nl>\n"
-"Language-Team: Dutch <debian-l10n-dutch@lists.debian.org>\n"
+"Language-Team: Debian l10n Dutch <debian-l10n-dutch@lists.debian.org>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -29,63 +22,41 @@ msgstr ""
 #: ../templates:2001
 msgid "Should adjtimex be run at installation and at every startup?"
 msgstr ""
-"Wilt u dat adjtimex bij elke installatie en bij elke opstartprocedure "
-"gedraaid wordt?"
+"Wilt u dat adjtimex bij de installatie en bij elke opstartprocedure gedraaid "
+"wordt?"
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
-#, fuzzy
-#| msgid ""
-#| "adjtimex can run at system startup to set the kernel time parameters to "
-#| "the values in /etc/default/adjtimex. Don't accept if you just want to use "
-#| "adjtimex to inspect the current parameters."
 msgid ""
 "Running adjtimex at system startup will set the kernel time parameters to "
 "the values in /etc/default/adjtimex."
 msgstr ""
-"adjtimex kan gedraaid worden bij het opstarten van het systeem om de "
-"kerneltijd parameters in te stellen zoals gedefinieerd in /etc/default/"
-"adjtimex. Accepteer deze optie niet als u adjtimex wilt gebruiken om de "
-"huidige parameters te bekijken."
+"Het draaien van adjtimex bij het opstarten van het systeem zal "
+"tijdparameters van de kernel instellen zoals gedefinieerd in /etc/default/"
+"adjtimex."
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
-#, fuzzy
-#| msgid ""
-#| "adjtimex can run at system startup to set the kernel time parameters to "
-#| "the values in /etc/default/adjtimex. Don't accept if you just want to use "
-#| "adjtimex to inspect the current parameters."
 msgid ""
 "You should not choose this option if you just want to use adjtimex to "
 "inspect the current parameters."
 msgstr ""
-"adjtimex kan gedraaid worden bij het opstarten van het systeem om de "
-"kerneltijd parameters in te stellen zoals gedefinieerd in /etc/default/"
-"adjtimex. Accepteer deze optie niet als u adjtimex wilt gebruiken om de "
-"huidige parameters te bekijken."
+"Accepteer deze optie niet als u adjtimex alleen wilt gebruiken om de huidige "
+"parameters te bekijken."
 
 #. Type: boolean
 #. Description
 #: ../templates:3001
-#, fuzzy
-#| msgid "Should adjtimexconfig be run at installation time?"
 msgid "Run adjtimexconfig when adjtimex is installed or upgraded?"
-msgstr "Wilt u dat adjtimexconfig bij het installeren wordt gedraaid?"
+msgstr ""
+"Wilt u dat adjtimexconfig bij het installeren en opwaarderen wordt gedraaid?"
 
 #. Type: boolean
 #. Description
 #. Translators: do not translate "tick" and "frequency"
 #: ../templates:3001
-#, fuzzy
-#| msgid ""
-#| "The adjtimexconfig script will use adjtimex to find values for the kernel "
-#| "variables tick and frequency that will make the system clock "
-#| "approximately agree with the hardware clock (also known as the CMOS "
-#| "clock).  It then saves these values in the configuration file /etc/"
-#| "default/adjtimex so the settings will be restored on every boot, when /"
-#| "etc/init.d/adjtimex runs."
 msgid ""
 "The adjtimexconfig script will use adjtimex to find values for the kernel "
 "variables \"tick\" and \"frequency\" that will make the system clock "
@@ -94,22 +65,16 @@ msgid ""
 "so the settings will be restored on every boot, when /etc/init.d/adjtimex "
 "runs."
 msgstr ""
-"Het adjtimexconfig script zal adjtimex gebruiken om de eigenschappen voor de "
-"kernelvariablen tick en frequency te vinden. Dit zal zorgen dat de "
-"systeemklok gelijk loopt met de hardware klok (ook bekend onder de naam CMOS "
-"klok). Het slaat deze eigenschappen op in het configuratiebestand /etc/"
-"default/adjtimex, dus de instellingen worden bij elke "
-"systeemopstartprocedure hersteld als /etc/init.d/adjtimex draait."
+"Het adjtimexconfig-script zal adjtimex gebruiken om de eigenschappen voor de "
+"kernelvariabelen \"tick\" en \"frequency\" te vinden. Dit zal er voor zorgen "
+"dat de systeemklok gelijk loopt met de hardware-klok (ook bekend onder de "
+"naam CMOS-klok). Deze eigenschappen worden opgeslagen in het "
+"configuratiebestand /etc/default/adjtimex, dus de instellingen worden bij "
+"elke systeemopstartprocedure hersteld als /etc/init.d/adjtimex draait."
 
 #. Type: boolean
 #. Description
 #: ../templates:3001
-#, fuzzy
-#| msgid ""
-#| "The script takes 70 sec to run. Alternatively, you can run adjtimexconfig "
-#| "yourself at a later time, or determine the kernel variables one of "
-#| "several other ways (see the adjtimex man page) and install them in /etc/"
-#| "default/adjtimex."
 msgid ""
 "The script takes 70 seconds to run, so running it for every upgrade may be a "
 "waste of time. Alternatively, you can run adjtimexconfig manually when "
@@ -117,6 +82,5 @@ msgid ""
 "them manually in /etc/default/adjtimex."
 msgstr ""
 "Het script doet er 70 seconden over om te draaien. Als alternatief kunt u "
-"adjtimexconfig later handmatig draaien, of de kerneleigenschappen op een "
-"andere manier bepalen (zie de adjtimex man-pagina) en deze zelf in /etc/"
-"default/adjtimex zetten."
+"adjtimexconfig later handmatig draaien, of de kernelvariabelen op een andere "
+"manier bepalen en deze zelf in /etc/default/adjtimex zetten."

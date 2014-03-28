@@ -90,7 +90,9 @@ case "$1" in
 
 # A previous installation may have left a corrupt conffile.
 # The regexp matches only blank lines, comments, and integer assignments:
-	egrep -qv '^([:space:]*(#.*)?|[:space:]*[a-zA-Z][a-zA-Z0-9]*[:space:]*=[:space:]*[0-9]+[:space:]*)$' $conffile && rm -f $conffile
+    if [ -f $conffile ]; then
+        egrep -qv '^([[:space:]]*(#.*)?|[[:space:]]*[a-zA-Z][a-zA-Z0-9]*[[:space:]]*=[[:space:]]*-?[0-9]+[[:space:]]*)$' $conffile && rm -f $conffile
+    fi
 
 	create_adjtimex_conf
 

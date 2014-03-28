@@ -1,0 +1,2 @@
+adjtimex /sbin
+debian/adjtimexconfig /usr/sbin

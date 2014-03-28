@@ -1,3 +1,21 @@
+adjtimex (1.29-3) unstable; urgency=low
+
+  * QA upload.
+  * Maintainer field set to QA Group.
+  * Switch to dpkg-source 3.0 (quilt) format.
+  * debian/postinst:
+    - Fix extended regexp to avoid removing /etc/default/adjtimex on
+      upgrades. Closes: #688368.
+    - Fix character class syntax in extended regexp. Closes: #630812.
+    - Check if conffile exists before reading it. 
+  * patches/01-makefile.in-ldflags.diff: add LDFLAGS to Makefile.in.
+  * Set debhelper compatibility level to 9.
+  * Rewrite debian/rules using dh(1) with autoreconf.
+  * Source /lib/lsb/init-functions in init.d script.
+  * Bump Standards-Version to 3.9.5.
+
+ -- Emanuele Rocca <ema@debian.org>  Fri, 28 Mar 2014 15:59:46 +0100
+
 adjtimex (1.29-2.2) unstable; urgency=low
 
   * Non-maintainer upload.

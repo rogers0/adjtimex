@@ -1,0 +1,14 @@
+Description: Add LDFLAGS to Makefile.in
+Author: Emanuele Rocca <ema@debian.org>
+
+--- adjtimex-1.29.orig/Makefile.in
++++ adjtimex-1.29/Makefile.in
+@@ -36,7 +36,7 @@ Makefile config.h: Makefile.in config.h.
+ 
+ adjtimex: adjtimex.c mat.o config.h Makefile
+ 	$(CC) $(CFLAGS) -I. -DVERSION=\"$(VERSION)\" -o adjtimex  \
+-		 adjtimex.c mat.o -lm
++		 adjtimex.c mat.o -lm $(LDFLAGS)
+ 
+ mat.o: mat.c
+ 	$(CC) $(CFLAGS) -c mat.c

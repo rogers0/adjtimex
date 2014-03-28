@@ -1,117 +1,21 @@
 #!/usr/bin/make -f
-# Sample debian/rules that uses debhelper.
-# GNU copyright 1997 to 1999 by Joey Hess.
 
-# Uncomment this to turn on verbose mode.
-#export DH_VERBOSE=1
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/buildflags.mk
 
-# These are used for cross-compiling and for saving the configure script
-# from having to guess our platform (since we know it already)
-DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
-DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
-
-
-package=adjtimex
-
-CFLAGS = -Wall -g
-INSTALL = install
-INSTALL_FILE    = $(INSTALL) -p    -o root -g root  -m  644
-INSTALL_PROGRAM = $(INSTALL) -p    -o root -g root  -m  755
-INSTALL_SCRIPT  = $(INSTALL) -p    -o root -g root  -m  755
-INSTALL_DIR     = $(INSTALL) -p -d -o root -g root  -m  755
-
-ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
-CFLAGS += -O0
-else
-CFLAGS += -O2
-endif
-ifeq (,$(filter nostrip,$(DEB_BUILD_OPTIONS)))
-INSTALL_PROGRAM += -s
-endif
-# parallel build isn't worth while
-
-config.status: configure
-	dh_testdir
-	# configure the package.
-	./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
-	touch config.h
-
-build: build-arch build-indep
-
-build-arch: build-stamp
-
-build-indep: build-stamp
-
-build-stamp:  config.status
-	dh_testdir
-
-	# compile the package.
-	$(MAKE) CFLAGS="$(CFLAGS)"
-	#/usr/bin/docbook-to-man debian/adjtimex.sgml > adjtimex.1
-
-	touch build-stamp
-
-clean:
-	dh_testdir
-	dh_testroot
-	rm -f build-stamp 
-
-	# clean up after the build process.
-	debconf-updatepo
-	[ ! -f Makefile ] || $(MAKE) veryclean
-	rm -rf adjtimex *.o config.cache config.log config.status
-	-test -r /usr/share/misc/config.sub && \
-	  cp -f /usr/share/misc/config.sub config.sub
-	-test -r /usr/share/misc/config.guess && \
-	  cp -f /usr/share/misc/config.guess config.guess
-
-
+override_dh_clean:
+	[ ! -f Makefile ] || make veryclean
 	dh_clean
+	-rm config.status config.log Makefile configure adjtimex.lsm \
+		config.h config.h.in
 
-install: build
-	dh_testdir
-	dh_testroot
-	dh_clean -k
-	dh_installdirs
+override_dh_auto_install:
 
-	# install the package into debian/$(package).
-	$(INSTALL_PROGRAM) adjtimex $(CURDIR)/debian/$(package)/sbin
-	$(INSTALL_SCRIPT)  debian/adjtimexconfig			\
-		$(CURDIR)/debian/$(package)/usr/sbin/adjtimexconfig
-
-# Build architecture-independent files here.
-binary-indep: build install
-# We have nothing to do
-
-# Build architecture-dependent files here.
-binary-arch: build install
-	dh_testdir
-	dh_testroot
-	dh_installdebconf	
-	dh_installdocs
-	dh_installexamples
-	dh_installmenu
-#	dh_installlogrotate
-#	dh_installemacsen
-#	dh_installpam
-#	dh_installmime
-	dh_installinit -n
-	dh_installcron
-	dh_installman adjtimex.8 debian/adjtimexconfig.8
-	dh_installinfo
-#	dh_undocumented
+override_dh_installchangelogs:
 	dh_installchangelogs ChangeLog
-	dh_link
-	dh_strip
-	dh_compress
-	dh_fixperms
-#	dh_makeshlibs
-	dh_installdeb
-#	dh_perl
-	dh_shlibdeps
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
 
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install 
+override_dh_installinit:
+	dh_installinit -n
+
+%:
+	dh $@ --with autoreconf

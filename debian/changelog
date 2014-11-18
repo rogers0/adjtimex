@@ -1,3 +1,21 @@
+adjtimex (1.29-4) experimental; urgency=medium
+
+  * QA upload.
+  * Bumped Standards-Version to 3.9.6.
+  * debian/control: removed an extra space from Depends field.
+  * debian/copyright: migrated to 1.0 (DEP5) format.
+  * debian/patches/:
+      - 01-makefile.in-ldflags.diff: improved to allow full GCC hardening.
+      - 02-fix-manpage: added to fix some hyphen used as minus sign.
+  * debian/rules:
+      - Added the '-f' option to 'rm' command in override_dh_clean target.
+      - Added the variable 'DEB_BUILD_MAINT_OPTIONS' to add all flags
+        requested by blhc command.
+  * debian/watch: added a fake site to explain about the current
+      status of the original upstream homepage.
+
+ -- Joao Eriberto Mota Filho <eriberto@debian.org>  Tue, 18 Nov 2014 09:31:06 -0200
+
 adjtimex (1.29-3) unstable; urgency=low
 
   * QA upload.

@@ -1,0 +1,45 @@
+Description: fix some hyphen used as minus sign in manpage.
+Author: Joao Eriberto Mota Filho <eriberto@debian.org>
+Last-Update: 2014-11-24
+Index: adjtimex-1.29/adjtimex.8
+===================================================================
+--- adjtimex-1.29.orig/adjtimex.8
++++ adjtimex-1.29/adjtimex.8
+@@ -19,7 +19,7 @@ may change them.
+ .PP
+ Your computer has two clocks - the "hardware clock" that runs all the
+ time, and the system clock that runs only while the computer is on.
+-Normally, "hwclock --hctosys" should be run
++Normally, "hwclock \-\-hctosys" should be run
+ at startup to initialize the system clock.  
+ The system clock has much better precision (approximately 1 usec), but
+ the hardware clock probably has better long-term stability.  There are
+@@ -179,8 +179,8 @@ or .0864 sec/day.  Thus, all of these ar
+      \fB\-\-tick  9995 \--frequency  32768000\fP
+      \fB\-\-tick 10000 \--frequency   6553600\fP
+      \fB\-\-tick 10001 \--frequency         0\fP
+-     \fB\-\-tick 10002 \--frequency  -6553600\fP
+-     \fB\-\-tick 10005 \--frequency -32768000\fP
++     \fB\-\-tick 10002 \--frequency  \-6553600\fP
++     \fB\-\-tick 10005 \--frequency \-32768000\fP
+ .fi
+ To see the acceptable range for \fInewfreq\fP, use \-\-print and look at
+ "tolerance", or try an illegal value (e.g. \-\-tick 0).
+@@ -194,7 +194,7 @@ notes how long it has been since the las
+ and then adjusts the frequency offset to correct for the apparent drift.  
+ .\"The short range of this parameter makes it almost 
+ .\"totally useless except for use with ntpd:
+-\fIadj\fP must be in the range -512000...512000.
++\fIadj\fP must be in the range \-512000...512000.
+ .IP "\fB\-S\fP \fIstatus\fP, \fB\-\-status\fP \fIstatus\fP"
+ Set kernel system clock status register to value \fIstatus\fP. Look here
+ above at the \fB\-\-print\fP switch section for the meaning of
+@@ -329,7 +329,7 @@ To correct the rest of the error, you co
+ in rc.local would approximately correct the system clock:
+ 
+ .nf
+-     adjtimex  --tick 9999  --freq 485452
++     adjtimex  \-\-tick 9999  \-\-freq 485452
+ .fi
+ .PP
+ .\"}}}

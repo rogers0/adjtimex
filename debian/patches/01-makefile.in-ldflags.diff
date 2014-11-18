@@ -1,14 +1,35 @@
 Description: Add LDFLAGS to Makefile.in
 Author: Emanuele Rocca <ema@debian.org>
+Last-Update: 2014-03-28
 
+Description: add extra flags to Makefile.in to allow GCC hardening
+             and modify the original upstream CFLAGS to accept flags
+             from DH9.
+Author: Joao Eriberto Mota Filho <eriberto@debian.org>
+Last-Update: 2014-11-18
+Index: adjtimex-1.29/Makefile.in
+===================================================================
 --- adjtimex-1.29.orig/Makefile.in
 +++ adjtimex-1.29/Makefile.in
-@@ -36,7 +36,7 @@ Makefile config.h: Makefile.in config.h.
+@@ -4,7 +4,7 @@ VPATH = .
+ 
+ VERSION=1.29
+ 
+-CFLAGS = @CFLAGS@ -Wall
++CFLAGS += @CFLAGS@ -Wall
+ prefix = @prefix@
+ man1dir=@mandir@/man1
+ exec_prefix = @exec_prefix@
+@@ -36,10 +36,10 @@ Makefile config.h: Makefile.in config.h.
  
  adjtimex: adjtimex.c mat.o config.h Makefile
  	$(CC) $(CFLAGS) -I. -DVERSION=\"$(VERSION)\" -o adjtimex  \
 -		 adjtimex.c mat.o -lm
-+		 adjtimex.c mat.o -lm $(LDFLAGS)
++		 adjtimex.c mat.o -lm $(LDFLAGS) $(CPPFLAGS)
  
  mat.o: mat.c
- 	$(CC) $(CFLAGS) -c mat.c
+-	$(CC) $(CFLAGS) -c mat.c
++	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -c mat.c
+ 
+ install: all
+ 	$(INSTALL) -g bin -m 755 -o root adjtimex $(bindir)/adjtimex

@@ -1,3 +1,13 @@
+adjtimex (1.29-5) unstable; urgency=medium
+
+  * QA upload.
+  * Upload to unstable.
+  * debian/copyright:
+      - Dropping dot-zero from GPL license short name.
+      - Updated the packaging copyright years.
+
+ -- Joao Eriberto Mota Filho <eriberto@debian.org>  Tue, 05 May 2015 16:40:45 -0300
+
 adjtimex (1.29-4) experimental; urgency=medium
 
   * QA upload.

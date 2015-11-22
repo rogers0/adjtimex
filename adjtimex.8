@@ -1,0 +1,157 @@
+..\"{{{  Title
+.TH ADJTIMEX 8 "March 2, 1995"
+..\"}}}
+..\"{{{  Name
+.SH NAME
+adjtimex \- display or set the kernel time variables
+..\"}}}
+..\"{{{  Synopsis
+.SH SYNOPSIS
+.ad l
+.\" commands only
+.B adjtimex
+.RB [ \-offset
+.IR val ]
+.RB [ \-singleshot
+.IR adjustment ]
+.RB [ \-frequency
+.IR newfreq ]
+.RB [ \-maxerror
+.IR val ]
+.RB [ \-esterror
+.IR val ]
+.RB [ \-timeconstant
+.IR val ]
+.RB [ \-tick
+.IR val ]
+.RB [ \-status
+.IR val ]
+.RB [ \-print ]
+.RB [ \-help ]
+..\"}}}
+..\"{{{  Config
+.SH DESCRIPTION
+This program gives you raw access to the kernel time variables.  For a
+machine connected to the Internet, or equipped with a precision oscillator 
+or radio clock, the best way to keep the system clock
+correct is with \fBxntpd\fP(8).  For a standalone or intermittently
+connected machine, you may use \fBadjtimex\fP instead to at least correct
+for systematic drift.
+.PP
+Anyone may print out the time variables, but only the superuser
+may change them.
+.PP
+If your computer is connected to the net, but you prefer not
+to run \fBxntpd\fP due to its size, you might still run it for
+a day or two and use \fBadjtimex -print\fP to learn what values
+of tick and freq it settled on.
+You could then kill \fBxntpd\fP, and add a line to rc.local invoking
+\fBadjtimex\fP to set those parameters each time you reboot.
+..\"}}}
+..\"{{{  Options
+.SH OPTIONS
+.IP "\fB\-tick\fP \fIval\fP"
+Set the number of microseconds that should be added to the system time
+for each kernel tick interrupt.  There are supposed to be 100 ticks per
+second, so \fIval\fP should be close to 10000.  Increasing \fIval\fP
+by 1 speeds up the system clock by about 100 ppm, or 8.64 sec/day.
+.IP "\fB\-frequency\fP \fInewfreq\fP"
+Set the system clock frequency offset to \fInewfreq\fP.  \fInewfreq\fP can be
+negative or positive, and gives a much finer adjustment than the
+\fB-tick\fP switch.  The value is scaled such that \fInewfreq\fP = 1<<16
+speeds up the system clock by about 1 ppm, or .0864 sec/day.
+Thus, \fB-tick 10000 -newfreq 6553600\fP is about the same as \fB-tick
+10001 -newfreq 0\fP.  \fInewfreq\fP must be in the range
+-6553600...6553600 (-100<<16...100<<16).
+
+.IP "\fB\-singleshot\fP \fIadjustment\fP"
+Slew the system clock by \fIadjustment\fP usec.  
+(Its rate is changed temporarily by about 1 part in 2000.)
+..\"\fIadjustment\fP must be in the range -131000...131000.
+.IP "\fB\-offset\fP \fIval\fP" 
+Add a time offset of \fIval\fP usec.
+The kernel code adjusts the time gradually by \fIval\fP, 
+notes how long it has been since the last time offset, 
+and then adjusts the frequency offset to correct for the apparent drift.  
+..\"The short range of this parameter makes it almost 
+..\"totally useless except for use with xntpd:
+\fIval\fP must be in the range -131000...131000.
+.IP "\fB\-maxerror\fP \fIval\fP"
+Set maximum error (usec). 
+.IP "\fB\-esterror\fP \fIval\fP"
+Set estimated error (usec). 
+The maximum and estimated error are not used by the kernel.
+They are merely made available to user processes via the 
+adjtimex(2) system call.
+.IP "\fB\-timeconstant\fP \fIval\fP"
+Set phase locked loop (PLL) time constant. 
+\fIval\fP determines the bandwidth or "stiffness"
+of the PLL.  The effective PLL time constant will be a multiple of (1
+<< \fIval\fP).  For room-temperature quartz
+oscillators, David Mills recommends the value 2,
+which corresponds
+to a PLL time constant of about 900 sec and a maximum update interval
+of about 64 sec.  The maximum update interval scales directly with the
+time constant, so that at the maximum time constant of 6, the
+update interval can be as large as 1024 sec.
+
+Values of \fIval\fP between zero and 2 give quick convergence; values
+between 2 and 6 can be used to reduce network load, but at a modest cost
+in accuracy. 
+.IP "\fB\-status\fP \fIval\fP"
+Set \fItime_status\fP variable in the kernel: 
+.nf
+      0   the kernel should periodically set the 
+          CMOS clock to match the system clock
+      1   insert a leap second at midnight
+      2   delete a leap second at midnight
+      3   leap second in progress
+      4   the kernel should leave the CMOS clock alone
+.fi
+Using any of the above switches automatically resets the status to 0.
+Do not use \fB-status\fP with \fB\-singleshot\fP.
+In that case, setting the \fItime_status\fP back to 4 
+must be done in a separate operation.  This is a race condition.
+The kernel must be patched to permit using \fB-status\fP with 
+\fB\-singleshot\fP as an atomic operation.
+.IP "\fB\-print\fP"
+Print the current values of the kernel time variables.
+NOTE: The time is "raw", and may be off by up to one timer tick (10 msec).
+.IP "\fB\-help\fP"
+Print the program options.
+.PP
+..\"}}}
+..\"{{{  Examples
+.SH EXAMPLES
+If your system clock gained 8 seconds in 24 hours, you
+could set the tick to 9999, and then it would lose 0.64 seconds a day
+(that is, 1 tick unit = 8.64 seconds per day).
+To correct the rest of the error, you could set the frequency offset to
+(1<<16)*0.64/.0864 = 485452.  Thus, putting the following
+in rc.local would approximately correct the system clock:
+
+.nf
+     adjtimex -tick 9999 -freq 485452
+.fi
+.PP
+..\"}}}
+..\"{{{  Notes
+.SH NOTES
+\fBadjtimex\fP deals only with the system clock \(em the one
+that runs while the computer is powered up.  To read or set the CMOS
+clock, see \fBclock\fP(8).
+..\"}}}
+..\"{{{  Author
+.SH AUTHOR
+Steven S. Dick <ssd@nevets.oau.org>.  
+..\" man page by Jim Van Zandt <jrv@vanzandt.mv.com>
+..\"}}}
+..\"{{{  See also
+.SH "SEE ALSO"
+.BR date "(1L), " gettimeofday "(2), " settimeofday "(2), " 
+.BR clock "(8), " xntpd (8),
+\fI/usr/src/linux/include/linux/timex.h,
+/usr/src/linux/include/linux/sched.h,
+/usr/src/linux/kernel/time.c,
+/usr/src/linux/kernel/sched.c\fP
+..\"}}}

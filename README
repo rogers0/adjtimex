@@ -1,0 +1,190 @@
+ADJTIMEX 
+
+I will assume you have already read the man page for adjtimex :-)
+
+
+BACKGROUND
+
+You probably already know that your computer has two clocks - the "real
+time clock" (RTC) that runs all the time, and the system clock that runs
+only while the computer is on.  The system clock has much better
+precision (approximately 1 usec), but the RTC probably has better
+long-term stability.  adjtimex can be used to approximately correct the
+system clock for drift.
+
+The handiest reference clock is the RTC.  I have included the small
+program clockdiff which shows the time, the difference between the two
+clocks, the first difference (how much the system clock has gained or
+lost relative to the RTC since the last check), and two kernel time
+parameters: tick and frequency offset.  Of course, the RTC probably has
+a systematic error of its own.  clock(8) uses the file /etc/adjtime to
+record the drift rate and the time since the RTC was last set.
+clockdiff uses the same file.
+
+
+INSTALLATION
+
+Type "make" to compile, then copy the binary to /sbin, and the man page
+to /usr/man/man8 or wherever.
+
+
+ASIDES
+
+You will have to log in as root for most of the following.
+
+The standard kernel will leave the RTC alone only until one of the time
+parameters is set (using adjtimex, for example).  Then it thinks xntpd
+is regulating the system time, and it starts "correcting" the RTC
+approximately every ten minutes.  You can prevent this by setting the
+parameter "status" to 4.  I will include this in every command line.
+
+
+USAGE
+
+Create /etc/adjtime.  clockdiff uses the file /etc/adjtime to correct
+for systematic error in the RTC.  Set it up as explained in the man page
+for clock(8).  clock (and a lot of other useful utilities) is included
+in Rik Faith's collection:
+sunsite.unc.edu:pub/Linux/system/Misc/util-linux-1.10.tar.gz If your RTC
+is already accurate enough to suit you, just create a file /etc/adjtime
+containing as the first and only line: '0.0 0 0.0'.
+
+
+Compile clockdiff, run it, and let it report twice, ten seconds apart
+(you will have to interrupt it with ^C).  Suppose the result is:
+
+# ./clockdiff -p 10
+794625929   -0.597638 -0.597638         0     10000         0
+794625939   -0.602050 -0.004412         0     10000         0
+                      ^^^^^^^^^
+This number says the system clock lost over 4 msec in just 10 sec with
+respect to the RTC, or 4 parts in 10000.  Therefore, we increase the
+tick parameter to 10004, and repeat the comparison:
+
+# adjtimex -status 4  -tick 10004
+# ./clockdiff -p 10
+794626037   -0.644860 -0.644860         0     10004         0
+794626047   -0.645259 -0.000399         0     10004         0
+
+Now the system clock is slow by about 39.9 parts per million.  We can
+change the frequency offset to fix this.  Recall that the frequency
+offset is in parts per million, with the fraction point in the center
+(16 bits on either side).  Therefore, we set the offset to 39.9*65536 =
+2614886:
+
+# adjtimex -status 4  -frequency 2614886
+# ./clockdiff -p 10
+794626313   -0.652147 -0.652147   2614886     10004         0
+794626323   -0.652247 -0.000100   2614886     10004         0
+
+It still seems to be off by about 10 ppm, so we increase the offset
+by 10*65536, to 3270246:
+
+# adjtimex -status 4  -frequency 3270246
+# ./clockdiff -p 10
+794627233   -0.795221 -0.795221   3270246     10004         0
+794627243   -0.795231 -0.000009   3270246     10004         0
+
+Continue until you're satisfied (or tired :-).  
+
+By the way, using the -offset or -singleshot options seems to have a
+long-term effect on the clock.  I suggest you determine the tick and
+frequency settings before trying the other options.
+
+
+You may already have an entry like this in rc.S or one of the
+other startup files:
+
+	# Adjust CMOS clock based on /etc/adjtime, then set system clock.
+	# Add -u switch if your system keeps GMT.
+	if [ -x /sbin/clock ]; then
+	  /sbin/clock -a
+	fi
+
+
+Just add an entry like this:
+
+	# Regulate the sytem clock
+	if [ -x /sbin/adjtimex ]; then
+	  /sbin/adjtimex  -tick 10004  -frequency 3270246  -status 4
+	fi
+
+
+THE PATCH
+
+As mentioned in the man page, the -status and -singleshot options
+interfere.  The following kernel patch eliminates this problem, and adds
+some checks that were suggested in the original code:
+
+diff -u -r linux-1.1.93.orig/kernel/time.c linux-1.1.93/kernel/time.c
+--- linux-1.1.93.orig/kernel/time.c	Wed Feb  1 02:19:36 1995
++++ linux-1.1.93/kernel/time.c	Wed Feb 22 20:54:22 1995
+@@ -16,6 +16,8 @@
+  *      adjtime interface update and CMOS clock write code
+  * 02 Jul 94	Alan Modra
+  *	fixed set_rtc_mmss, fixed time.year for >= 2000, new mktime
++ * 22 Feb 95	Jim Van Zandt
++ *	adjtime mode tests fixed
+  */
+ 
+ #include <linux/errno.h>
+@@ -348,11 +350,19 @@
+ 	/* Now we validate the data before disabling interrupts
+ 	 */
+ 
+-	if (txc.mode != ADJ_OFFSET_SINGLESHOT && (txc.mode & ADJ_OFFSET))
++	if ((txc.mode & ADJ_OFFSET) &&
++		((txc.mode & ADJ_OFFSET_SINGLESHOT) != ADJ_OFFSET_SINGLESHOT)) {
++
++	  /* if applying offset, can't change other variables too */
++	  /* XXX should give error for setting any other bits? */
++	  if (txc.mode & ADJ_TICK || txc.mode & ADJ_FREQUENCY)
++	    return -EINVAL;
++
+ 	  /* Microsec field limited to -131000 .. 131000 usecs */
+ 	  if (txc.offset <= -(1 << (31 - SHIFT_UPDATE))
+ 	      || txc.offset >= (1 << (31 - SHIFT_UPDATE)))
+ 	    return -EINVAL;
++	}
+ 
+ 	/* time_status must be in a fairly small range */
+ 	if (txc.mode & ADJ_STATUS)
+@@ -391,7 +401,7 @@
+ 		time_constant = txc.time_constant;
+ 
+ 	    if (txc.mode & ADJ_OFFSET)
+-	      if (txc.mode == ADJ_OFFSET_SINGLESHOT)
++	      if ((txc.mode & ADJ_OFFSET_SINGLESHOT) == ADJ_OFFSET_SINGLESHOT)
+ 		{
+ 		  time_adjust = txc.offset;
+ 		}
+
+
+FURTHER READING
+
+For authoritative documentation on the kernel time software, see
+the following, all by David L. Mills <mills@udel.edu>:
+
+[MIL92a] Mills, D.L. Network Time Protocol (Version 3) specification,
+implementation and analysis, RFC 1305, University of Delaware, March
+1992, 113 pp.
+
+[MIL92c] Mills, D.L. Simple Network Time Protocol (SNTP), RFC 1361,
+University of Delaware, August 1992, 10 pp.
+
+[MIL94a] Mills, D.L. A kernel model for precision timekeeping. ARPA
+Network Working Group Report RFC-1589, University of Delaware, March
+1994. 31 pp.
+
+README.kern, which can be found in louie.udel.edu:/pub/ntp/kernel.tar.Z.
+
+
+THANKS
+
+to David Mills for the kernel timekeeping code, and Steven Dick for
+writing adjtimex.
+
+
+Enjoy!
+                - Jim Van Zandt <jrv@vanzandt.mv.com>
+

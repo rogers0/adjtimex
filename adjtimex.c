@@ -8,9 +8,11 @@
 		ssd@nevets.oau.org (Steven S. Dick)
 		jrv@vanzandt.mv.com (Jim Van Zandt)
 
-	$Id: adjtimex.c,v 1.6 1998/08/23 00:11:47 jrv Exp jrv $
+	$Id: adjtimex.c,v 1.7 1998/11/29 01:26:28 jrv Exp jrv $
 
 */
+
+#define _GNU_SOURCE		/* strptime is a GNU extension */
 
 #include <ctype.h>
 #include <errno.h>
@@ -32,7 +34,11 @@
 #include <unistd.h>
 #include <utmp.h>
 
+#ifdef __alpha__
+extern int adjtimex(struct timex *);
+#else
 _syscall1(int, adjtimex, struct timex *, txcp)
+#endif
 int F_print = 0;
 
 #ifndef LOG_PATH
@@ -42,6 +48,8 @@ int F_print = 0;
 #define WTMP_PATH "/var/log/wtmp"
 #endif
 
+static unsigned long epoch = 1900; /* year corresponding to 0x00   */
+ 
  /* Here the information for CMOS clock adjustments is kept. */
 #define ADJPATH "/etc/adjtime"
 
@@ -176,13 +184,13 @@ Estimate Systematic Drifts:
        -a, --adjust[=count]      adjust system clock per CMOS clock
        -i, --interval tim        set clock comparison interval (sec)
        -l, --log[=file]          log current times to file
-       -h, --host timeserver     query the timeserver
+           --host timeserver     query the timeserver
        -w, --watch               get current time from user
        -r, --review[=file]       review clock log file, estimate drifts
        -u, --utc                 the CMOS clock is set to UTC
 
 Informative Output:
-       -?, --help                print this help, then exit
+           --help                print this help, then exit
        -v, --version             print adjtimex program version, then exit
 ";
 
@@ -287,9 +295,7 @@ main(int argc, char *argv[])
 	    break;
 	  case 'v':
 	    {
-	      char version[]="$Revision: 1.6 $";
-	      strtok(version, " ");
-	      printf("adjtimex %s\n", strtok(NULL, " "));
+	      printf("adjtimex %s\n", VERSION);
 	      exit(0);
 	    }
 	  case 'w':
@@ -564,10 +570,11 @@ cmos clock last adjusted at Tue Aug 26 11:43:57 1997 (= 872610237)
       /* fetch system time immediately */
       gettimeofday (&now, NULL);
 
-
       tm.tm_mon--;		/* DOS uses 1 base */
       tm.tm_wday -= 3;		/* DOS uses 3 - 9 for week days */
       tm.tm_isdst = -1;		/* don't know whether it's daylight */
+      if ((tm.tm_year += (epoch - 1900)) <= 69)
+	tm.tm_year += 100;
 
       if (universal)
 	cmos_time = mkgmtime(&tm);
@@ -778,38 +785,30 @@ void log_times()
     }
   else if (timeserver)
     {
-      int ret;
       FILE *ifile;
       char command[128];
       char buf[BUFLEN];
-      char tempfile[32];
       char *str[5];
       int i, n=0;
       double d, mean=0, val, var=0, num=0;
 
-      /* if we're root, make sure temporary file is somewhere an
-         ordinary user cannot create symbolic links */
-      if (geteuid()==0) strcpy(tempfile, "/etc/adjtimex.temp");
-      else strcpy(tempfile, "/tmp/adjtimex.temp");
 #ifdef NTPDATE_STUB
-      sprintf(command, "cat ../ntpdate-sample 2>&1 >%s", tempfile);
+      ifile = fopen("../ntpdate-sample", "r");
 #else
-      sprintf(command, "ntpdate -d %.32s 2>&1 >%.32s", timeserver, tempfile);
+      sprintf(command, "ntpdate -d %.32s ", timeserver);
+      ifile = popen(command, "r");
 #endif
-      ret = system(command);
-      if (ret != 0) failntpdate("call to ntpdate failed");
+      if (ifile == NULL) failntpdate("call to ntpdate failed");
 
       /* read and save the significant lines, which should look like this:
 filter offset: -0.02800 -0.01354 -0.01026 -0.01385
 offset -0.013543
  1 Sep 11:51:23 ntpdate[598]: adjust time server 1.2.3.4 offset -0.013543 sec
  */
-      ifile = fopen(tempfile, "r");
       while(fgets(buf, BUFLEN, ifile))
 	if (strstr(buf, "offset") && n < 4)
 	  str[n++] = strdup(buf);
       fclose(ifile);
-      unlink(tempfile);
       if (n != 3) failntpdate("cannot understand ntpdate output");
       gettimeofday(&tv_sys, &tz);
       ftime_sys = tv_sys.tv_sec;
@@ -944,7 +943,7 @@ int valid_system_rate(double ftime_sys, double ftime_ref, double sigma_ref)
     printf("System clock is currently not disciplined - good.\n");
   else
     {
-      printf("System clock is synchronized (by xntpd?) - bad.\n");
+      printf("System clock is synchronized (by ntpd?) - bad.\n");
       undisturbed_sys = 0;
     }
 
@@ -1044,7 +1043,7 @@ int valid_cmos_rate(double ftime_cmos, double ftime_ref, double sigma_ref)
       printf("  the real time clock (cmos clock) has running continuously,\n");
       printf("  it has not been reset with `/sbin/clock',\n");
       printf("  no operating system other than Linux has been running, and\n");
-      printf("  xntpd has not been running? (y/n) [%c] ", default_answer);
+      printf("  ntpd has not been running? (y/n) [%c] ", default_answer);
       fgets(buf, BUFLEN, stdin);
       ch = buf[0];
       if (ch == '\n') ch = default_answer;
@@ -1175,6 +1174,8 @@ compare_cmos_sys()
       tm.tm_mon--;		/* DOS uses 1 base */
       tm.tm_wday -= 3;		/* DOS uses 3 - 9 for week days */
       tm.tm_isdst = -1;		/* don't know whether it's daylight */
+      if ((tm.tm_year += (epoch - 1900)) <= 69)
+	tm.tm_year += 100;
 #ifdef DEBUG
       printf (" mday=%d  mon=%d  wday=%d  year=%d\n",
 	      tm.tm_mday, tm.tm_mon, tm.tm_wday, tm.tm_year);

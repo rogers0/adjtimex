@@ -1,12 +1,14 @@
-#### Start of system configuration section. ####
+#### Start of system configuration section.             -*-makefile-*- ####
  srcdir = .
 VPATH = .
+
+VERSION=1.10
 
 CFLAGS = @CFLAGS@
 prefix = @prefix@
 man1dir=@mandir@/man1
 exec_prefix = @exec_prefix@
-bindir=$(exec_prefix)/bin
+bindir=/sbin
 
 INSTALL=@INSTALL@
 
@@ -19,17 +21,19 @@ mandir = $(prefix)/man/man$(manext)
 
 SHELL = /bin/sh
 
-SRC = adjtimex.c adjtimex.8 mat.c mat.h install-sh configure.in \
- configure Makefile.in README adjtimex.lsm COPYING COPYRIGHT ChangeLog
+SRC = adjtimex.c adjtimex.8 mat.c mat.h install-sh configure.in		\
+ configure Makefile.in README adjtimex.lsm adjtimex.lsm.in COPYING	\
+ COPYRIGHT ChangeLog
 
-MISC = Makefile adjtimex.8 README  adjtimex.lsm
-DISTFILES = $(MISC) $(SRCS)
-
-all: adjtimex
+all: adjtimex adjtimex.lsm
 
 adjtimex: adjtimex.c mat.o
-	$(CC) $(CFLAGS) -I. -o adjtimex adjtimex.c mat.o -lm
-	
+	$(CC) $(CFLAGS) -I. -DVERSION=\"$(VERSION)\" -o adjtimex adjtimex.c  \
+		mat.o -lm
+
+adjtimex.lsm: adjtimex.lsm.in
+	sed s/@VERSION@/$(VERSION)/ adjtimex.lsm.in >adjtimex.lsm
+
 mat.o: mat.c
 	$(CC) $(CFLAGS) -c mat.c
 
@@ -47,21 +51,17 @@ veryclean: clean
 	rm -f adjtimex
 
 shar: $(SRC)
-	distname=`sed -e '/Id.*adjtimex.c/!d' \
-		-e 's/[^0-9]*\([0-9.]*\).*/adjtimex-\1/' \
-		-e q adjtimex.c`; \
+	distname=adjtimex-$(VERSION);		\
 	shar $(SRC) >$$distname.shar 
 
 dist: $(SRC)
-	distname=`sed -e '/Id.*adjtimex.c/!d' \
-		-e 's/[^0-9]*\([0-9.]*\).*/adjtimex-\1/' \
-		-e q adjtimex.c`; \
-	rm -fr $$distname; \
-	mkdir $$distname; \
-	for file in $(SRC); do \
-	  ln $$file $$distname/$$file \
+	distname=adjtimex-$(VERSION);					      \
+	rm -fr $$distname;						      \
+	mkdir $$distname;						      \
+	for file in $(SRC); do						      \
+	  ln $$file $$distname/$$file					      \
 	  || { echo copying $$file instead; cp -p $$file $$distname/$$file;}; \
-	done; \
-	chmod -R a+rX $$distname; \
-	tar -chz -f $$distname.tar.gz $$distname; \
+	done;								      \
+	chmod -R a+rX $$distname;					      \
+	tar -chz -f $$distname.tar.gz $$distname;			      \
 	rm -fr $$distname

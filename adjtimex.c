@@ -45,8 +45,6 @@ int F_print = 0;
 #ifndef WTMP_PATH
 #define WTMP_PATH "/var/log/wtmp"
 #endif
-
-static unsigned long epoch = 1900; /* year corresponding to 0x00   */
  
  /* Here the information for CMOS clock adjustments is kept. */
 #define ADJPATH "/etc/adjtime"
@@ -58,6 +56,10 @@ static unsigned long epoch = 1900; /* year corresponding to 0x00   */
 #define SECONDSPERDAY 86400
 #define BUFLEN 128
 
+#ifndef USE_INLINE_ASM_IO
+static int port_fd = -1;	/* used to access the RTC via /dev/port I/O */
+#endif
+static char *cmos_device;	/* filename of the RTC device */
 static int cmos_fd = -1;
 static int using_dev_rtc = -1;	/* 0 = not using /dev/rtc
 				 1 = using /dev/rtc
@@ -149,9 +151,11 @@ static inline void outb (short port, char val);
 static inline void outb (short port, char val);
 static inline unsigned char inb (short port);
 static void cmos_init ();
+static void cmos_init_directisa ();
 static inline int cmos_read_bcd (int addr);
 static void cmos_read_time (time_t *cmos_timep, double *sysp);
-static void busy_wait(struct timeval *timestamp);
+static void busywait_uip_fall(struct timeval *timestamp);
+static void busywait_second_change(struct tm *cmos, struct timeval *timestamp);
 static void compare(void);
 static void failntpdate();
 static void reset_time_status(void);
@@ -278,7 +282,7 @@ main(int argc, char *argv[])
     txc.modes = 0;
 
     while((c = getopt_long_only(argc, argv, 
-				"a::c::l::e:f:h:i:m:o:prPPsPS:RT:t:udvVw", 
+				"a::c::l::e:f:h:i:m:o:pr::s:S:RT:t:udvVw", 
 				longopt, NULL)) != -1)
       {
 	switch(c)
@@ -503,8 +507,8 @@ outb (short port, char val)
   __asm__ volatile ("out%B0 %0,%1"::"a" (val), "d" (port));
 
 #else
-  lseek (cmos_fd, port, 0);
-  write (cmos_fd, &val, 1);
+  lseek (port_fd, port, 0);
+  write (port_fd, &val, 1);
 #endif
 }
 
@@ -517,55 +521,93 @@ inb (short port)
   __asm__ volatile ("in%B0 %1,%0":"=a" (ret):"d" (port));
 
 #else
-  lseek (cmos_fd, port, 0);
-  read (cmos_fd, &ret, 1);
+  lseek (port_fd, port, 0);
+  read (port_fd, &ret, 1);
 #endif
   return ret;
 }
 
-/* set the global variable cmos_fd to a file descriptor for the CMOS
-   clock */
-static 
+/*
+ * Main initialisation of CMOS clock access methods, for all modes.
+ * Set the global variable cmos_device to the first available RTC device
+ * driver filename between /dev/rtc and /dev/rtc0, and set cmos_fd to
+ * a file descriptor for it.
+ * Failing that, select and initialize direct I/O ports mode.
+ */
+static
 void cmos_init ()
 {
   if (using_dev_rtc < 0)
     {
-      cmos_fd = open ("/dev/rtc", O_RDONLY);
+      cmos_device = "/dev/rtc";
+      cmos_fd = open (cmos_device, O_RDONLY);
       if (cmos_fd >= 0)
 	{
 	  if(verbose)
-	    fprintf (stdout, "opened /dev/rtc for reading\n");
+	    fprintf (stdout, "opened %s for reading\n", cmos_device);
 	  using_dev_rtc = 1;
 	  return;
 	}
       if(verbose)
-	fprintf (stdout, "cannot open /dev/rtc for reading\n");
+	fprintf (stdout, "cannot open %s for reading\n", cmos_device);
+
+      /* falback on /dev/rtc0 */
+      cmos_device = "/dev/rtc0";
+      cmos_fd = open (cmos_device, O_RDONLY);
+      if (cmos_fd >= 0)
+	{
+	  if(verbose)
+	    fprintf (stdout, "opened %s for reading\n", cmos_device);
+	  using_dev_rtc = 1;
+	  return;
+	}
+      if(verbose)
+	fprintf (stdout, "cannot open %s for reading\n", cmos_device);
       using_dev_rtc = 0;
     }
   else if (using_dev_rtc > 0)
     return;
 
-  if (verbose)
-    fprintf (stdout, "using /dev/port I/O\n");
+  /* otherwise do direct I/O */
+  cmos_init_directisa();
+}
 
+/*
+ * Initialise CMOS clock access method, only for direct I/O ports mode.
+ * Set the global variable port_fd to a file descriptor for /dev/port.
+ * This function can safely be called repeatedly (does nothing the
+ * second and following times).
+ */
+static
+void cmos_init_directisa ()
+{
 #ifdef USE_INLINE_ASM_IO
+  if (verbose)
+    fprintf (stdout, "using I/O ports\n");
+
   if (ioperm (0x70, 2, 1))
     {
       fprintf (stderr, "clock: unable to get I/O port access\n");
       exit (1);
     }
 #else
-  if (cmos_fd < 0) 
-    cmos_fd = open ("/dev/port", O_RDWR);
-  if (cmos_fd < 0)
+  if (port_fd >= 0)	/* already initialised */
+    return;
+
+  if (verbose)
+    fprintf (stdout, "using /dev/port I/O\n");
+
+  if (port_fd < 0)
+    port_fd = open ("/dev/port", O_RDWR);
+  if (port_fd < 0)
     {
       perror ("unable to open /dev/port read/write : ");
       exit (1);
     }
-  if(verbose)
+  if (verbose)
     fprintf (stdout, "opened /dev/port for reading\n");
 
-  if (lseek (cmos_fd, 0x70, 0) < 0 || lseek (cmos_fd, 0x71, 0) < 0)
+  if (lseek (port_fd, 0x70, 0) < 0 || lseek (port_fd, 0x71, 0) < 0)
     {
       perror ("unable to seek port 0x70 in /dev/port : ");
       exit (1);
@@ -595,70 +637,79 @@ cmos_read_time (time_t *cmos_timep, double *sysp)
   static int sanity_checked=0;
   time_t cmos_time;
   struct timeval now;
+  int noint_fallback = 1;	/* detect tick by 0 => uip, 1 => time change */
 
-  if (using_dev_rtc > 0)
+  if (using_dev_rtc > 0)	/* access the CMOS clock thru /dev/rtc */
     {
       ioctl (cmos_fd, RTC_PIE_OFF, NULL); /* disable periodic interrupts */
       rc = ioctl (cmos_fd, RTC_UIE_ON, NULL); /* enable update
 					       complete interrupts */
-      if (rc == -1)
+      if (rc == -1)	/* no interrupts? fallback to busywait */
 	{
 	  if (verbose)
 	    fprintf(stdout, 
-		    "/dev/rtc doesn't allow user access to update interrupts\n"
-		    " - using busy wait instead\n");
-	  busy_wait(&now);
-	}
-      {
-	unsigned long interrupt_info;
-	int type, count;
-	
-	do {
-	  rc = read(cmos_fd, &interrupt_info, sizeof(interrupt_info));
-	  gettimeofday(&now, NULL);
+		    "%s doesn't allow user access to update interrupts\n"
+		    " - using busy wait instead\n", cmos_device);
 
-	  if (rc == -1)
-	    {
-	      perror("read() from /dev/rtc to wait for clock tick failed");
-	      exit(1);
-	    }
-	  type = (int)(interrupt_info & 0xff);
-	  count = (int)(interrupt_info >> 8);
-	} while ((type==0)||(count>1));	/* The low-order byte holds
+	  if (noint_fallback)
+	    busywait_second_change(&tm, &now);
+	  else
+	    busywait_uip_fall(&now);
+	}
+      else		/* wait for update-ended interrupt */
+	{
+	  unsigned long interrupt_info;
+	  int type, count;
+
+	  if (verbose)
+	    fprintf (stdout, "waiting for CMOS update-ended interrupt\n");
+
+	  do {
+	    rc = read(cmos_fd, &interrupt_info, sizeof(interrupt_info));
+	    gettimeofday(&now, NULL);
+
+	    if (rc == -1)
+	      {
+		char message[128];
+		snprintf(message, sizeof(message),
+			"read() from %s to wait for clock tick failed", cmos_device);
+		perror(message);
+		exit(1);
+	      }
+	    type = (int)(interrupt_info & 0xff);
+	    count = (int)(interrupt_info >> 8);
+	  } while ((type==0)||(count>1));	/* The low-order byte holds
 		the interrupt type.  The first read may succeed
 		immediately, but in that case the byte is zero, so we
 		know to try again. If there has been more than one
 		interrupt, then presumably periodic interrupts were
 		enabled.  We need to try again for just the update
 		interrupt.  */
-	
-	ioctl (cmos_fd, RTC_RD_TIME, &tm);
-	ioctl (cmos_fd, RTC_UIE_OFF, NULL); /* disable update complete
+
+	} /* the CMOS clock tick just happened, and has been timestamped */
+
+      /* now get this just beginning RTC second */
+      ioctl (cmos_fd, RTC_RD_TIME, &tm);
+      ioctl (cmos_fd, RTC_UIE_OFF, NULL); /* disable update complete
 					     interrupts */
-	}
     }
-  else
+  else		/* access the CMOS clock thru I/O ports */
     {
       /* The "do" loop is "low-risk programming" */
       /* In theory it should never run more than once */
       do
 	{
-	  busy_wait(&now);
+	  busywait_uip_fall(&now);
 	  tm.tm_sec = cmos_read_bcd (0);
 	  tm.tm_min = cmos_read_bcd (2);
 	  tm.tm_hour = cmos_read_bcd (4);
-	  tm.tm_wday = cmos_read_bcd (6);
+	  tm.tm_wday = cmos_read_bcd(6)-1;/* RTC uses 1 - 7 for day of the week, 1=Sunday */
 	  tm.tm_mday = cmos_read_bcd (7);
-	  tm.tm_mon = cmos_read_bcd (8);
-	  tm.tm_year = cmos_read_bcd (9);
+	  tm.tm_mon = cmos_read_bcd(8)-1; /* RTC uses 1 base */
+	  /* we assume we're not running on a PS/2, where century is in byte 55 */
+	  tm.tm_year = cmos_read_bcd(9)+100*cmos_read_bcd(50)-1900;
 	}
       while (tm.tm_sec != cmos_read_bcd (0));
-
-      tm.tm_mon--;		/* RTC uses 1 base */
-      tm.tm_wday--;		/* RTC uses 1 - 7 for day of the week, 1=Sunday */
-      if ((tm.tm_year += (epoch - 1900)) <= 69)
-	tm.tm_year += 100;
-
     }
   tm.tm_isdst = -1;		/* don't know whether it's summer time */
 
@@ -743,11 +794,23 @@ cmos_read_time (time_t *cmos_timep, double *sysp)
 
 /* busywait for UIP fall and timestamp this event */
 static void
-busy_wait(struct timeval *timestamp)
+busywait_uip_fall(struct timeval *timestamp)
 {
   long i;
-  
-  /* read RTC exactly on falling edge of update flag */
+
+  /*
+   * Initialise direct I/O access mode.
+   * This may have been already done previously by the main
+   * initialisation cmos_init(), if the CMOS access mode is direct I/O.
+   * We init it here again, to make busywait_uip_fall() usable in any
+   * other CMOS access modes (/dev/rtc).
+   */
+  cmos_init_directisa();
+
+  if (verbose)
+    fprintf (stdout, "waiting for CMOS update-in-progress fall\n");
+
+  /* read RTC exactly on falling edge of update-in-progress flag */
   /* Wait for rise.... (may take up to 1 second) */
   
   for (i = 0; i < 10000000; i++)
@@ -761,6 +824,39 @@ busy_wait(struct timeval *timestamp)
       gettimeofday(timestamp, NULL);
       break;
     }
+}
+
+/*
+ * Busywait for a change in RTC time and timestamp this event.
+ * cmos_init() must have been called before, and the selected
+ * access method must be using_dev_rtc=1.
+ *
+ * Important note: an ioctl(RTC_RD_TIME) call that happens while the RTC
+ * is updating itself (UIP up, a 2 milliseconds long event) will block.
+ * Properly block until UIP release on recent Linux kernels since 2.6.16.
+ * However all older Linux kernels had a misfeature: they blocked much
+ * longer than necessary, up to 20 ms longer in the worst case.
+ * The method used here cannot detect precisely the CMOS clock tick on
+ * such older kernels. It would result in a random delay, the timestamp
+ * being between 8 and 18 ms late. Hell: that's 3 orders of magnitude
+ * worse than the accuracy expected from this function.
+ */
+static void
+busywait_second_change(struct tm *cmos, struct timeval *timestamp)
+{
+  struct tm begin;
+
+  if (verbose)
+    fprintf (stdout, "waiting for CMOS time change\n");
+
+  /* pick the time, then loop until it changes */
+  ioctl (cmos_fd, RTC_RD_TIME, &begin);
+  do
+    {
+      ioctl (cmos_fd, RTC_RD_TIME, cmos);
+    }
+  while (cmos->tm_sec == begin.tm_sec);
+  gettimeofday(timestamp, NULL);
 }
 
 static inline void 

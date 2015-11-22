@@ -227,7 +227,7 @@ usage(void)
 "       -T, --timeconstant val    set phase locked loop time constant\n"
 "       -a, --adjust[=count]      set system clock parameters per CMOS \n"
 "                                 clock or (with --review) log file\n"
-"       --force-adjust            override +-500 ppm sanity check\n"
+"       --force-adjust            override +-1 percent sanity check\n"
 "\n"
 "Estimate Systematic Drifts:\n"
 "       -c, --compare[=count]     compare system and CMOS clocks\n"
@@ -1264,17 +1264,13 @@ cmos time     system-cmos  error_ppm   tick      freq    tick      freq
 		     txc.tick + tick_delta, txc.freq + freq_delta);
 	      if (loops > 4 && adjusting)
 		{
-		  if (abs(error_ppm)>500)
+		  if (abs(error_ppm)>10000)
 		    {
-		      if (force_adjust)
-			printf (
-"\nWARNING: required correction is greater than plus/minus 500 parts \n"
-"per million, but adjusting anyway per your request.\n");
-		      else
+		      if (!force_adjust)
 			{
 			  printf(
-"\nERROR: required correction is greater than plus/minus 500 parts \n"
-"per million, quitting (use --force-adjust to override).\n");
+"\nERROR: required correction is greater than plus/minus 1 percent (10000 \n"
+"parts per million), quitting (use --force-adjust to override).\n");
 			  if (resetting)
 			    reset_time_status();
 			  exit(1);

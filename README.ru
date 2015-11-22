@@ -188,5 +188,5 @@ adjtimex. (Я сильно изменил код. Любые проблемы - моя ответственность.)
 
 
 Наслаждайтесь!
-                - Jim Van Zandt <jrv@vanzandt.mv.com>
+                - Jim Van Zandt <jrv at comcast.net>
 

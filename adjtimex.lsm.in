@@ -5,7 +5,7 @@ Entered-date:	@DATE@
 Description:	Adjusts the system clock
 Keywords:	time, system clock, hardware clock
 Author:		ssd@nevets.oau.org (Steven S. Dick) 
-Maintained-by:  jrv@vanzandt.mv.com (Jim Van Zandt)
+Maintained-by:  jrv@removeme.comcast.net (Jim Van Zandt)
 Primary-site:	sunsite.unc.edu /pub/Linux/utils/administration
 		47k adjtimex-@VERSION@.tar.gz
 Platforms:	Linux

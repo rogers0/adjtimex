@@ -2,9 +2,9 @@
  srcdir = .
 VPATH = .
 
-VERSION=1.12.1
+VERSION=1.20
 
-CFLAGS = @CFLAGS@
+CFLAGS = @CFLAGS@ -Wall
 prefix = @prefix@
 man1dir=@mandir@/man1
 exec_prefix = @exec_prefix@
@@ -15,7 +15,7 @@ INSTALL=@INSTALL@
 # Extension (not including `.') for the manual page filenames.
 manext = 8
 # Where to put the manual pages.
-mandir = $(prefix)/man/man$(manext)
+mandir = $(prefix)/share/man/man$(manext)
 
 #### End of system configuration section. ####
 
@@ -41,7 +41,8 @@ mat.o: mat.c
 
 install: all
 	$(INSTALL) -g bin -m 755 -o root adjtimex $(bindir)/adjtimex
-	-$(INSTALL) -g man -m 444 -o root $(srcdir)/adjtimex.8 \
+	$(INSTALL) -d -g root -m 755 -o root $(mandir)
+	-$(INSTALL) -g root -m 644 -o root $(srcdir)/adjtimex.8 \
 		$(mandir)/adjtimex.$(manext)
 
 uninstall:

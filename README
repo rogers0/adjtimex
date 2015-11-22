@@ -13,7 +13,9 @@ long-term stability.  adjtimex can be used to approximately correct the
 system clock for drift.
 
 The handiest reference clock is the RTC.  
-  adjtimex --compare
+
+	adjtimex --compare
+
 shows the time, the difference between the two clocks, the first
 difference (how much the system clock has gained or lost relative to
 the RTC since the last check), and two kernel time parameters: tick
@@ -25,11 +27,17 @@ may have a systematic error of its own.  clock(8) uses the file
 last set.  adjtimex also consults this file and applies the correction
 to the times from the RTC.
 
+adjtimex can also record the times on both clocks, and optionally
+another reference time, in a log.  It can later compare the logged
+time and estimate drift rates.
+
 
 INSTALLATION
 
-Type "make" to compile, then copy the binary to /sbin, and the man page
-to /usr/man/man8 or wherever.
+Type "./configure" to configure, "make" to compile, then "make
+install" to copy the binary to /usr/local/bin, and the man page to
+/usr/local/man/man8.  If you want the program installed in /usr rather
+than /usr/local, start with "./configure --prefix=/usr".
 
 
 ASIDES
@@ -59,18 +67,18 @@ I'll explain the manual procedure first.
 Compile and run adjtimex with the --compare switch.
 Suppose the result is:
 
-# adjtimex --compare
-794625929   -0.597638 -0.597638  ...
-794625939   -0.602050 -0.004412  ...
-                      ^^^^^^^^^
+	# adjtimex --compare
+	794625929   -0.597638 -0.597638  ...
+	794625939   -0.602050 -0.004412  ...
+			      ^^^^^^^^^
 This number says the system clock lost over 4 msec in just 10 sec with
 respect to the RTC, or 4 parts in 10000.  Therefore, we increase the
 tick parameter to 10004, and repeat the comparison:
 
-# adjtimex  --tick 10004
-# adjtimex --compare
-794626037   -0.644860 -0.644860  ...
-794626047   -0.645259 -0.000399  ...
+	# adjtimex  --tick 10004
+	# adjtimex --compare
+	794626037   -0.644860 -0.644860  ...
+	794626047   -0.645259 -0.000399  ...
 
 Now the system clock is slow by about 39.9 parts per million.  We can
 change the frequency offset to fix this.  Recall that the frequency
@@ -78,28 +86,29 @@ offset is in parts per million, with the fraction point in the center
 (16 bits on either side).  Therefore, we set the offset to 39.9*65536 =
 2614886:
 
-# adjtimex  --frequency 2614886
-# adjtimex --compare
-794626313   -0.652147 -0.652147  ...
-794626323   -0.652247 -0.000100  ...
+	# adjtimex  --frequency 2614886
+	# adjtimex --compare
+	794626313   -0.652147 -0.652147  ...
+	794626323   -0.652247 -0.000100  ...
 
 It still seems to be off by about 10 ppm, so we increase the offset
 by 10*65536, to 3270246:
 
-# adjtimex  --frequency 3270246
-# adjtimex --compare
-794627233   -0.795221 -0.795221  ...
-794627243   -0.795231 -0.000009  ...
+	# adjtimex  --frequency 3270246
+	# adjtimex --compare
+	794627233   -0.795221 -0.795221  ...
+	794627243   -0.795231 -0.000009  ...
 
 The entries in the "suggested" columns are calculated in this way.
-Using the --adjust switch automates the entire process.
+Using the --adjust switch automates the process - periodically
+installing the "suggested" values.
 
 By the way, using the --offset or --singleshot options seems to have a
 long-term effect on the clock.  I suggest you determine the tick and
 frequency settings before trying the other options.
 
-You may already have an entry like this in rc.S or one of the
-other startup files:
+You may already have an entry like this in /etc/rc.d/rc.S,
+/etc/init.d/boot, or one of the other startup files:
 
 	# Adjust CMOS clock based on /etc/adjtime, then set system clock.
 	# Add -u switch if your system keeps GMT.
@@ -107,13 +116,48 @@ other startup files:
 	  /sbin/clock -a
 	fi
 
-
 Just add an entry like this:
 
 	# Regulate the sytem clock
 	if [ -x /sbin/adjtimex ]; then
 	  /sbin/adjtimex  --tick 10004  --frequency 3270246 
 	fi
+
+
+LONG TERM COMPARISONS
+
+You can use adjtimex to record the values of the CMOS and system
+times, and optionally a reference time, so drift rates can be
+determined over long periods.  To enter a reference time manually, use
+
+	# adjtimex  --log --watch
+
+adjtimex will ask you to hit a key when you know the time, then will
+ask the time and its approximate precision.  It will then ask whether
+either clock has been disturbed since the previous log entry.  You can
+take the time from an accurate clock, a radio time broadcast like WWV
+or CHU, etc.
+
+If you have ntpdate installed, and your computer has network
+connectivity, use
+
+	# adjtimex  --log  --host www.xxx.yyy.zzz
+
+and adjtimex will use ntpdate to request the time from the specified
+host.  (Ask your Internet Service Provider whether he has an NTP time
+server, or can suggest one.)
+
+After you have made several log entries, you can ask adjtimex to
+review the log with
+
+	# adjtimex  --review
+
+It will take each pair of log entries in turn, and calculate the error
+in each clock's rate in parts per million (ppm), with its estimated
+uncertainty.  It will also find over-all average errors, and will
+suggest parameter values to correct for drift.  Be sure to check the
+outputs for consistency.  One incorrect reference time can throw off
+all the calculations.
 
 
 FURTHER READING
@@ -137,9 +181,11 @@ README.kern, which can be found in louie.udel.edu:/pub/ntp/kernel.tar.Z.
 
 THANKS
 
-to David Mills for the kernel timekeeping code, and Steven Dick for
-writing adjtimex.  (I've changed the code a lot.  Any problems are my
-responsibility.)
+to David Mills for the kernel timekeeping code, and Steven Dick
+<ssd@nevets.oau.org> for writing adjtimex originally.  (I've changed
+the code a lot.  Any problems are my responsibility.)  Thanks also to
+Michael Meskes <meskes@debian.org>, whose Debian installation script
+inspired the "--compare" and "--adjust" options.
 
 
 Enjoy!

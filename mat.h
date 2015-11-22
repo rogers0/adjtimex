@@ -1,0 +1,12 @@
+void mat_copy(void *, int, int, void *, int, int);
+void mat_add(void *, int, int, void *, int, int, void *, int, int);
+void mat_sub(void *, int, int, void *, int, int, void *, int, int);
+void mat_zero(void *, int, int);
+void mat_one(void *, int, int);
+void mat_mul(void *, int, int, void *, int, int, void *, int, int);
+void mat_mul_tn(void *, int, int, void *, int, int, void *, int, int);
+void mat_mul_nt(void *, int, int, void *, int, int, void *, int, int);
+int mat_similarity(void *, int, int, void *, int, int, void *, int, int);
+int sym_factor(void *, int, int, void *, int, int);
+void sym_rdiv(void *, int, int, void *, int, int, void *, int, int);
+void sym_ldiv(void *, int, int, void *, int, int, void *, int, int);

@@ -2,7 +2,7 @@
  srcdir = .
 VPATH = .
 
-VERSION=1.10
+VERSION=1.12.1
 
 CFLAGS = @CFLAGS@
 prefix = @prefix@
@@ -22,8 +22,8 @@ mandir = $(prefix)/man/man$(manext)
 SHELL = /bin/sh
 
 SRC = adjtimex.c adjtimex.8 mat.c mat.h install-sh configure.in		\
- configure Makefile.in README adjtimex.lsm adjtimex.lsm.in COPYING	\
- COPYRIGHT ChangeLog
+ configure Makefile.in README README.ru adjtimex.lsm adjtimex.lsm.in	\
+ COPYING COPYRIGHT ChangeLog
 
 all: adjtimex adjtimex.lsm
 
@@ -31,8 +31,10 @@ adjtimex: adjtimex.c mat.o
 	$(CC) $(CFLAGS) -I. -DVERSION=\"$(VERSION)\" -o adjtimex adjtimex.c  \
 		mat.o -lm
 
-adjtimex.lsm: adjtimex.lsm.in
-	sed s/@VERSION@/$(VERSION)/ adjtimex.lsm.in >adjtimex.lsm
+adjtimex.lsm: adjtimex.lsm.in Makefile.in
+	sed -e 's/@VERSION@/$(VERSION)/'		\
+	  -e "s/@DATE@/`date +%d%b%y|tr [a-z] [A-Z]`/"	\
+	  adjtimex.lsm.in >adjtimex.lsm
 
 mat.o: mat.c
 	$(CC) $(CFLAGS) -c mat.c

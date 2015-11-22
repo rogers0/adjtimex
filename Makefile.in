@@ -2,7 +2,7 @@
  srcdir = .
 VPATH = .
 
-VERSION=1.27
+VERSION=1.27.1
 
 CFLAGS = @CFLAGS@ -Wall
 prefix = @prefix@
@@ -12,6 +12,7 @@ bindir=/sbin
 
 INSTALL=@INSTALL@
 
+
 # Extension (not including `.') for the manual page filenames.
 manext = 8
 # Where to put the manual pages.
@@ -19,22 +20,21 @@ mandir = $(prefix)/share/man/man$(manext)
 
 #### End of system configuration section. ####
 
-SHELL = /bin/sh
-
 SRC = adjtimex.c adjtimex.8 mat.c mat.h install-sh configure.in		\
- configure Makefile.in README README.ru adjtimex.lsm adjtimex.lsm.in	\
- COPYING COPYRIGHT ChangeLog
+ configure Makefile.in config.h.in README README.ru adjtimex.lsm	\
+  adjtimex.lsm.in COPYING COPYRIGHT ChangeLog
 
 all: adjtimex adjtimex.lsm Makefile
 
-adjtimex: adjtimex.c mat.o
-	$(CC) $(CFLAGS) -I. -DVERSION=\"$(VERSION)\" -o adjtimex adjtimex.c  \
-		mat.o -lm
+configure config.h.in: configure.in
+	autoconf
+	autoheader
+Makefile config.h: Makefile.in config.h.in
+	./configure
 
-adjtimex.lsm: adjtimex.lsm.in Makefile
-	sed -e 's/@VERSION@/$(VERSION)/'	\
-	  -e "s/@DATE@/`date +%Y-%m-%d`/"	\
-	  adjtimex.lsm.in >adjtimex.lsm
+adjtimex: adjtimex.c mat.o config.h Makefile
+	$(CC) $(CFLAGS) -I. -DVERSION=\"$(VERSION)\" -o adjtimex  \
+		 adjtimex.c mat.o -lm
 
 mat.o: mat.c
 	$(CC) $(CFLAGS) -c mat.c
@@ -53,6 +53,11 @@ clean:
 veryclean: clean
 	rm -f adjtimex
 
+adjtimex.lsm: adjtimex.lsm.in Makefile
+	sed -e 's/@VERSION@/$(VERSION)/'	\
+	  -e "s/@DATE@/`date +%Y-%m-%d`/"	\
+	  adjtimex.lsm.in >adjtimex.lsm
+
 shar: $(SRC)
 	distname=adjtimex-$(VERSION);		\
 	shar $(SRC) >$$distname.shar 
@@ -69,5 +74,3 @@ dist: $(SRC)
 	tar -chz -f $$distname.tar.gz $$distname;			      \
 	rm -fr $$distname
 
-Makefile: Makefile.in
-	./configure

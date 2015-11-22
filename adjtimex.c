@@ -36,7 +36,26 @@
 #include <utmp.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include "config.h"
+#ifdef HAVE_LINUX_RTC_H
 #include <linux/rtc.h>
+#else
+struct rtc_time {
+	int tm_sec;
+	int tm_min;
+	int tm_hour;
+	int tm_mday;
+	int tm_mon;
+	int tm_year;
+	int tm_wday;
+	int tm_yday;
+	int tm_isdst;
+};
+#define RTC_UIE_ON   _IO('p', 0x03)	/* Update int. enable on	*/
+#define RTC_UIE_OFF  _IO('p', 0x04)	/* ... off			*/
+#define RTC_PIE_OFF  _IO('p', 0x06)	/* Periodic int. enable off	*/
+#define RTC_RD_TIME  _IOR('p', 0x09, struct rtc_time) /* Read RTC time  */
+#endif /* HAVE_LINUX_RTC_H */
 
 int F_print = 0;
 

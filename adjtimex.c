@@ -62,12 +62,6 @@ static int port_fd = -1;	/* used to access the RTC via /dev/port I/O */
 #endif
 static char *cmos_device;	/* filename of the RTC device */
 static int cmos_fd = -1;
-static int using_dev_rtc = -1;	/* 0 = not using /dev/rtc
-				 1 = using /dev/rtc
-				-1 = will use /dev/rtc if available,
-				     but have not tried to open it yet */
-static int nointerrupt = 0;	/* 0 = try to detect RTC tick via interrupt
-				   1 = via another method */
 
 struct hack {
   double ref;			/* reference time for time hack */
@@ -102,11 +96,40 @@ struct cmos_adj
 
 struct timex txc;
 
-#define HELP 131
+/* command line option variables */
+
+static int using_dev_rtc = -1;	/* 0 = not using /dev/rtc
+				 1 = using /dev/rtc
+				-1 = will use /dev/rtc if available,
+				     but have not tried to open it yet */
+static int nointerrupt = 0;	/* 0 = try to detect RTC tick via interrupt
+				   1 = via another method */
+
+int adjusting = 0;
+int force_adjust;
+int comparing = 0;
+int logging = 0;
+int reviewing = 0;
+int resetting = 0;		/* nonzero if need to call
+				   reset_time_status() */
+int interval = 10;
+int count = 8;
+int marked;
+int universal = 0;
+int verbose = 0;
+int watch;			/* nonzero if time specified on command line */
+int undisturbed_sys = 0;
+int undisturbed_cmos = 0;
+char *log_path = LOG_PATH;
+
+char *timeserver;		/* points to name of timeserver */
+
+enum {HELP=131};
 
 struct option longopt[]=
 {
   {"adjust", 2, NULL, 'a'},
+  {"force-adjust", 0, &force_adjust, 1},
   {"compare", 2, NULL, 'c'},
   {"log", 2, NULL, 'l'},
   {"esterror", 1, NULL, 'e'},
@@ -131,24 +154,6 @@ struct option longopt[]=
   {"watch", 0, NULL, 'w'},
   {0,0,0,0}
 };
-
-int adjusting = 0;
-int comparing = 0;
-int logging = 0;
-int reviewing = 0;
-int resetting = 0;		/* nonzero if need to call
-				   reset_time_status() */
-int interval = 10;
-int count = 8;
-int marked;
-int universal = 0;
-int verbose = 0;
-int watch;			/* nonzero if time specified on command line */
-int undisturbed_sys = 0;
-int undisturbed_cmos = 0;
-char *log_path = LOG_PATH;
-
-char *timeserver;		/* points to name of timeserver */
 
 static void usage(void);
 static inline void outb (short port, char val);
@@ -203,6 +208,7 @@ usage(void)
 "       -T, --timeconstant val    set phase locked loop time constant\n"
 "       -a, --adjust[=count]      set system clock parameters per CMOS \n"
 "                                 clock or (with --review) log file\n"
+"       --force-adjust            override +-500 ppm sanity check\n"
 "\n"
 "Estimate Systematic Drifts:\n"
 "       -c, --compare[=count]     compare system and CMOS clocks\n"
@@ -292,6 +298,8 @@ main(int argc, char *argv[])
       {
 	switch(c)
 	  {
+	  case 0: break;	/* options that just set a variable
+				   are handled in longopt */
 	  case 'a':
 	    adjusting = 1;
 	    if (optarg)
@@ -390,7 +398,7 @@ main(int argc, char *argv[])
 	      exit(0);
 	    }
 	  case 'V':
-	    verbose = 1;
+	    verbose++;
 	    break;
 	  case 'w':
 	    watch = 1;
@@ -401,7 +409,8 @@ main(int argc, char *argv[])
 	    break;
 	  case '?':
 	  default:
-	    fprintf(stderr, "For valid options, try 'adjtimex --help'\n");
+	    fprintf(stderr, "Unrecognized option %s\nFor valid "
+		    "options, try 'adjtimex --help'\n", argv[optind-1]);
 	    exit(1);
 	  }
 	}
@@ -571,12 +580,12 @@ void cmos_init ()
 	  cmos_fd = open (cmos_device, O_RDONLY);
 	  if (cmos_fd >= 0)
 	    {
-	      if(verbose)
+	      if (verbose)
 		fprintf (stdout, "opened %s for reading\n", cmos_device);
 	      using_dev_rtc = 1;
 	      return;
 	    }
-	  if(verbose)
+	  if (verbose)
 	    {
 	      int saveerr=errno;
 	      fprintf (stdout, "adjtimex: cannot open %s for reading\n", 
@@ -699,11 +708,31 @@ cmos_read_time (time_t *cmos_timep, double *sysp)
   int got_tick = 0;
   int got_time = 0;
   int saveerr;
+  int type_uie, count;
+  double update_delay;
 
   if (using_dev_rtc > 0)	/* access the CMOS clock thru /dev/rtc */
     {
       if (!nointerrupt)		/* get RTC tick via update interrupt */
 	{
+	  struct timeval before;
+
+	  gettimeofday(&before, NULL);
+
+	  /* Ordinarily, reading /dev/rtc does not wait until the
+   beginning of the next second.  It only returns the current timer
+   value, so it's only accurate to 1 sec which isn't good enough for
+   us.  I see this comment in drivers/char/rtc.c, function
+   rtc_get_rtc_time(), in the kernel sources:
+
+	 * read RTC once any update in progress is done. The update
+	 * can take just over 2ms. We wait 10 to 20ms. There is no need to
+	 * to poll-wait (up to 1s - eeccch) for the falling edge of RTC_UIP.
+	 * If you need to know *exactly* when a second has started, enable
+	 * periodic update complete interrupts, (via ioctl) and then 
+	 * immediately read /dev/rtc which will block until you get the IRQ.
+	 * Once the read clears, read the RTC time (again via ioctl). Easy. 
+   */
 	  ioctl (cmos_fd, RTC_PIE_OFF, NULL); /* disable periodic interrupts */
 	  rc = ioctl (cmos_fd, RTC_UIE_ON, NULL); /* enable update
 						     complete interrupts */
@@ -718,38 +747,50 @@ cmos_read_time (time_t *cmos_timep, double *sysp)
  	  else		/* wait for update-ended interrupt */
 	    {
 	      unsigned long interrupt_info;
-	      int type_uie, count;
 
 	      if (verbose)
 		fprintf (stdout, "waiting for CMOS update-ended interrupt\n");
 
-	      alarm_timeout(1);	/* arm a 2 seconds timeout */
-
 	      do {
+		{
+		  /* avoid blocking even if /dev/rtc never becomes readable */
+		  fd_set readfds;
+		  struct timeval tv;
+		  int retval;
+		  
+		  FD_ZERO(&readfds);
+		  FD_SET(cmos_fd, &readfds);
+		  tv.tv_sec=2; tv.tv_usec=0; /* wait up to 2 sec */
+		  retval = select(cmos_fd+1, &readfds, NULL, NULL, &tv);
+		  if (retval <= 0)
+		    {
+		      ioctl (cmos_fd, RTC_UIE_OFF, NULL); /* disable update complete
+							     interrupts */
+		      if (retval == -1)
+			perror("select()");
+		      if (!retval)
+			if (verbose)
+			  fprintf(stdout,
+				  "timeout waiting for a CMOS update interrupt from %s\n"
+				  " - using busy wait instead\n", cmos_device);
+		      nointerrupt = 1;
+		      goto directisa;
+		    }
+		}
 		rc = read(cmos_fd, &interrupt_info, sizeof(interrupt_info));
 		saveerr = errno;
 		gettimeofday(&now, NULL);
 
 		if (rc == -1)
 		  {
-		    if (saveerr == EINTR && timeout) /* timeout waiting for interrupt? fallback to busywait */
-		      {
-			if (verbose)
-			  fprintf(stdout,
-				  "timeout waiting for a CMOS update interrupt from %s\n"
-				  " - using busy wait instead\n", cmos_device);
-			nointerrupt = 1;
-		      }
-		    else	/* read(/dev/rtc) failed for another reason (not a timeout) */
-		      {
-			char message[128];
-			snprintf(message, sizeof(message),
-				"adjtimex: "
-				"read() from %s to wait for clock tick failed",
-				cmos_device);
-			perror(message);
-			exit(1);
-		      }
+		    /* no timeout, but read(/dev/rtc) failed for another reason */
+		    char message[128];
+		    snprintf(message, sizeof(message),
+			     "adjtimex: "
+			     "read() from %s to wait for clock tick failed",
+			     cmos_device);
+		    perror(message);
+		    exit(1);
 		  }
 
 		type_uie = (int)(interrupt_info & 0x80);
@@ -762,13 +803,22 @@ cmos_read_time (time_t *cmos_timep, double *sysp)
 		 interrupt, then presumably periodic interrupts were
 		 enabled.  We need to try again for just the update
 		 interrupt.  */
+	      
+	      update_delay = (now.tv_sec + .000001*now.tv_usec) -  
+		(before.tv_sec + .000001*before.tv_usec);
 
-	      if ((type_uie) && (count == 1))
+	      if ((type_uie) && (count == 1) && (update_delay > .001))
 		got_tick = 1;
-
-	      alarm_timeout(0);		/* disable timeout */
-
-	    }	    /* end of successfull RTC_UIE_ON case */
+	      else
+		{
+		  if (verbose)
+		    fprintf(stdout, "CMOS interrupt with status "
+			    "0x%2x came in only %8.6f sec\n"
+			    " - using busy wait instead\n",
+			    (unsigned int)interrupt_info&0xff, update_delay);
+		  nointerrupt = 1;
+		}
+	    }	    /* end of successful RTC_UIE_ON case */
 	}	/* end of interrupt tryouts */
 
 
@@ -777,6 +827,7 @@ cmos_read_time (time_t *cmos_timep, double *sysp)
 	 bypassed, unavailable, or timeouted). Fallback to busywaiting
 	 for the tick. */
 
+    directisa:
       if (!got_tick)
 	{
 	  if (noint_fallback)
@@ -851,8 +902,9 @@ cmos_read_time (time_t *cmos_timep, double *sysp)
   
   if (verbose)
     printf ("CMOS time %s (%s) = %ld\n", asctime (&tm),
-	    summertime_correction?"after adjustment":
-	    (universal?"assuming UTC":"assuming local time"),
+	    universal?"assuming UTC":
+	    (summertime_correction?"assuming local time with summer time adjustment":
+	     "assuming local time without summer time adjustment"),
 	    cmos_time);
   
   if (!sanity_checked)
@@ -927,7 +979,7 @@ cmos_read_time (time_t *cmos_timep, double *sysp)
  * detect the update-in-progress flag up state. This UIP up state lasts
  * for 2 ms each second. Detecting a 2 ms event, when other processes
  * can steal us one or several 10 ms timeslices, this is something that
- * can very easely fail. We *can* miss a second tick, or even several in
+ * can very easily fail. We *can* miss a second tick, or even several in
  * a row, under heavy system load. Missing ticks is not a severe problem
  * for adjtimex, as long as we timestamp accurately the tick we'll
  * finally catch. However there is a timeout issue: we can't just arm an
@@ -949,8 +1001,8 @@ busywait_uip_fall(struct timeval *timestamp)
    */
   cmos_init_directisa();
 
-  if (verbose)
-    fprintf (stdout, "waiting for CMOS update-in-progress fall\n");
+  if (verbose>1)
+    fprintf (stdout, "  waiting for CMOS update-in-progress fall\n");
 
   /* read RTC exactly on falling edge of update-in-progress flag */
   /* Wait for rise.... (may take up to 1 second) */
@@ -1064,6 +1116,10 @@ compare()
   int wrote_to_log = 0;
   int hz, tick_min, tick_mid, tick_max;
   long maxfreq;
+  struct timeval tv_dummy;
+
+  /* dummy training call: the next important timestamp will be more accurate */
+  gettimeofday(&tv_dummy, NULL);
 
   probe_time(&hz, &tick_min, &tick_mid, &tick_max, &maxfreq);
 
@@ -1190,6 +1246,23 @@ cmos time     system-cmos  error_ppm   tick      freq    tick      freq
 		     txc.tick + tick_delta, txc.freq + freq_delta);
 	      if (loops > 4 && adjusting)
 		{
+		  if (abs(error_ppm)>500)
+		    {
+		      if (force_adjust)
+			printf (
+"\nWARNING: required correction is greater than plus/minus 500 parts \n"
+"per million, but adjusting anyway per your request.\n");
+		      else
+			{
+			  printf(
+"\nERROR: required correction is greater than plus/minus 500 parts \n"
+"per million, quitting (use --force-adjust to override).\n");
+			  if (resetting)
+			    reset_time_status();
+			  exit(1);
+			}
+		    }
+
 		  txc.modes = ADJ_FREQUENCY | ADJ_TICK;
 		  txc.tick += tick_delta;
 		  txc.freq += freq_delta;
@@ -1212,7 +1285,7 @@ cmos time     system-cmos  error_ppm   tick      freq    tick      freq
       if (interval == 0)
 	break;
       if (count)		/* if it is not the last round */
-	xusleep (interval*1000000L - 900000); /* reading RTC takes 1 sec */
+	xusleep (interval*1000000L - 500000); /* reading RTC takes 1 sec */
     }
 }
 
@@ -1251,17 +1324,19 @@ static void log_times()
   char ch, buf[64], *s;
   int n, ret;
   struct timeval tv_sys;
-  struct timezone tz;
   struct tm bdt;
   time_t when, tref;
   double ftime_ref, ftime_sys, ftime_cmos;
+
+  /* dummy training call: the next important timestamp will be more accurate */
+  gettimeofday(&tv_sys, NULL);
 
   if (watch)
     {
       while(1) {
 	printf("Please press <enter> when you know the time of day: ");
 	ch = getchar();
-	gettimeofday(&tv_sys, &tz);
+	gettimeofday(&tv_sys, NULL);
 	when = tv_sys.tv_sec;
 	bdt = *localtime(&when); /* set default values for most fields */
 	strftime(buf, sizeof(buf), "%Z", &bdt);
@@ -1366,7 +1441,7 @@ offset -0.013543
       failntpdate("cannot understand ntpdate output");
 
     ntpdate_okay:
-      gettimeofday(&tv_sys, &tz);
+      gettimeofday(&tv_sys, NULL);
       ftime_sys = tv_sys.tv_sec;
 	      /* ntpdate selects the offset from one of its samples
 		 (the one with the shortest round-trip delay?) */
@@ -1411,7 +1486,7 @@ offset -0.013543
   else				/* no absolute time reference */
     {
       time_t now;
-      gettimeofday(&tv_sys, &tz);
+      gettimeofday(&tv_sys, NULL);
       now = (time_t)tv_sys.tv_sec;
       bdt = *gmtime(&now);
       ftime_sys = tv_sys.tv_sec + tv_sys.tv_usec*.000001;
@@ -1866,6 +1941,15 @@ void review()
       printf("No previous clock comparison in log file\n");
       return;
     }
+  /*
+    In the following, we assume the reference times are most accurate,
+    then the CMOS clock, then the system clock.  Hence, when comparing
+    CMOS and reference times, we're calculating the error in PPM of
+    the CMOS rate, and when comparing system time to either CMOS or
+    reference times, we're calculating error in PPM of the system
+    rate.  For system time, we're calculating the error if TICK is set
+    to the middle of the rnage, and FREQ is zero.
+  */
 
   /* compare cmos and system rates */
   printf(
@@ -1880,7 +1964,7 @@ void review()
 	  sys_time = hacks[i]->sys - hacks[i-1]->sys;
 	  cmos_time = hacks[i]->cmos - hacks[i-1]->cmos;
 	  hacks[i]->relative_rate =
-	    diff_ppm = 1.e6*(sys_time - cmos_time)*2/(sys_time + cmos_time)
+	    diff_ppm = 1.e6*(sys_time - cmos_time)/sys_time
 	    - 100*(hacks[i]->tick - tick_mid) - hacks[i]->freq/SHIFT;
 	  if (fabs(diff_ppm) > 10000.) /* agree within 1 percent? */
 	    continue;
@@ -1913,7 +1997,7 @@ void review()
 	  ref_time = hacks[i]->ref - hacks[i-1]->ref;
 	  cmos_time = hacks[i]->cmos - hacks[i-1]->cmos;
 	  hacks[i]->cmos_rate =
-	    diff_ppm = 1.e6*(cmos_time - ref_time)*2/(ref_time + cmos_time);
+	    diff_ppm = 1.e6*(cmos_time - ref_time)/cmos_time;
 	  if (fabs(diff_ppm) > 10000.) /* agree within 1 percent? */
 	    continue;
 	  hacks[i]->valid |= CMOS_VALID | REF_VALID;
@@ -1947,7 +2031,7 @@ void review()
 	  ref_time = hacks[i]->ref - hacks[i-1]->ref;
 	  sys_time = hacks[i]->sys - hacks[i-1]->sys;
 	  hacks[i]->sys_rate =
-	    diff_ppm = 1.e6*(sys_time - ref_time)*2/(ref_time + sys_time)
+	    diff_ppm = 1.e6*(sys_time - ref_time)/sys_time
 	    - 100*(hacks[i]->tick - tick_mid) - hacks[i]->freq/SHIFT;
 	  if (fabs(diff_ppm) > 10000.) /* agree within 1 percent? */
 	    continue;
@@ -2056,6 +2140,9 @@ void review()
       error_ppm += tick_delta*hz;
       printf("      suggested tick = %5ld  freq = %9.0f\n",
 	     tick_mid + tick_delta, -error_ppm*SHIFT);
+      if (abs(error_ppm)>500)
+	printf ("WARNING: required correction is greater "
+		"than plus/minus 500 parts per million.\n");
     }
   else
     printf("      (no suggestion)\n");
@@ -2070,6 +2157,22 @@ void review()
 "least squares solution has a bigger error than estimated here\n");
   if (sigma_ppm < 100 && adjusting)
     {
+      if (abs(error_ppm)>500)
+	{
+	  if (force_adjust)
+	    printf (
+"\nWARNING: required correction is greater than plus/minus 500 parts \n"
+"per million, but adjusting anyway per your request.\n");
+	  else
+	    {
+	      printf(
+"\nERROR: required correction is greater than plus/minus 500 parts \n"
+"per million, quitting (use --force-adjust to override).\n");
+	      if (resetting)
+		reset_time_status();
+	      exit(1);
+	    }
+	}
       txc.modes = ADJ_FREQUENCY | ADJ_TICK;
       txc.tick = tick_mid + tick_delta;
       txc.freq = -error_ppm*SHIFT;

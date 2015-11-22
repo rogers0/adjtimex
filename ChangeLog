@@ -1,13 +1,87 @@
-2004-09-19  James R. Van Zandt  <jrv@debian.org>
+2006-05-27  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+	* adjtimex.c (log_times): Permit ntpdate to contact any number of
+	time servers.
+	(log_times): add -q to ntpdate command line
+	(puthackent): with --verbose, display log entry and path to log
+	file.
+	(valid_system_rate, valid_cmos_rate): in messages, ask about
+	/sbin/hwclock rather than the old /sbin/clock.
+	(probe_time): If call to adjtimex fails, quit with error message.
+	(Need root priv.)  Thus, "adjtimex -r" and "adjtimex -c" fail
+	rather than succeeding with bogus results.
+
+2006-05-26  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+	* adjtimex.c (log_times): use stat to look for ntpdate in
+	/usr/bin, /bin, /usr/sbin and /sbin. Close pipe with pclose
+	instead of fclose.
+
+	* adjtimex.8: express PLL time constant in terms of a power of two
+	rather than the more obscure 1<<val.
+
+2006-05-25  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+	* adjtimex.c (log_times): Eliminate compare_cmos_sys(), call
+	cmos_read_time() instead.
+
+2006-05-24  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+	* adjtimex.c (review): For both CMOS and system clocks, write
+	suggested and current adjustments on a separate line from the
+	estimated error in ppm.
+	(cmos_read_time): Move the sanity check code (to adjust CMOS time
+	by multiples of one hour) and code to read sytem time into this
+	function.
+
+2006-05-23  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+	* adjtimex.c (compare_cmos_sys): delete code to find UTC time via
+	switching TZ (was controlled by ZONESWITCH, which was not #defined).
+
+	* adjtimex.8: -h specifies the host, so it can't also ask for the
+	help printout.  -V or --verbose increases verbosity.  Shifting
+	CMOS time by up to 13 hours.
+
+2006-05-23  James R. Van Zandt  <jrv at debian.org>
+
+	* adjtimex.c (cmos_read_time): set tm_isdst to -1 to signal that
+	summer time information is not available (/dev/rtc doesn't set it)
+
+2006-05-22  James R. Van Zandt  <jrv at debian.org>
+
+	* adjtimex.c (cmos_read_time): adjust month, day of week, and year
+	only if reading from /dev/port.
+
+	* Makefile (VERSION): version 1.21
+
+	* adjtimex.c (compare): Adjust CMOS times by + or - 60 min, if
+	that brings them closer to the system time.  If they still differ
+	by more than 6 min, then print a warning and suppress logging.
+	(Thanks to Alain Guibert <derogaton at oreka.com> for noting that
+	summer time start/end can impact the log.)
+
+2006-05-21  James R. Van Zandt  <jrv at debian.org>
+
+	* ChangeLog: Fix spelling of name Alain Guibert (sorry :-)
+
+	* adjtimex.c (cmos_read_time): use /dev/rtc interface if possible
+	(thanks to  Richard Henderson <rth at twiddle.net>).
+
+2005-09-05  James R. Van Zandt  <jrv at debian.org>
+
+	* README: fix email address
+
+2004-09-19  James R. Van Zandt  <jrv at debian.org>
 
 	* Makefile.in (VERSION): version 1.20
 
 	* adjtimex.c (compare): in "compare" or "adjust", return
 	immediately after printing last result (instead of sleeping an
-	extra $interval seconds) (Thanks to Alain Guilbert <derogaton at
-	oreka.com> 
+	extra $interval seconds) (Thanks to Alain Guibert <derogaton at
+	oreka.com>)
 
-2004-09-11  James R. Van Zandt  <jrv@debian.org>
+2004-09-11  James R. Van Zandt  <jrv at debian.org>
 
 	* Makefile.in (VERSION): version 1.19
 
@@ -22,7 +96,7 @@
 	* adjtimex.c: revert to poll-wait instead of using /dev/rtc,
 	because the latter only provides time with one second precision.
 
-2004-04-11  James R. Van Zandt  <jrv@debian.org>
+2004-04-11  James R. Van Zandt  <jrv at debian.org>
 
 	* Makefile.in (VERSION): version 1.18
 
@@ -33,17 +107,17 @@
 	default action, because it's not needed by recent kernels) (thanks
 	to Alain Guibert <derogaton at oreka.com>)
 
-2004-04-09  James R. Van Zandt  <jrv@debian.org>
+2004-04-09  James R. Van Zandt  <jrv at debian.org>
 
 	* adjtimex.c (longopt): --status switch sets clock status
 	(courtesy of Alain Guibert <derogaton at oreka.com>
 	
-2004-04-04  James R. Van Zandt  <jrv@debian.org>
+2004-04-04  James R. Van Zandt  <jrv at debian.org>
 
 	* Makefile.in (CFLAGS): add compiler switch -Wall
 	(mandir): put man pages in $(prefix)/share/man/man8
 
-2004-04-03  James R. Van Zandt  <jrv@debian.org>
+2004-04-03  James R. Van Zandt  <jrv at debian.org>
 
 	* Makefile.in (VERSION): version 1.17
 

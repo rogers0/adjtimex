@@ -1,5 +1,5 @@
 .\"{{{  Title                      Emacs major mode should be: -*- nroff -*-
-.TH ADJTIMEX 8 "November 25, 1997"
+.TH ADJTIMEX 8 "August 22, 1998"
 .\"}}}
 .\"{{{  Name
 .SH NAME
@@ -184,7 +184,7 @@ Set the interval in seconds between clock comparisons for the
 The CMOS clock is set to UTC (universal time) rather than local time.
 .IP "\fB\-l\fP[\fIfile\fP], \fB\--log\fP[\fB=\fP\fIfile\fP]"
 Save the current values of the system and CMOS clocks, and optionally
-a reference time, to \fIfile\fP (default \fI/var/log/clock.log\fP).
+a reference time, to \fIfile\fP (default \fI/var/log/clocks.log\fP).
 The reference time is taken from a network timeserver (see the
 \fB--host\fP switch) or supplied by the user (see the \fB--watch\fP
 switch).
@@ -197,7 +197,7 @@ Protocol (NTP) server, or if that server is not synchronized.  Implies
 Ask for a keypress when the user knows the time, then ask what that
 time was, and its approximate accuracy.  Implies \fB--log\fP.
 .IP "\fB-r\fP[\fIfile\fP], \fB\--review\fP[\fB=\fP\fIfile\fP]"
-Review the clock log \fIfile\fP (default \fI/var/log/clock.log\fP) and
+Review the clock log \fIfile\fP (default \fI/var/log/clocks.log\fP) and
 estimate, if possible, the rates of the CMOS and system clocks.  
 Calculate least-squares rates using all suitable log entries.
 Suggest corrections to adjust for systematic drift.

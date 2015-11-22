@@ -8,107 +8,9 @@
 		ssd@nevets.oau.org (Steven S. Dick)
 		jrv@vanzandt.mv.com (Jim Van Zandt)
 
-	$Id: adjtimex.c,v 1.5 1998/04/20 21:32:29 jrv Exp jrv $
+	$Id: adjtimex.c,v 1.6 1998/08/23 00:11:47 jrv Exp jrv $
 
-	$Log: adjtimex.c,v $
-	Revision 1.5  1998/04/20 21:32:29  jrv
-	 Code cleanups to silence warnings: Added some casts.  Removed unused
-	variables.  Added parens around assignments inside tests.
-	 Code is now covered by GNU GPL.
-
-	Revision 1.4  1997/12/12 02:35:09  jrv
-	  Minor code cleanup.
-
-	Revision 1.3.1.6  1997/11/27 03:26:20  jrv
-	  Credit Michael Meskes.
-	  Error sends short message to stderr.
-	  Usage message reworded.
-
-	Revision 1.3.1.5  1997/11/26 02:41:22  jrv
-	  Including string.h rather than strings.h
-	  Really implementing --version switch
-	  Displaying more informative help message
-
-	Revision 1.3.1.4  1997/11/26 01:50:34  jrv
-	  An uncertainty is printed with two significant digits if the first
-	digit is `1', and one significant digit otherwise.
-	  Optional arguments on --log and --review switches sets the log path
-	  Making no adjustment recommendations unless uncertainty is < 100 ppm.
-	  Caveating uncertainty of least-squares solution.
-
-	Revision 1.3.1.3  1997/09/14 02:02:40  jrv
-	  --compare-all renamed to --log.
-	  --log can be used with --compare.
-	  compare3() renamed to log_times().
-	  hack.tref (log time) renamed to hack.log.
-	  Log time is taken from system time, or even cmos time, if reference
-	time is not available.
-	  No longer printing sys_error header an extra time.
-
-	Revision 1.3.1.2  1997/09/02 01:50:58  jrv
-	 LOG_PATH, WTMP_PATH, and ADJPATH introduced.
-	 added mkgmtime() which is like mktime() but assumes it's given UTC.
-	 Removed old code which changes the TZ environment variable.
-	 --host uses ntpdate to call timeserver.
-	 Implemented puthackent().
-	 Filling out struct hack, calling puthackent() to write it.
-	 valid_system_time() checks /etc/adjtime too.
-	 valid_*() used getch() to read single character -- won't work with
-	buffered reads.  Switched to fgets().
-	 Using /proc/rtc if available and not root.
-	 review() calculates adjustments from log entries.  uses
-	kalman_update(), which uses matrix routines from mat.c.
-
-	Revision 1.3.1.1  1997/08/21 17:55:29  jrv
-	 Scanning wtmp rather than utmp, looking for clock resets and reboots.
-	 Storing log file entry in a struct hack_s.
-	 --compare-all or -C logs values of both clocks and a reference time:
-	compare3().
-	 --watch asks user for reference time.
-	 -h consults specified host for reference time (partial implementation).
-	 valid_system_rate() determines whether we can estimate system clock
-	rate from previous inverval.
-	 valid_cmos_rate() determines whether we can estimate cmos clock rate
-	from previous interval.
-	 cmos_adj() fetches cmos adjustment from config file.
-	 compare_cmos_sys() compares the times on the two clocks, using
-	enhanced real time clock support (/proc/rtc) if not root.
-
-	Revision 1.3  1997/02/28 02:57:27  jrv
-	Added --help and --version switches.
-
-	Revision 1.2.1.4  1997/02/25 11:53:12  jrv
-	put settimeofday() stuff in separate function, called twice.
-
-	Revision 1.2.1.3  1997/02/25 03:39:52  jrv
-	Incorporated clockdiff functions into adjtimex, as the
-	"--comparing" and "--adjusting" options.  (Thanks to Michael
-	Meskes <meskes@debian.org> for the idea -- he implemented this
-	functionality in the configuration script of his Debian
-	package.)  Repeat count set by "--count", and interval set by
-	"--interval".
-
-	Revision 1.2.1.2  1997/02/25 02:05:29  jrv
-	Parsing command line options with getopt_long_only().
-	Test for "-singleshot" had broken "-offset" option.
-
-	Revision 1.2.1.1  1997/02/21 01:29:58  jrv
-	Removed "status" setting option.
-	Checking that ADJ_OFFSET_SINGLESHOT is not used with any other option.
-	Label "time" -> "raw time".
-	Ensuring kernel resets its internal status to TIME_BAD by calling
-	settimeofday().
-
- * Revision 1.2  1995/03/15  01:08:55  jrv
- * Moved documentation to README file and man page.
- * Ran through indent.
- * Usage msg only shows "print" once.
- *
- * Revision 1.1  1995/03/07  01:46:31  jrv
- * Initial revision
- *
-
-********/
+*/
 
 #include <ctype.h>
 #include <errno.h>
@@ -385,7 +287,7 @@ main(int argc, char *argv[])
 	    break;
 	  case 'v':
 	    {
-	      char version[]="$Revision: 1.5 $";
+	      char version[]="$Revision: 1.6 $";
 	      strtok(version, " ");
 	      printf("adjtimex %s\n", strtok(NULL, " "));
 	      exit(0);
@@ -1339,6 +1241,17 @@ void sethackent(void)
 {
   endhackent();
   lfile = fopen(log_path, "r");
+  if (!lfile && logging)
+    {
+      lfile = fopen(log_path, "a+"); /* create it if it doesn't exist */
+      if (!lfile)
+	{
+	  fprintf(stderr, "%s does not exist, and could not be created\n",
+		  log_path);
+	  exit(1);
+	}
+      fseek(lfile, 0L, 0);	/* start at beginning */
+    }
 }
 
 void endhackent(void)
@@ -1356,11 +1269,7 @@ struct hack *gethackent(void)
   static struct hack h;
 
   if (!lfile) sethackent();
-  if (!lfile)
-    {
-      fprintf(stderr, "cannot open clock log file\n");
-      exit(1);
-    }
+  if (!lfile) return NULL;
   while(fgets(buf, sizeof(buf), lfile))
     {
       int tokens;
@@ -1415,7 +1324,7 @@ void puthackent(struct hack *ph)
 	  ph->cmos, ph->cmos_ok?"y":"n");
 #endif /* DEBUG */
 
-  lfile = fopen(log_path, "a");
+  lfile = fopen(log_path, "a+");
   if (!lfile)
     {
       fprintf(stderr, "cannot open %s for writing\n", log_path);

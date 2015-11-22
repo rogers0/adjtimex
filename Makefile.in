@@ -20,7 +20,7 @@ mandir = $(prefix)/man/man$(manext)
 SHELL = /bin/sh
 
 SRC = adjtimex.c adjtimex.8 mat.c mat.h install-sh configure.in \
- configure Makefile.in README adjtimex.lsm COPYING COPYRIGHT
+ configure Makefile.in README adjtimex.lsm COPYING COPYRIGHT ChangeLog
 
 MISC = Makefile adjtimex.8 README  adjtimex.lsm
 DISTFILES = $(MISC) $(SRCS)

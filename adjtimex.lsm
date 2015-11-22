@@ -1,13 +1,13 @@
 Begin3
 Title:		adjtimex - display or set the kernel time variables
-Version:	1.3.1.3
-Entered-date:	13SEP97
+Version:	1.6
+Entered-date:	22AUG98
 Description:	Adjusts the system clock
-Keywords:	time, system clock
+Keywords:	time, system clock, hardware clock
 Author:		ssd@nevets.oau.org (Steven S. Dick) 
 Maintained-by:  jrv@vanzandt.mv.com (Jim Van Zandt)
 Primary-site:	sunsite.unc.edu /pub/Linux/utils/administration
-		35k adjtimex-1.3.1.3.tar.gz
+		45k adjtimex-1.6.tar.gz
 Platforms:	Linux
 Copying-policy:	Freely distributable
 End

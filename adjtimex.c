@@ -1259,8 +1259,7 @@ cmos time     system-cmos  error_ppm   tick      freq    tick      freq
 	      long tick_delta = 0, freq_delta = 0;
 	      
 	      tick_delta = ceil((-error_ppm + txc.freq/SHIFT - hz)/hz);
-	      error_ppm += tick_delta*hz;
-	      freq_delta = -error_ppm*SHIFT;
+	      freq_delta = -(error_ppm + tick_delta*hz)*SHIFT;
 	      printf("  %6ld %9ld\n",
 		     txc.tick + tick_delta, txc.freq + freq_delta);
 	      if (loops > 4 && adjusting)

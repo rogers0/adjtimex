@@ -2,13 +2,15 @@
  srcdir = .
 VPATH = .
 
-VERSION=1.27.1
+VERSION=1.28
 
 CFLAGS = @CFLAGS@ -Wall
 prefix = @prefix@
 man1dir=@mandir@/man1
 exec_prefix = @exec_prefix@
 bindir=/sbin
+datadir = @datadir@
+datarootdir = @datarootdir@
 
 INSTALL=@INSTALL@
 

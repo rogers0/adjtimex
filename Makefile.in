@@ -2,7 +2,7 @@
  srcdir = .
 VPATH = .
 
-VERSION=1.20
+VERSION=1.22
 
 CFLAGS = @CFLAGS@ -Wall
 prefix = @prefix@

@@ -1,2 +1,3 @@
-02-fix-manpage
 01-makefile.in-ldflags.diff
+02-fix-manpage
+03-remove-a-few-unused-variable-to-avoid-gcc-warnings.patch

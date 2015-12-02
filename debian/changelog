@@ -1,3 +1,18 @@
+adjtimex (1.29-6) unstable; urgency=medium
+
+  * New maintainer (Closes: #636404).
+  * debian/adjtimex.service: add systemd service (Closes: #796588).
+  * debian/dirs: add new path for systemd service
+  * debian/control: limit "Architecture" to linux-any
+  * debian/patches/:
+    - change the patching order to follow 01->02->03
+    - 03-remove-a-few-unused-variable-to-avoid-gcc-warnings.patch:
+      remove a few unused variables to avoid gcc warnings.
+  * debian/watch: update to use real upstream's URL
+  * remove unnecessary debian/dirs file
+
+ -- Roger Shimizu <rogershimizu@gmail.com>  Thu, 03 Dec 2015 01:04:06 +0900
+
 adjtimex (1.29-5) unstable; urgency=medium
 
   * QA upload.

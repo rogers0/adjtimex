@@ -1,3 +1,2 @@
 version=3
-opts=dversionmangle=s/.*/0.No-Site/ \
-https://people.debian.org/~eriberto/ FakeWatchNoUpstreamSiteForThisPackage-(\d\S+)\.gz
+http://metalab.unc.edu/pub/Linux/system/admin/time/adjtimex-(.+)\.tar\.gz

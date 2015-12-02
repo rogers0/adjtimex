@@ -1,12 +1,15 @@
 Source: adjtimex
 Section: admin
 Priority: optional
-Maintainer: Debian QA Group <packages@qa.debian.org>
+Maintainer: Roger Shimizu <rogershimizu@gmail.com>
 Build-Depends: debhelper (>= 9), po-debconf, dh-autoreconf
 Standards-Version: 3.9.6
+Homepage: http://metalab.unc.edu/pub/Linux/system/admin/time
+Vcs-Git: git://github.com/rogers0/adjtimex.git
+Vcs-Browser: https://github.com/rogers0/adjtimex
 
 Package: adjtimex
-Architecture: any
+Architecture: linux-any
 Depends: ${misc:Depends}, ${shlibs:Depends}, debconf | debconf-2.0
 Suggests: ntpdate
 Description: kernel time variables configuration utility

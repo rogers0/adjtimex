@@ -1,0 +1,58 @@
+From: Roger Shimizu <rogershimizu@gmail.com>
+Date: Sun, 29 Nov 2015 21:07:03 +0900
+Subject: remove a few unused variable to avoid gcc warnings.
+
+Signed-off-by: Roger Shimizu <rogershimizu@gmail.com>
+---
+ adjtimex.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/adjtimex.c b/adjtimex.c
+index 5a461c1..b2c0967 100644
+--- a/adjtimex.c
++++ b/adjtimex.c
+@@ -726,7 +726,6 @@ cmos_read_time (time_t *cmos_timep, double *sysp)
+   int noint_fallback = 1;	/* detect tick by 0 => uip, 1 => time change */
+   int got_tick = 0;
+   int got_time = 0;
+-  int saveerr;
+   int type_uie, count;
+   double update_delay;
+ 
+@@ -797,7 +796,6 @@ cmos_read_time (time_t *cmos_timep, double *sysp)
+ 		    }
+ 		}
+ 		rc = read(cmos_fd, &interrupt_info, sizeof(interrupt_info));
+-		saveerr = errno;
+ 		gettimeofday(&now, NULL);
+ 
+ 		if (rc == -1)
+@@ -1335,8 +1333,8 @@ static void log_times()
+   struct hostent he;
+ #endif
+   double sigma_ref;
+-  char ch, buf[64], *s;
+-  int n, ret;
++  char buf[64], *s;
++  int n;
+   struct timeval tv_sys;
+   struct tm bdt;
+   time_t when, tref;
+@@ -1349,7 +1347,7 @@ static void log_times()
+     {
+       while(1) {
+ 	printf("Please press <enter> when you know the time of day: ");
+-	ch = getchar();
++	getchar();
+ 	gettimeofday(&tv_sys, NULL);
+ 	when = tv_sys.tv_sec;
+ 	bdt = *localtime(&when); /* set default values for most fields */
+@@ -1529,7 +1527,7 @@ offset -0.013543
+     h.log = (time_t)ftime_ref;
+     h.sys = ftime_sys;
+     txc.modes = 0;
+-    ret = adjtimex(&txc);
++    adjtimex(&txc);
+     h.tick = txc.tick;
+     h.freq = txc.freq;
+     h.sys_ok = valid_system_rate(ftime_sys, ftime_ref, sigma_ref);

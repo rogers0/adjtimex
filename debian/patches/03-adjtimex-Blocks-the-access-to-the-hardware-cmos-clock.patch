@@ -1,0 +1,209 @@
+From: Bjarni Ingi Gislason <bjarniig@rhi.hi.is>
+Date: Sun, 29 Sep 2013 17:28:55 +0000
+Subject: adjtimex: Blocks the access to the hardware (cmos) clock
+
+Package: adjtimex
+Version: 1.29-2.2
+Severity: normal
+Tags: patch
+
+Dear Maintainer,
+
+  while "adjtimex" runs, the command "hwclock --show" does not work.
+
+  The command keeps the device "/dev/rtc" open the whole time.
+
+  It does not need to be open while the command sleeps, which is most of
+the time it is running.
+
+  Necessary changes:
+  a) Open the device inside the while loop (not in front of it)
+  b) Close it before the program goes to sleep before the end of the
+     while loop
+
+  Other changes
+  a) Fixed some code to eliminate warnings from the compiler
+  b) Some cosmetic changes.
+
+Closes: #724929
+[rogershimizu@gmail.com: slightly modified]
+Signed-off-by: Bjarni Ingi Gislason <bjarniig@rhi.hi.is>
+Signed-off-by: Roger Shimizu <rogershimizu@gmail.com>
+---
+ adjtimex.c | 45 +++++++++++++++++++++++++--------------------
+ 1 file changed, 25 insertions(+), 20 deletions(-)
+
+diff --git a/adjtimex.c b/adjtimex.c
+index 5a461c1..8cf97a8 100644
+--- a/adjtimex.c
++++ b/adjtimex.c
+@@ -178,14 +178,14 @@ static void usage(void);
+ static inline void outb (short port, char val);
+ static inline void outb (short port, char val);
+ static inline unsigned char inb (short port);
+-static void cmos_init ();
+-static void cmos_init_directisa ();
++static void cmos_init (void);
++static void cmos_init_directisa (void);
+ static inline int cmos_read_bcd (int addr);
+ static void cmos_read_time (time_t *cmos_timep, double *sysp);
+ static void busywait_uip_fall(struct timeval *timestamp);
+ static void busywait_second_change(struct tm *cmos, struct timeval *timestamp);
+ static void compare(void);
+-static void failntpdate();
++static void failntpdate(char *);
+ static void reset_time_status(void);
+ static struct cmos_adj *get_cmos_adjustment(void);
+ static void log_times(void);
+@@ -571,7 +571,7 @@ inb (short port)
+  * Failing that, select and initialize direct I/O ports mode.
+  */
+ static
+-void cmos_init ()
++void cmos_init (void)
+ {
+ /*
+  following explanation taken from hwclock sources:
+@@ -630,7 +630,7 @@ void cmos_init ()
+  * second and following times).
+  */
+ static
+-void cmos_init_directisa ()
++void cmos_init_directisa (void)
+ {
+ #ifdef USE_INLINE_ASM_IO
+   if (verbose)
+@@ -680,7 +680,7 @@ cmos_read_bcd (int addr)
+ static int timeout;	/* An alarm signal has occurred */
+ 
+ static void
+-alarm_handler (int const dummy) {
++alarm_handler (int const dummy __attribute__ ((unused)) ) {
+   timeout = 1;
+ }
+ 
+@@ -726,7 +726,6 @@ cmos_read_time (time_t *cmos_timep, double *sysp)
+   int noint_fallback = 1;	/* detect tick by 0 => uip, 1 => time change */
+   int got_tick = 0;
+   int got_time = 0;
+-  int saveerr;
+   int type_uie, count;
+   double update_delay;
+ 
+@@ -797,13 +796,12 @@ cmos_read_time (time_t *cmos_timep, double *sysp)
+ 		    }
+ 		}
+ 		rc = read(cmos_fd, &interrupt_info, sizeof(interrupt_info));
+-		saveerr = errno;
+ 		gettimeofday(&now, NULL);
+ 
+ 		if (rc == -1)
+ 		  {
+ 		    /* no timeout, but read(/dev/rtc) failed for another reason */
+-		    char message[128];
++		    char message[BUFLEN];
+ 		    snprintf(message, sizeof(message),
+ 			     "adjtimex: "
+ 			     "read() from %s to wait for clock tick failed",
+@@ -874,7 +872,7 @@ cmos_read_time (time_t *cmos_timep, double *sysp)
+ 	     Or: UIE interrupts do beat, but RTC is invalid. */
+ 	  if (rc == -1)
+ 	    {
+-	      char message[128];
++	      char message[BUFLEN];
+ 	      snprintf(message, sizeof(message),
+ 			"adjtimex: "
+ 			"ioctl(%s, RTC_RD_TIME) to read the CMOS clock failed",
+@@ -1072,7 +1070,7 @@ busywait_second_change(struct tm *cmos, struct timeval *timestamp)
+      that the RTC isn't running or contains invalid data */
+   if (rc == -1)
+     {
+-      char message[128];
++      char message[BUFLEN];
+       snprintf(message, sizeof(message),
+ 		"adjtimex: "
+ 		"ioctl(%s, RTC_RD_TIME) to read the CMOS clock failed",
+@@ -1165,10 +1163,10 @@ cmos clock last adjusted at Tue Aug 26 11:43:57 1997 (= 872610237)
+   }
+ #endif
+ 
+-  cmos_init ();
+-
+   while (count != 0)
+     {
++      cmos_init ();
++
+       if (count > 0) count--;
+ 
+       cmos_read_time (&cmos_time, &system_sec);
+@@ -1244,6 +1242,8 @@ cmos time     system-cmos  error_ppm   tick      freq    tick      freq
+       printf ("%10ld  %13.6f",
+ 	      (long) cmos_sec,
+ 	      dif);
++      if (loops == 0)
++	printf ("%11s %6ld %9ld", " ", txc.tick, txc.freq);
+       if (++loops > 1)
+ 	{			/* print difference in rates */
+ #define SHIFT (1<<16)
+@@ -1264,7 +1264,7 @@ cmos time     system-cmos  error_ppm   tick      freq    tick      freq
+ 		     txc.tick + tick_delta, txc.freq + freq_delta);
+ 	      if (loops > 4 && adjusting)
+ 		{
+-		  if (abs(error_ppm)>10000)
++		  if (abs(error_ppm) > 10000)
+ 		    {
+ 		      if (!force_adjust)
+ 			{
+@@ -1298,6 +1298,10 @@ cmos time     system-cmos  error_ppm   tick      freq    tick      freq
+       dif_prev = dif;
+       if (interval == 0)
+ 	break;
++/* Release read access to cmos clock (/dev/rtc) while sleeping */
++/* Otherwise others can't access the clock ("hwclock --show" does not work) */
++      close(cmos_fd);
++      using_dev_rtc = -1;
+       if (count)		/* if it is not the last round */
+ 	xusleep (interval*1000000L - 500000); /* reading RTC takes 1 sec */
+     }
+@@ -1335,8 +1339,8 @@ static void log_times()
+   struct hostent he;
+ #endif
+   double sigma_ref;
+-  char ch, buf[64], *s;
+-  int n, ret;
++  char ch __attribute__ ((unused)), buf[64], *s;
++  int n, ret __attribute__ ((unused));
+   struct timeval tv_sys;
+   struct tm bdt;
+   time_t when, tref;
+@@ -1397,9 +1401,10 @@ static void log_times()
+   else if (timeserver)
+     {
+       FILE *ifile;
+-      char command[128];
++      char command[BUFLEN];
+       char buf[BUFLEN];
+-      int i, j;
++      unsigned int i;
++      int j;
+       double d, mean=0, val, var=0, num=0; /* for finding statistics */
+       
+       struct stat filestat;
+@@ -2154,7 +2159,7 @@ void review()
+       error_ppm += tick_delta*hz;
+       printf("      suggested tick = %5ld  freq = %9.0f\n",
+ 	     tick_mid + tick_delta, -error_ppm*SHIFT);
+-      if (abs(error_ppm)>500)
++      if (abs(error_ppm) > 500)
+ 	printf ("WARNING: required correction is greater "
+ 		"than plus/minus 500 parts per million.\n");
+     }
+@@ -2171,7 +2176,7 @@ void review()
+ "least squares solution has a bigger error than estimated here\n");
+   if (sigma_ppm < 100 && adjusting)
+     {
+-      if (abs(error_ppm)>500)
++      if (abs(error_ppm) > 500)
+ 	{
+ 	  if (force_adjust)
+ 	    printf (

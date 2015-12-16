@@ -3,6 +3,7 @@ Description=the kernel time variables setting
 DefaultDependencies=no
 After=local-fs.target
 Before=sysinit.target
+ConditionPathExists=/etc/default/adjtimex
 
 [Service]
 Type=oneshot

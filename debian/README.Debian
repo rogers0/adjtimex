@@ -9,13 +9,14 @@ who also maintains the program and therefore used the master sources.
 further Information:
 
 * adjtimex manpage
-* copying policy 
+* adjtimexconfig manpage
+* copying policy
 	/usr/share/doc/adjtimex/copyright
 	(or debian/copyright in the source package)
 * changelog for debian package
-	/usr/share/doc/adjtimex/changelog.Debian	 
+	/usr/share/doc/adjtimex/changelog.Debian.gz
 * adjtimex's README:
-	/usr/share/doc/adjtimex/README
+	/usr/share/doc/adjtimex/README.gz
 
 
 James R. Van Zandt <jrv@debian.org>, Sun,  7 Mar 1999 21:58:51 -0500

@@ -2,26 +2,27 @@
 
 conffile=/etc/default/adjtimex
 startfile=/etc/init.d/adjtimex
+tmpfile=/tmp/adjtimex.adjust
 
 echo -n "Comparing clocks (this will take 70 sec)..."
 
 # Get the parameters
 
-/sbin/adjtimex --print --tick 0  >/etc/adj.adjust  2>/dev/null
-baseline=`awk '/<= tick/{print ($1+$NF)/2}' /etc/adj.adjust`
-hz=`awk '/USER_HZ/{print $3}' /etc/adj.adjust`
+/sbin/adjtimex --print --tick 0  >$tmpfile  2>/dev/null
+baseline=$(awk '/<= tick/{print ($1+$NF)/2}' $tmpfile)
+hz=$(awk '/USER_HZ/{print $3}' $tmpfile)
 /sbin/adjtimex  --tick $baseline  --frequency 0
-/sbin/adjtimex  --adjust --force-adjust >/etc/adj.adjust
+/sbin/adjtimex  --adjust --force-adjust >$tmpfile
 echo "done."
-ticks=`tail -n 1 /etc/adj.adjust|awk '{print $6}'`
-freq=`tail -n 1 /etc/adj.adjust|awk '{print $7}'`
-# cat /etc/adj.adjust
+ticks=$(tail -n 1 $tmpfile|awk '{print $6}')
+freq=$(tail -n 1 $tmpfile|awk '{print $7}')
+# cat $tmpfile
 # echo hz=$hz baseline=$baseline ticks=$ticks freq=$freq
-rm /etc/adj.adjust
-adjt=`awk "BEGIN{print (($ticks-$baseline)*$hz + $freq/65536.)*.0864}"`
+rm $tmpfile
+adjt=$(awk "BEGIN{print (($ticks-$baseline)*$hz + $freq/65536.)*.0864}")
 echo -n "Adjusting system time by ${adjt} sec/day to agree with CMOS clock..."
 
-# Recreate /etc/adjtimex.conf if necessary
+# Recreate $conffile if necessary
 
 if [ -f $conffile ]; then 
 #   echo "using existing $conffile";
@@ -47,11 +48,11 @@ sed -e "s/^TICK=.*/TICK=$ticks/"		\
     $conffile >$conffile.TMP &&			\
     mv $conffile.TMP $conffile
 
-# grep "TICK=" /etc/init.d/adjtimex | cut -d'#' -f1 > /etc/adj.tick
-# grep "FREQ=" /etc/init.d/adjtimex | cut -d'#' -f1 > /etc/adj.freq
+# grep "TICK=" /etc/init.d/adjtimex | cut -d'#' -f1 > /tmp/adj.tick
+# grep "FREQ=" /etc/init.d/adjtimex | cut -d'#' -f1 > /tmp/adj.freq
 # 
-# TICKLINE="`echo -n "TICK="$ticks" # old: "; cat /etc/adj.tick`"
-# FREQLINE="`echo -n "FREQ="$freq" # old: "; cat /etc/adj.freq`"
+# TICKLINE="$(echo -n "TICK="$ticks" # old: "; cat /tmp/adj.tick)"
+# FREQLINE="$(echo -n "FREQ="$freq" # old: "; cat /tmp/adj.freq)"
 # 
 # cp /etc/init.d/adjtimex /etc/init.d/adjtimex.TMP
 # sed -e "s/^TICK=.*/$TICKLINE/" -e "s/^FREQ=.*/$FREQLINE/" \
@@ -61,7 +62,5 @@ sed -e "s/^TICK=.*/TICK=$ticks/"		\
 # then
 # 	  rm -f /etc/init.d/adjtimex.TMP
 # fi
-# rm -f /etc/adj.tick /etc/adj.freq /etc/adj.adjust
-rm -f /etc/adj.adjust
+# rm -f /tmp/adj.tick /tmp/adj.freq $tmpfile
 echo "done."
-

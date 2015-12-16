@@ -1,0 +1,85 @@
+From: Roger Shimizu <rogershimizu@gmail.com>
+Date: Thu, 17 Dec 2015 00:59:39 +0900
+Subject: avoid a few gcc warnings
+
+Signed-off-by: Roger Shimizu <rogershimizu@gmail.com>
+---
+ adjtimex.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
+
+diff --git a/adjtimex.c b/adjtimex.c
+index 4ea0bb0..d34211d 100644
+--- a/adjtimex.c
++++ b/adjtimex.c
+@@ -176,7 +176,6 @@ struct option longopt[]=
+ 
+ static void usage(void);
+ static inline void outb (short port, char val);
+-static inline void outb (short port, char val);
+ static inline unsigned char inb (short port);
+ static void cmos_init (void);
+ static void cmos_init_directisa (void);
+@@ -543,22 +542,20 @@ outb (short port, char val)
+   __asm__ volatile ("out%B0 %0,%1"::"a" (val), "d" (port));
+ 
+ #else
+-  lseek (port_fd, port, 0);
+-  write (port_fd, &val, 1);
++  if (lseek (port_fd, port, 0) == port && write (port_fd, &val, 1));
+ #endif
+ }
+ 
+ static inline unsigned char
+ inb (short port)
+ {
+-  unsigned char ret;
++  unsigned char ret = 0;
+ 
+ #ifdef USE_INLINE_ASM_IO
+   __asm__ volatile ("in%B0 %1,%0":"=a" (ret):"d" (port));
+ 
+ #else
+-  lseek (port_fd, port, 0);
+-  read (port_fd, &ret, 1);
++  if (lseek (port_fd, port, 0) == port && read (port_fd, &ret, 1));
+ #endif
+   return ret;
+ }
+@@ -1554,7 +1551,7 @@ int valid_system_rate(double ftime_sys, double ftime_ref, double sigma_ref)
+ {
+   int n;
+   int default_answer;
+-  int ch;
++  int ch = 0;
+   char buf[BUFLEN];
+   struct hack *ph;
+   struct cmos_adj *pca = get_cmos_adjustment();
+@@ -1647,7 +1644,8 @@ ctime(&prev.log));
+       printf("  the kernel time variables have not been changed, and\n");
+       printf("  the computer has not been suspended? (y/n) [%c] ", 
+ 	     default_answer);
+-      fgets(buf, BUFLEN, stdin);
++      if (fgets(buf, BUFLEN, stdin) != buf)
++        continue;
+       ch = buf[0];
+       if (ch == '\n') ch = default_answer;
+     } while (ch != 'n' && ch != 'y');
+@@ -1674,7 +1672,7 @@ static
+ int valid_cmos_rate(double ftime_cmos, double ftime_ref, double sigma_ref)
+ {
+   int default_answer;
+-  int ch;
++  int ch = 0;
+   char buf[BUFLEN];
+ 
+   default_answer = undisturbed_cmos?'y':'n';
+@@ -1685,7 +1683,8 @@ int valid_cmos_rate(double ftime_cmos, double ftime_ref, double sigma_ref)
+       printf("  it has not been reset with `/sbin/hwclock',\n");
+       printf("  no operating system other than Linux has been running, and\n");
+       printf("  ntpd has not been running? (y/n) [%c] ", default_answer);
+-      fgets(buf, BUFLEN, stdin);
++      if (fgets(buf, BUFLEN, stdin) != buf)
++        continue;
+       ch = buf[0];
+       if (ch == '\n') ch = default_answer;
+     } while (ch != 'n' && ch != 'y');

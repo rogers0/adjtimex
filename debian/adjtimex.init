@@ -25,9 +25,8 @@ FREQ=0
 # values in $cfg take precedence over the values here
 cfg=/etc/default/adjtimex
 
-if [ -f $cfg ]; then
-  . $cfg
-fi
+test -r $cfg || exit 0
+. $cfg
 
 case "$1" in
   start|restart|force-reload)

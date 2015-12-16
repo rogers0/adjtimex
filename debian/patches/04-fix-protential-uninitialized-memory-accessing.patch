@@ -1,0 +1,26 @@
+From: peppe <g1pi@libero.it>
+Date: Thu, 27 Sep 2012 08:02:32 +0200
+Subject: adjtimex does not check the return value of stat()
+
+adjtimex does not check the return value of stat() and uses possibly
+uninitialized memory.
+
+Closes: #688933
+---
+ adjtimex.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/adjtimex.c b/adjtimex.c
+index 8cf97a8..4ea0bb0 100644
+--- a/adjtimex.c
++++ b/adjtimex.c
+@@ -1413,8 +1413,7 @@ static void log_times()
+ 
+       for (i=0; i<sizeof(paths)/sizeof(paths[0]); i++)
+ 	{
+-	  stat(paths[i], &filestat);
+-	  if (S_ISREG(filestat.st_mode))
++	  if (0 == stat(paths[i], &filestat) && S_ISREG(filestat.st_mode))
+ 	    goto found_ntpdate;
+ 	}
+       failntpdate("cannot find ntpdate");

@@ -3,25 +3,25 @@
 set -e
 
 case "$1" in
-    purge)
-	rm -f /etc/adjtimex.conf /etc/default/adjtimex
-	update-rc.d adjtimex remove >/dev/null
-	if [ -e /usr/share/debconf/confmodule ]; then
-          # Source debconf library.
-	    . /usr/share/debconf/confmodule
-          # Remove my changes to the db.
+	purge)
+		rm -f /etc/adjtimex.conf /etc/default/adjtimex
+		update-rc.d adjtimex remove >/dev/null
+		if [ -e /usr/share/debconf/confmodule ]; then
+			# Source debconf library.
+			. /usr/share/debconf/confmodule
+			# Remove my changes to the db.
 echo "removing debconf db entries"
-	    db_purge
+			db_purge
 echo "removed debconf db entries"
-	fi
-	;;
-    remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
-	exit 0
-	;;
-    *)
-	echo "postrm called with unknown argument \`$1'" >&2
-	exit 0
-	;;
+		fi
+		;;
+	remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+		exit 0
+		;;
+	*)
+		echo "postrm called with unknown argument \`$1'" >&2
+		exit 0
+		;;
 esac
 
 #DEBHELPER#

@@ -7,19 +7,9 @@
 # Even minor modifications require translation updates and such
 # changes should be coordinated with translators and reviewers.
 
-Template: adjtimex/run_daemon
-Type: boolean
-Default: true
-_Description: Should adjtimex be run at installation and at every startup?
- Running adjtimex at system startup will set the kernel time parameters to
- the values in /etc/default/adjtimex.
- .
- You should not choose this option if you just want to
- use adjtimex to inspect the current parameters.
-
 Template: adjtimex/compare_rtc
 Type: boolean
-Default: true
+Default: false
 #flag:comment:2
 # Translators: do not translate "tick" and "frequency"
 _Description: Run adjtimexconfig when adjtimex is installed or upgraded?

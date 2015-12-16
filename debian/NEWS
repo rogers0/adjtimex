@@ -1,0 +1,15 @@
+adjtimex (1.29-7) unstable; urgency=medium
+
+  adjtimexconfig will not be called on every install/upgrade by default,
+  so as to avoid 70 seconds waiting time, except you choose so in debconf.
+  If you installed adjtimex previously, and are using previously default "Yes",
+  now you can change to "No" by command:
+    dpkg-reconfigure adjtimex
+  then choose "No" in debconf.
+
+  Because adjtimexconfig is not triggered by default on install/upgrade,
+  so there's no /etc/default/adjtimex by default now, the startup service
+  is skipped accordingly, until /etc/default/adjtimex is ready.  So you can
+  simply run adjtimexconfig to let it generate for you.
+
+ -- Roger Shimizu <rogershimizu@gmail.com>  Thu, 17 Dec 2015 01:08:32 +0900

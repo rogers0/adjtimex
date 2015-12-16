@@ -13,62 +13,60 @@ startfile=/etc/init.d/adjtimex
 #		 new configuration file
 conffile=/etc/default/adjtimex
 
-create_adjtimex_conf()
+migrate_old_adjtimex_conf()
 {
 
-    TICK=10000
-    FREQ=0
-	
-    if [ -f $oldfile ]; then
-	TICK=`awk '
-	BEGIN{tick=10000;}
-	/[ \t]*TICK[ \t]*=[ \t]*"?[0-9]+"?/ {
-	    sub(/[ \t]*TICK[ \t]*=[ \t]*"?/,"");
-	    tick=$0+0;
-	}
-	END {print tick;}
-	' $oldfile` 
+	TICK=10000
+	FREQ=0
 
-	FREQ=`awk '
-	BEGIN{freq=0;}
-	/[ \t]*FREQ[ \t]*=[ \t]*"?[0-9]+"?/ {
-	    sub(/[ \t]*FREQ[ \t]*=[ \t]*"?/,"");
-	    freq=$0+0;
-	}
-	END {print freq;}
-	' $oldfile` 
+	if [ -f $oldfile ]; then
+		TICK=`awk '
+		BEGIN{tick=10000;}
+		/[ \t]*TICK[ \t]*=[ \t]*"?[0-9]+"?/ {
+			sub(/[ \t]*TICK[ \t]*=[ \t]*"?/,"");
+			tick=$0+0;
+		}
+		END {print tick;}
+		' $oldfile`
 
-#	echo "parameters from $oldfile: TICK=$TICK FREQ=$FREQ";
-    else 
-	if [ -f $olderfile ]; then
-	    TICK=`awk '
-	    BEGIN{tick=10000;}
-	    /[ \t]*TICK[ \t]*=[ \t]*"?[0-9]+"?/ {
-		sub(/[ \t]*TICK[ \t]*=[ \t]*"?/,"");
-	    tick=$0+0;
-	}
-	END {print tick;}
-	' $olderfile` 
-	    
-	    FREQ=`awk '
-	    BEGIN{freq=0;}
-	    /[ \t]*FREQ[ \t]*=[ \t]*"?[0-9]+"?/ {
-		sub(/[ \t]*FREQ[ \t]*=[ \t]*"?/,"");
-		freq=$0+0;
-	    }
-	    END {print freq;}
-	    ' $olderfile` 
+		FREQ=`awk '
+		BEGIN{freq=0;}
+		/[ \t]*FREQ[ \t]*=[ \t]*"?[0-9]+"?/ {
+			sub(/[ \t]*FREQ[ \t]*=[ \t]*"?/,"");
+			freq=$0+0;
+		}
+		END {print freq;}
+		' $oldfile`
 
-#	    echo "parameters from $olderfile: TICK=$TICK FREQ=$FREQ";
+#		echo "parameters from $oldfile: TICK=$TICK FREQ=$FREQ";
+	elif [ -f $olderfile ]; then
+		TICK=`awk '
+		BEGIN{tick=10000;}
+		/[ \t]*TICK[ \t]*=[ \t]*"?[0-9]+"?/ {
+			sub(/[ \t]*TICK[ \t]*=[ \t]*"?/,"");
+			tick=$0+0;
+		}
+		END {print tick;}
+		' $olderfile`
+
+		FREQ=`awk '
+		BEGIN{freq=0;}
+		/[ \t]*FREQ[ \t]*=[ \t]*"?[0-9]+"?/ {
+			sub(/[ \t]*FREQ[ \t]*=[ \t]*"?/,"");
+			freq=$0+0;
+		}
+		END {print freq;}
+		' $olderfile`
+
+#		echo "parameters from $olderfile: TICK=$TICK FREQ=$FREQ";
 	fi
-    fi
-    
-	if [ -f $conffile ]; then 
-#	    echo "using existing $conffile";
-	    true;
-	else 
-	    if [ -d /etc/default ]; then true; else mkdir /etc/default; fi
-	    cat >$conffile <<EOF
+
+	if [ -f $conffile ]; then
+#		echo "using existing $conffile";
+		true;
+	elif [ -f $oldfile ] || [ -f $olderfile ]; then
+		[ ! -d /etc/default ] && mkdir /etc/default
+		cat >$conffile <<EOF
 #  $conffile - configuration file for adjtimex(8)
 #
 #  you may adjust these values manually or by calling /usr/sbin/adjtimexconfig
@@ -86,40 +84,32 @@ EOF
 
 
 case "$1" in
-    configure)
+	configure)
 
 # A previous installation may have left a corrupt conffile.
 # The regexp matches only blank lines, comments, and integer assignments:
-    if [ -f $conffile ]; then
-        egrep -qv '^([[:space:]]*(#.*)?|[[:space:]]*[a-zA-Z][a-zA-Z0-9]*[[:space:]]*=[[:space:]]*-?[0-9]+[[:space:]]*)$' $conffile && rm -f $conffile
-    fi
+		if [ -f $conffile ]; then
+			egrep -qv '^([[:space:]]*(#.*)?|[[:space:]]*[a-zA-Z][a-zA-Z0-9]*[[:space:]]*=[[:space:]]*-?[0-9]+[[:space:]]*)$' $conffile && rm -f $conffile
+		fi
 
-	create_adjtimex_conf
+		migrate_old_adjtimex_conf
 
-	db_get adjtimex/run_daemon
-	if [ "$RET" = "true" ]; then
-	    update-rc.d adjtimex start 20 S . >/dev/null
-    
-	    if which invoke-rc.d >/dev/null 2>&1; then
-		invoke-rc.d adjtimex start
-	    else
-		/etc/init.d/adjtimex start
-	    fi
-	fi
+		# service starting depends on existence of /etc/default/adjtimex, which is ready only after running adjtimexconfig
+		update-rc.d adjtimex defaults > /dev/null
 
-	db_get adjtimex/compare_rtc
-	if [ "$RET" = "true" ]; then
-	    adjtimexconfig
-	fi
+		db_get adjtimex/compare_rtc
+		if [ "$RET" = "true" ]; then
+			adjtimexconfig
+		fi
 
-	;;
-    abort-upgrade|abort-remove|abort-deconfigure)
-	exit 0
-	;;
-    *)
-	echo "postinst called with unknown argument \`$1'" >&2
-	exit 0
-	;;
+		;;
+	abort-upgrade|abort-remove|abort-deconfigure)
+		exit 0
+		;;
+	*)
+		echo "postinst called with unknown argument \`$1'" >&2
+		exit 0
+		;;
 esac
 
 #DEBHELPER#

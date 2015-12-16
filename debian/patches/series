@@ -1,3 +1,5 @@
 01-makefile.in-ldflags.diff
 02-fix-manpage
-03-remove-a-few-unused-variable-to-avoid-gcc-warnings.patch
+03-adjtimex-Blocks-the-access-to-the-hardware-cmos-clock.patch
+04-fix-protential-uninitialized-memory-accessing.patch
+05-avoid-gcc-warnings.patch

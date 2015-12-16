@@ -19,32 +19,6 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:2001
-msgid "Should adjtimex be run at installation and at every startup?"
-msgstr "adjtimex có nên chạy vào lúc cài đặt và khi nào khởi động không?"
-
-#. Type: boolean
-#. Description
-#: ../templates:2001
-msgid ""
-"Running adjtimex at system startup will set the kernel time parameters to "
-"the values in /etc/default/adjtimex."
-msgstr ""
-"Chạy adjtimex vào lúc khởi chạy hệ thống thì lập các tham số thời gian của "
-"hạt nhân thành những giá trị trong tập tin « /etc/default/adjtimex »."
-
-#. Type: boolean
-#. Description
-#: ../templates:2001
-msgid ""
-"You should not choose this option if you just want to use adjtimex to "
-"inspect the current parameters."
-msgstr ""
-"Không nên bật tuỳ chọn này nếu bạn chỉ muốn sử dụng adjtimex để kiểm tra "
-"những tham số hiện thời."
-
-#. Type: boolean
-#. Description
 #: ../templates:3001
 msgid "Run adjtimexconfig when adjtimex is installed or upgraded?"
 msgstr "Chạy adjtimexconfig khi adjtimex được cài đặt hay nâng cấp ?"

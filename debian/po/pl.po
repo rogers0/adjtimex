@@ -28,47 +28,6 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:2001
-msgid "Should adjtimex be run at installation and at every startup?"
-msgstr ""
-"Czy adjtimex ma byæ uruchomiany podczas instalacji i ka¿dego startu systemu?"
-
-#. Type: boolean
-#. Description
-#: ../templates:2001
-#, fuzzy
-#| msgid ""
-#| "adjtimex can run at system startup to set the kernel time parameters to "
-#| "the values in /etc/default/adjtimex. Don't accept if you just want to use "
-#| "adjtimex to inspect the current parameters."
-msgid ""
-"Running adjtimex at system startup will set the kernel time parameters to "
-"the values in /etc/default/adjtimex."
-msgstr ""
-"adjtimex mo¿e byæ uruchamiany podczas ka¿dego uruchomienia systemu,by "
-"ustawiæ parametry czasu w j±drze na warto¶ci znajduj±ce siê w pliku/etc/"
-"default/adjtimex. Nie wyra¿aj zgody, je¶li chcesz u¿ywaæ adjtimextylko do "
-"sprawdzania aktualnych warto¶ci."
-
-#. Type: boolean
-#. Description
-#: ../templates:2001
-#, fuzzy
-#| msgid ""
-#| "adjtimex can run at system startup to set the kernel time parameters to "
-#| "the values in /etc/default/adjtimex. Don't accept if you just want to use "
-#| "adjtimex to inspect the current parameters."
-msgid ""
-"You should not choose this option if you just want to use adjtimex to "
-"inspect the current parameters."
-msgstr ""
-"adjtimex mo¿e byæ uruchamiany podczas ka¿dego uruchomienia systemu,by "
-"ustawiæ parametry czasu w j±drze na warto¶ci znajduj±ce siê w pliku/etc/"
-"default/adjtimex. Nie wyra¿aj zgody, je¶li chcesz u¿ywaæ adjtimextylko do "
-"sprawdzania aktualnych warto¶ci."
-
-#. Type: boolean
-#. Description
 #: ../templates:3001
 #, fuzzy
 #| msgid "Should adjtimexconfig be run at installation time?"

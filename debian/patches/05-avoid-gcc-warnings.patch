@@ -8,7 +8,7 @@ Signed-off-by: Roger Shimizu <rogershimizu@gmail.com>
  1 file changed, 9 insertions(+), 10 deletions(-)
 
 diff --git a/adjtimex.c b/adjtimex.c
-index 4ea0bb0..d34211d 100644
+index 4ea0bb0..028cd74 100644
 --- a/adjtimex.c
 +++ b/adjtimex.c
 @@ -176,7 +176,6 @@ struct option longopt[]=

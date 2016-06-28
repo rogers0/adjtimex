@@ -1,16 +1,20 @@
-Description: Add LDFLAGS to Makefile.in
-Author: Emanuele Rocca <ema@debian.org>
-Last-Update: 2014-03-28
+From: Emanuele Rocca <ema@debian.org>
+Date: Fri, 28 Mar 2014 15:59:46 +0100
+Subject: Add LDFLAGS to Makefile.in
 
 Description: add extra flags to Makefile.in to allow GCC hardening
              and modify the original upstream CFLAGS to accept flags
              from DH9.
 Author: Joao Eriberto Mota Filho <eriberto@debian.org>
 Last-Update: 2014-11-18
-Index: adjtimex-1.29/Makefile.in
-===================================================================
---- adjtimex-1.29.orig/Makefile.in
-+++ adjtimex-1.29/Makefile.in
+---
+ Makefile.in | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 75ba580..fefa0d6 100644
+--- a/Makefile.in
++++ b/Makefile.in
 @@ -4,7 +4,7 @@ VPATH = .
  
  VERSION=1.29
@@ -20,7 +24,7 @@ Index: adjtimex-1.29/Makefile.in
  prefix = @prefix@
  man1dir=@mandir@/man1
  exec_prefix = @exec_prefix@
-@@ -36,10 +36,10 @@ Makefile config.h: Makefile.in config.h.
+@@ -36,10 +36,10 @@ Makefile config.h: Makefile.in config.h.in
  
  adjtimex: adjtimex.c mat.o config.h Makefile
  	$(CC) $(CFLAGS) -I. -DVERSION=\"$(VERSION)\" -o adjtimex  \

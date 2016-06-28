@@ -1,3 +1,11 @@
+adjtimex (1.29-8) UNRELEASED; urgency=medium
+
+  * debian/patches:
+      - Improve precision. Thanks Christopher Alexander Tobias Schulze.
+        (Closes: #633082).
+
+ -- Roger Shimizu <rogershimizu@gmail.com>  Tue, 28 Jun 2016 22:23:31 +0900
+
 adjtimex (1.29-7) unstable; urgency=medium
 
   * remove the wrong debian/dirs line in changelog of previous version 1.29-6

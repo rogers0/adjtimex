@@ -3,3 +3,4 @@
 03-adjtimex-Blocks-the-access-to-the-hardware-cmos-clock.patch
 04-fix-protential-uninitialized-memory-accessing.patch
 05-avoid-gcc-warnings.patch
+06-improve-precision.patch

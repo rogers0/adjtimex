@@ -1,0 +1,42 @@
+From: Roger Shimizu <rogershimizu@gmail.com>
+Date: Tue, 28 Jun 2016 22:26:54 +0900
+Subject: Improve precision
+
+Thanks Christopher Alexander Tobias Schulze.
+
+Closes: #633082
+---
+ adjtimex.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/adjtimex.c b/adjtimex.c
+index 028cd74..2bcb4e7 100644
+--- a/adjtimex.c
++++ b/adjtimex.c
+@@ -1457,7 +1457,7 @@ offset -0.013543
+ 
+     ntpdate_okay:
+       gettimeofday(&tv_sys, NULL);
+-      ftime_sys = tv_sys.tv_sec;
++      ftime_sys = tv_sys.tv_sec + tv_sys.tv_usec*.000001;
+ 	      /* ntpdate selects the offset from one of its samples
+ 		 (the one with the shortest round-trip delay?) */
+       ftime_ref = ftime_sys + atof(strstr(buf, "offset") + 6);
+@@ -1982,7 +1982,7 @@ void review()
+ 	  cmos_time = hacks[i]->cmos - hacks[i-1]->cmos;
+ 	  hacks[i]->relative_rate =
+ 	    diff_ppm = 1.e6*(sys_time - cmos_time)/sys_time
+-	    - 100*(hacks[i]->tick - tick_mid) - hacks[i]->freq/SHIFT;
++	    - 100*(hacks[i]->tick - tick_mid) - ((double)(hacks[i]->freq))/SHIFT;
+ 	  if (fabs(diff_ppm) > 10000.) /* agree within 1 percent? */
+ 	    continue;
+ 	  hacks[i]->valid = CMOS_VALID | SYS_VALID;
+@@ -2049,7 +2049,7 @@ void review()
+ 	  sys_time = hacks[i]->sys - hacks[i-1]->sys;
+ 	  hacks[i]->sys_rate =
+ 	    diff_ppm = 1.e6*(sys_time - ref_time)/sys_time
+-	    - 100*(hacks[i]->tick - tick_mid) - hacks[i]->freq/SHIFT;
++	    - 100*(hacks[i]->tick - tick_mid) - ((double)(hacks[i]->freq))/SHIFT;
+ 	  if (fabs(diff_ppm) > 10000.) /* agree within 1 percent? */
+ 	    continue;
+ 	  hacks[i]->valid |= REF_VALID | SYS_VALID;

@@ -1,5 +1,6 @@
 [Unit]
 Description=the kernel time variables setting
+Documentation=man:adjtimex(8)
 DefaultDependencies=no
 After=local-fs.target
 Before=sysinit.target

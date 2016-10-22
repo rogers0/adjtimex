@@ -12,7 +12,10 @@ Vcs-Browser: https://github.com/rogers0/adjtimex
 
 Package: adjtimex
 Architecture: linux-any
-Depends: ${misc:Depends}, ${shlibs:Depends}, debconf | debconf-2.0
+Depends:
+ lsb-base (>= 3.0-6),
+ ${misc:Depends},
+ ${shlibs:Depends}
 Suggests: ntpdate
 Description: kernel time variables configuration utility
  This package provides a utility to manipulate the kernel time

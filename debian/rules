@@ -20,4 +20,4 @@ override_dh_installinit:
 	dh_installinit -n
 
 %:
-	dh $@ --with autoreconf
+	dh $@

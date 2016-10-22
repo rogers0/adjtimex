@@ -2,10 +2,12 @@ Source: adjtimex
 Section: admin
 Priority: optional
 Maintainer: Roger Shimizu <rogershimizu@gmail.com>
-Build-Depends: debhelper (>= 9), po-debconf, dh-autoreconf
+Build-Depends:
+ debhelper (>= 10),
+ po-debconf
 Standards-Version: 3.9.6
 Homepage: http://metalab.unc.edu/pub/Linux/system/admin/time
-Vcs-Git: git://github.com/rogers0/adjtimex.git
+Vcs-Git: https://github.com/rogers0/adjtimex.git
 Vcs-Browser: https://github.com/rogers0/adjtimex
 
 Package: adjtimex

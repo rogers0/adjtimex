@@ -1,0 +1,31 @@
+From: Roger Shimizu <rogershimizu@gmail.com>
+Date: Sun, 23 Oct 2016 22:31:43 +0900
+Subject: update manpage adjtimex.8
+
+Add a few new timex status from kernel parameter, which was appended
+by commit:
+ https://github.com/torvalds/linux/commit/eea83d896e318bda54be2d2770d2c5d6668d11db
+
+Thanks to Chris Hiestand <chiestand@salk.edu>.
+
+Closes: #759399
+Signed-off-by: Roger Shimizu <rogershimizu@gmail.com>
+---
+ adjtimex.8 | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/adjtimex.8 b/adjtimex.8
+index 2470c18..65ed72e 100644
+--- a/adjtimex.8
++++ b/adjtimex.8
+@@ -158,6 +158,10 @@ For Linux kernels 2.0 through 2.6, the value is a sum of these:
+    1024   PPS signal wander exceeded
+    2048   PPS signal calibration error
+    4096   clock hardware fault
++ * The following status value are appended since 2.6.26 (July 2008):
++   8192   resolution (0 = us, 8192 = ns)
++  16384   mode (0 = PLL, 16384 = FLL)
++  32768   clock source (0 = A, 32768 = B)
+ .fi
+ .IP "\fB\-t\fP \fIval\fP, \fB\-\-tick\fP \fIval\fP"
+ Set the number of microseconds that should be added to the system time

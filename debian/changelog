@@ -13,6 +13,9 @@ adjtimex (1.29-8) UNRELEASED; urgency=medium
       - Bump policy version to 3.9.8 (no actual change required)
   * debian/adjtimex.service:
       - Add documentation line. Thanks to lintian.
+  * debian/rules:
+      - Add a few comments
+      - Remove hardening setting already enabled by default since compat=9
 
  -- Roger Shimizu <rogershimizu@gmail.com>  Tue, 28 Jun 2016 22:23:31 +0900
 

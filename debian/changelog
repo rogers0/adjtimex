@@ -10,6 +10,7 @@ adjtimex (1.29-8) UNRELEASED; urgency=medium
   * debian/control:
       - Add lsb-base as dependency to package shadowsocks-libev, since
         the init script sources /lib/lsb/init-functions utility functions
+      - Bump policy version to 3.9.8 (no actual change required)
   * debian/adjtimex.service:
       - Add documentation line. Thanks to lintian.
 

@@ -5,7 +5,7 @@ Maintainer: Roger Shimizu <rogershimizu@gmail.com>
 Build-Depends:
  debhelper (>= 10),
  po-debconf
-Standards-Version: 3.9.6
+Standards-Version: 3.9.8
 Homepage: http://metalab.unc.edu/pub/Linux/system/admin/time
 Vcs-Git: https://github.com/rogers0/adjtimex.git
 Vcs-Browser: https://github.com/rogers0/adjtimex

@@ -1,21 +1,23 @@
 From: Roger Shimizu <rogershimizu@gmail.com>
-Date: Sun, 23 Oct 2016 22:31:43 +0900
+Date: Tue, 25 Oct 2016 00:26:58 +0900
 Subject: update manpage adjtimex.8
 
-Add a few new timex status from kernel parameter, which was appended
-by commit:
- https://github.com/torvalds/linux/commit/eea83d896e318bda54be2d2770d2c5d6668d11db
-
-Thanks to Chris Hiestand <chiestand@salk.edu>.
+- Add a few new timex status from kernel parameter, which was appended
+  by commit:
+   https://github.com/torvalds/linux/commit/eea83d896e318bda54be2d2770d2c5d6668d11db
+  Thanks to Chris Hiestand <chiestand@salk.edu>.
+- Update the example to explain --frequency calculation.
+  Thanks to Marco Marongiu <brontolinux@gmail.com>.
 
 Closes: #759399
+Closes: #743444
 Signed-off-by: Roger Shimizu <rogershimizu@gmail.com>
 ---
- adjtimex.8 | 4 ++++
- 1 file changed, 4 insertions(+)
+ adjtimex.8 | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/adjtimex.8 b/adjtimex.8
-index 2470c18..65ed72e 100644
+index 2470c18..acfef25 100644
 --- a/adjtimex.8
 +++ b/adjtimex.8
 @@ -158,6 +158,10 @@ For Linux kernels 2.0 through 2.6, the value is a sum of these:
@@ -29,3 +31,16 @@ index 2470c18..65ed72e 100644
  .fi
  .IP "\fB\-t\fP \fIval\fP, \fB\-\-tick\fP \fIval\fP"
  Set the number of microseconds that should be added to the system time
+@@ -177,9 +181,9 @@ that \fInewfreq\fP = 65536 speeds up the system clock by about 1 ppm,
+ or .0864 sec/day.  Thus, all of these are about the same:
+ .nf
+      \fB\-\-tick  9995 \--frequency  32768000\fP
+-     \fB\-\-tick 10000 \--frequency   6553600\fP
+-     \fB\-\-tick 10001 \--frequency         0\fP
+-     \fB\-\-tick 10002 \--frequency  \-6553600\fP
++     \fB\-\-tick 10000 \--frequency         0\fP
++     \fB\-\-tick 10001 \--frequency  \-6553600\fP
++     \fB\-\-tick 10002 \--frequency \-13107200\fP
+      \fB\-\-tick 10005 \--frequency \-32768000\fP
+ .fi
+ To see the acceptable range for \fInewfreq\fP, use \-\-print and look at

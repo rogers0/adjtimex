@@ -1,9 +1,12 @@
 adjtimex (1.29-9) UNRELEASED; urgency=medium
 
   * debian/patches:
-      - Add 07 patch to update manpage adjtimex.8, which adds a few
-        new timex status from kernel parameter.
-        Thanks to Chris Hiestand <chiestand@salk.edu>. (Closes: #759399)
+      - Add 07 patch to update manpage adjtimex.8:
+        . Add a few new timex status from kernel parameter.
+          Thanks to Chris Hiestand <chiestand@salk.edu>. (Closes: #759399)
+        . Update the example to explain --frequency calculation.
+          Thanks to Marco Marongiu <brontolinux@gmail.com>.
+          (Closes: #743444)
 
  -- Roger Shimizu <rogershimizu@gmail.com>  Sun, 23 Oct 2016 23:00:48 +0900
 

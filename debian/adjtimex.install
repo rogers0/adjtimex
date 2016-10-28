@@ -1,2 +1,3 @@
-adjtimex /sbin
-debian/adjtimexconfig /usr/sbin
+adjtimex sbin
+debian/adjtimexconfig usr/sbin
+debian/contrib/ntp-drift_to_freq.sh usr/share/doc/adjtimex/contrib

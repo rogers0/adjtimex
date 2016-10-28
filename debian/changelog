@@ -7,6 +7,9 @@ adjtimex (1.29-9) UNRELEASED; urgency=medium
         . Update the example to explain --frequency calculation.
           Thanks to Marco Marongiu <brontolinux@gmail.com>.
           (Closes: #743444)
+  * debian/contrib:
+      - Add a contrib script to calculate frequency from NTP drift file.
+        Thanks to <sacrificial-spam-address@horizon.com>. (Closes: #397182)
 
  -- Roger Shimizu <rogershimizu@gmail.com>  Sun, 23 Oct 2016 23:00:48 +0900
 

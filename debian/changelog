@@ -1,4 +1,4 @@
-adjtimex (1.29-9) UNRELEASED; urgency=medium
+adjtimex (1.29-9) unstable; urgency=medium
 
   * debian/patches:
       - Add 07 patch to update manpage adjtimex.8:
@@ -11,7 +11,7 @@ adjtimex (1.29-9) UNRELEASED; urgency=medium
       - Add a contrib script to calculate frequency from NTP drift file.
         Thanks to <sacrificial-spam-address@horizon.com>. (Closes: #397182)
 
- -- Roger Shimizu <rogershimizu@gmail.com>  Sun, 23 Oct 2016 23:00:48 +0900
+ -- Roger Shimizu <rogershimizu@gmail.com>  Sat, 29 Oct 2016 20:56:42 +0900
 
 adjtimex (1.29-8) unstable; urgency=medium
 

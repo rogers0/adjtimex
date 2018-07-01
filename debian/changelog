@@ -1,3 +1,10 @@
+adjtimex (1.29-10) UNRELEASED; urgency=medium
+
+  * debian/patches:
+      - Add 08 patch to fix FTCBFS in rebootstrap (Closes: 882577).
+
+ -- Roger Shimizu <rogershimizu@gmail.com>  Sun, 01 Jul 2018 15:26:16 +0900
+
 adjtimex (1.29-9) unstable; urgency=medium
 
   * debian/patches:

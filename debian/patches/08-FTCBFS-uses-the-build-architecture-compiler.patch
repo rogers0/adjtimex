@@ -1,0 +1,27 @@
+From: Helmut Grohne <helmut@subdivi.de>
+Date: Fri, 24 Nov 2017 06:37:02 +0100
+Subject: FTCBFS: uses the build architecture compiler
+
+adjtimex fails to cross build from source, because its Makefile fails to
+use the compiler discovered by ./configure. Instead it uses the make
+default "cc". After adding the CC=@CC@ substitution to Makefile.in,
+adjtimex cross build successfully. Please consider applying the attached
+patch.
+
+Closes: #882577
+---
+ Makefile.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile.in b/Makefile.in
+index fefa0d6..3563e27 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -4,6 +4,7 @@ VPATH = .
+ 
+ VERSION=1.29
+ 
++CC = @CC@
+ CFLAGS += @CFLAGS@ -Wall
+ prefix = @prefix@
+ man1dir=@mandir@/man1

@@ -5,3 +5,4 @@
 05-avoid-gcc-warnings.patch
 06-improve-precision.patch
 07-update-manpage-adjtimex.8.patch
+08-FTCBFS-uses-the-build-architecture-compiler.patch

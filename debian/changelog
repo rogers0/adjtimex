@@ -4,6 +4,8 @@ adjtimex (1.29-10) UNRELEASED; urgency=medium
       - Add 08 patch to fix FTCBFS in rebootstrap (Closes: 882577).
   * debian/changelog:
       - Remove trailing spaces in previous entries to make lintian happy.
+  * debian/watch:
+      - Use secure https URL when possible.
 
  -- Roger Shimizu <rogershimizu@gmail.com>  Sun, 01 Jul 2018 15:26:16 +0900
 

@@ -2,6 +2,8 @@ adjtimex (1.29-10) UNRELEASED; urgency=medium
 
   * debian/patches:
       - Add 08 patch to fix FTCBFS in rebootstrap (Closes: 882577).
+  * debian/changelog:
+      - Remove trailing spaces in previous entries to make lintian happy.
 
  -- Roger Shimizu <rogershimizu@gmail.com>  Sun, 01 Jul 2018 15:26:16 +0900
 
@@ -125,7 +127,7 @@ adjtimex (1.29-3) unstable; urgency=low
     - Fix extended regexp to avoid removing /etc/default/adjtimex on
       upgrades. Closes: #688368.
     - Fix character class syntax in extended regexp. Closes: #630812.
-    - Check if conffile exists before reading it. 
+    - Check if conffile exists before reading it.
   * patches/01-makefile.in-ldflags.diff: add LDFLAGS to Makefile.in.
   * Set debhelper compatibility level to 9.
   * Rewrite debian/rules using dh(1) with autoreconf.
@@ -173,7 +175,7 @@ adjtimex (1.29-1) unstable; urgency=low
     applied even if system clock is way off.  (Thanks to Santiago Vila
     <sanvila@unex.es> for helping to diagnose the problem.
     Closes:Bug#557949, #559882)
-  
+
   * debian/adjtimex.init: fix LSB comment header: require $local_fs, start
     in S
 
@@ -182,16 +184,16 @@ adjtimex (1.29-1) unstable; urgency=low
 adjtimex (1.28-4) unstable; urgency=low
 
   * Update debconf template translations:
-    Swedish (Thanks to Martin Bagge <brother@bsnet.se>, Closes:Bug#572579) 
+    Swedish (Thanks to Martin Bagge <brother@bsnet.se>, Closes:Bug#572579)
 
  -- James R. Van Zandt <jrv@debian.org>  Wed, 17 Mar 2010 19:51:06 -0400
 
 adjtimex (1.28-3) unstable; urgency=low
 
   * Update debconf template translations:
-    Swedish (Thanks to Martin Bagge <brother@bsnet.se>, Closes:Bug#562932) 
+    Swedish (Thanks to Martin Bagge <brother@bsnet.se>, Closes:Bug#562932)
     Russian (thanks to Yuri Kozlov <yuray@komyakino.ru>, Closes:Bug#563347)
-    Finnish (thanks to Esko =?UTF-8?Q?Araj=C3=A4rvi?= <edu@iki.fi>, 
+    Finnish (thanks to Esko =?UTF-8?Q?Araj=C3=A4rvi?= <edu@iki.fi>,
     Closes:Bug#564508)
 
   * debian/control: bump standards version to 3.8.4 (no changes needed)
@@ -205,7 +207,7 @@ adjtimex (1.28-2) unstable; urgency=low
     problem).
 
   * debian/control: bump standards version to 3.8.3 (no changes needed)
-  
+
  -- James R. Van Zandt <jrv@debian.org>  Fri, 05 Feb 2010 21:42:54 -0500
 
 adjtimex (1.28-1) unstable; urgency=low
@@ -213,7 +215,7 @@ adjtimex (1.28-1) unstable; urgency=low
   * New upstream release: (compare): Correctly apply +-500 ppm sanity
     check (Thanks to Jacques luder <j.luder@laposte.net>)
 
-  * Update debconf template translations: 
+  * Update debconf template translations:
     Swedish (thanks to: Martin Bagge <brother@bsnet.se>,
     Closes:Bug#533567)
     Russian (thanks to: Yuri Kozlov <yuray@komyakino.ru>,
@@ -223,7 +225,7 @@ adjtimex (1.28-1) unstable; urgency=low
 
 adjtimex (1.27.1-4) unstable; urgency=low
 
-  * Update translations: 
+  * Update translations:
     Japanese (thanks to: Hideki Yamane, henrich @ debian.or.jp.
     Closes:Bug#538242)
     Spanish (Thanks to Francisco Javier Cuadrado <fcocuadrado@gmail.com>,
@@ -234,10 +236,10 @@ adjtimex (1.27.1-4) unstable; urgency=low
 adjtimex (1.27.1-3) unstable; urgency=low
 
   * Update translations:
-    Japanese (thanks to: Hideki Yamane, henrich @ debian.or.jp. 
+    Japanese (thanks to: Hideki Yamane, henrich @ debian.or.jp.
     Closes:Bug#525233)
     Swedish (thanks to: Martin Bagge <brother@bsnet.se>.  Closes:Bug#525924)
-    Spanish (thanks to: Francisco Javier Cuadrado <fcocuadrado@gmail.com>, 
+    Spanish (thanks to: Francisco Javier Cuadrado <fcocuadrado@gmail.com>,
     Closes:Bug#528621)
     Russian (thanks to: Yuri Kozlov <yuray@komyakino.ru>, Closes:Bug#529047)
     Czech (thanks to: Martin Sin <martin.sin@zshk.cz>, Closes:Bug#529652)
@@ -257,7 +259,7 @@ adjtimex (1.27.1-1) unstable; urgency=low
 
   * New upstream release.  Provide workaround if linux/rtc.h
     is missing (Closes:#308864)
-  
+
   * debian/rules: delete config temporaries, but not config.h.in
   * debian/control: bump version to 3.8.1 (no changes needed)
 
@@ -283,9 +285,9 @@ adjtimex (1.27-1) unstable; urgency=low
     actually didn't wait.  Fall back to another method of reading RTC
     (closes:Bug#517732) Calculate RTC correction as PPM of RTC time
     (Thanks to Alain Guibert, closes:Bug#308863).
-    
+
   * debian/control: add ${misc:Depends} per lintian warning.
-  
+
  -- James R. Van Zandt <jrv@debian.org>  Sun, 22 Mar 2009 21:54:51 -0400
 
 adjtimex (1.26-2) unstable; urgency=low
@@ -294,7 +296,7 @@ adjtimex (1.26-2) unstable; urgency=low
     or upgraded" not just "at installation time" (thanks to Uwe Storbeck
     <uwe@ibr.ch> and Michael Meskes <meskes@debian.org>,
     Closes:Bug#514987)
-  
+
   * debian/postinst: don't prepend path to command running adjtimexconfig
     to silence lintian complaint.  (The package management system already
     puts /usr/sbin in path, because that's where install-info is.)
@@ -307,9 +309,9 @@ adjtimex (1.26-1) unstable; urgency=low
     one of those new non-PC-compatible RTCs. Cleanly exits with an error
     message, instead of either hang or returning garbage. (Thanks to Alain
     Guibert).
-  
+
   * debian/control: bump Debian policy version to 3.8.0 (no changes needed)
-  
+
   * debian/rules: use "filter" instead of "findstring" to parse
     DEB_BUILD_OPTIONS.
 
@@ -397,9 +399,9 @@ adjtimex (1.21.1-3) unstable; urgency=low
   * update German translation of debconf templates, thanks to Erik Schanze
     <eriks@debian.org> and Helge Kreutzmann
     <debian@helgefjell.de>(closes:#436080)
-  
+
   * debian/rules don't ignore failure of "make distclean"
-  
+
   * debian/adjtimex.init: make LSB compliant
 
  -- James R. Van Zandt <jrv@debian.org>  Mon, 06 Aug 2007 21:39:47 -0400
@@ -418,14 +420,14 @@ adjtimex (1.21.1-1) unstable; urgency=low
   * adjtimex.c: don't declare adjtimex syscall (should already be getting
     the declaration from sys/timex.h) Thanks to Andreas Jochens
     <aj@andaco.de> (closes:#390989)
-  
+
  -- James R. Van Zandt <jrv@debian.org>  Sat,  7 Oct 2006 08:04:52 -0400
 
 adjtimex (1.21-2) unstable; urgency=low
 
   * Makefile: correct version number to 1.21 (error in importing upstream
     sources)
-    
+
   * debian/control: depend on po-debconf
 
  -- James R. Van Zandt <jrv@debian.org>  Fri,  6 Oct 2006 20:41:00 -0400
@@ -439,7 +441,7 @@ adjtimex (1.21-1) unstable; urgency=low
     fail rather than printing bogus results. (closes:#364060)
 
   * debian/postinst: start with invoke-rc.d if available (closes:#367746)
-  
+
   * debian/control: update to policy 3.7.2
 
  -- James R. Van Zandt <jrv@debian.org>  Sat, 20 May 2006 08:33:05 -0400
@@ -521,7 +523,7 @@ adjtimex (1.19-1) unstable; urgency=high
 
   * adjtimex.c (compare): Account for the current frequency value
   when calculating the recommended frequency value.  Simplify
-  calculation of recommended tick. (compare): print estimated system 
+  calculation of recommended tick. (compare): print estimated system
   error in ppm instead of obscure "second diff".
 
   * adjtimex.8: use 2^16 instead of the more obscure 1<<16.
@@ -536,11 +538,11 @@ adjtimex (1.18-1.1) unstable; urgency=medium
 
   * Non-maintainer upload prepared by Joshua Kwan and Ken Bloom.
   * Applied patch from Jurij Smakov <jurij@wooyd.org> to #263401:
-    - Fixes the regular expression used to extract the baseline value 
+    - Fixes the regular expression used to extract the baseline value
       from the adjtimex output. Closes: #263401
-    - Replaces non-POSIX compliant calls to ('tail -1') by the 
+    - Replaces non-POSIX compliant calls to ('tail -1') by the
       POSIX-compliant ones ('tail -n 1')
-    - Cosmetic changes to the adjtimexconfig output, making it 
+    - Cosmetic changes to the adjtimexconfig output, making it
       consistent with the general Debian style.
   * Add German debconf template translations (closes: #250250)
 
@@ -549,7 +551,7 @@ adjtimex (1.18-1.1) unstable; urgency=medium
 adjtimex (1.18-1) unstable; urgency=low
 
   * New upstream release
-  
+
   * call reset_time_status() only when explicitly told to (thanks to Alain
     Guibert <derogaton at oreka.com>, closes:bug#243031)
 
@@ -565,8 +567,8 @@ adjtimex (1.17-1) unstable; urgency=low
   * control: compliant with Debian policy version 3.6.1
 
   * es.po: decode "quoted-printable" encoding.
-  
-  * adjtimex.c: update email 
+
+  * adjtimex.c: update email
     (main): If adjtimex() returns an error, print HZ and legal ranges
     for tick and freq.  (thanks to Sami Farin <safari at iki.fi>)
     (review): calculate reasonable tick and frequency when HZ != 100.
@@ -614,7 +616,7 @@ adjtimex (1.15.1-2) unstable; urgency=low
 adjtimex (1.15.1-1) unstable; urgency=low
 
   * New upstream release. Add explicit newlines in multi-line help text
-    (closes:bug#194858) 
+    (closes:bug#194858)
 
  -- James R. Van Zandt <jrv@vanzandt.mv.com>  Sat, 31 May 2003 20:53:14 -0400
 
@@ -659,9 +661,9 @@ adjtimex (1.12-1) unstable; urgency=low
 
   * New upstream release
   * debian/control: move Build-Depends entry to source section
-    (closes:bug#91928).  Policy version 3.5.2 
+    (closes:bug#91928).  Policy version 3.5.2
   * debian/rules: by default, compile without -g option.  Honor
-    DEB_BUILD_OPTIONS.  
+    DEB_BUILD_OPTIONS.
 
  -- James R. Van Zandt <jrv@vanzandt.mv.com>  Wed, 22 Nov 2000 01:37:58 -0500
 
@@ -683,7 +685,7 @@ adjtimex (1.11-1) unstable; urgency=low
 
   * /etc/init.d/adjtimex: restart|force-reload also run adjtimex
     (closes:bug#69514), add comment explaining precedence of
-    /etc/adjtimex.conf 
+    /etc/adjtimex.conf
 
   * New upstream release
 
@@ -790,7 +792,7 @@ adjtimex (1.5-3) unstable; urgency=low
 adjtimex (1.5-2) unstable; urgency=low
 
   * eliminate question in postinst, by eliminating postinst entirely
-    (Bug#22288) 
+    (Bug#22288)
 
  -- James R. Van Zandt <jrv@vanzandt.mv.com>  Sun,  7 Jun 1998 20:51:42 -0400
 
@@ -857,7 +859,7 @@ adjtimex (1.2-5) unstable; urgency=LOW
 Fri May 17 12:48:07 MET DST 1996 Michael Meskes (meskes@debian.org)
 
 	adjtimex (1.2-1):
-	
+
 	* Added Debian Linux package maintenance system files.
 
 Fri May 17 20:39:30 MET DST 1996 Michael Meskes	(meskes@debian.org)
@@ -885,5 +887,3 @@ Tue Jul  2 10:01:35 MET DST 1996 Michael Meskes (meskes@debian.org)
         adjtimex (1.2-4):
 
 	* Really say what we're doing in postinst (Bug#3474)
-
-

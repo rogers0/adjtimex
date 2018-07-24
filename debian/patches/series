@@ -7,3 +7,4 @@
 07-update-manpage-adjtimex.8.patch
 08-FTCBFS-uses-the-build-architecture-compiler.patch
 09-adjtimex.8-Some-fixes-to-the-manual.patch
+10-STA_NANO-confuses-adjtimex-8.patch

@@ -1,0 +1,94 @@
+From: Zefram <zefram@fysh.org>
+Date: Tue, 18 Apr 2017 17:25:25 +0100
+Subject: STA_NANO confuses adjtimex(8)
+
+Observe that the "raw time" line shows in its two-part form a time over
+23 million microseconds, i.e., over 23 seconds, into the present second.
+Also, in its one-part form it shows a value that seems to treat these
+microseconds as each being 1e-8 seconds long.  These displays are
+inconsistent with each other, and inconsistent with the meaning of
+microseconds.
+
+What's really going on is that the STA_NANO flag is set (8192 in the
+status), so the tv_usec field of the struct timeval doesn't actually
+represent microseconds.  It represents *nanoseconds*.  The true raw time
+is different from both of the values shown, and for the call made above
+should have been shown as
+
+     raw time:  1490397277s 23837440ns = 1490397277.023837440
+
+Closes: #858668
+---
+ adjtimex.8 |  6 ++++--
+ adjtimex.c | 14 +++++++++++---
+ 2 files changed, 15 insertions(+), 5 deletions(-)
+
+diff --git a/adjtimex.8 b/adjtimex.8
+index ae9a1ce..71dbbb4 100644
+--- a/adjtimex.8
++++ b/adjtimex.8
+@@ -190,10 +190,12 @@ or 0.0864 sec/day.  Thus, all of these are about the same:
+ To see the acceptable range for \fInewfreq\fP, use \-\-print and look at
+ "tolerance", or try an invalid value (e.g., \-\-tick 0).
+ .IP "\fB\-s\fP \fIadj\fP, \fB\-\-singleshot\fP \fIadj\fP"
+-Slew the system clock by \fIadj\fP usec.  
++Slew the system clock by \fIadj\fP usec or nsec
++(using whichever unit the clock is presently denominated in).
+ (Its rate is changed temporarily by about 1 part in 2000.)
+ .IP "\fB\-o\fP \fIadj\fP, \fB\-\-offset\fP \fIadj\fP" 
+-Add a time offset of \fIadj\fP usec.
++Add a time offset of \fIadj\fP usec or nsec
++(using whichever unit the clock is presently denominated in).
+ The kernel code adjusts the time gradually by \fIadj\fP, 
+ notes how long it has been since the last time offset, 
+ and then adjusts the frequency offset to correct for the apparent drift.  
+diff --git a/adjtimex.c b/adjtimex.c
+index 2bcb4e7..692b722 100644
+--- a/adjtimex.c
++++ b/adjtimex.c
+@@ -57,6 +57,12 @@ struct rtc_time {
+ #define RTC_RD_TIME  _IOR('p', 0x09, struct rtc_time) /* Read RTC time  */
+ #endif /* HAVE_LINUX_RTC_H */
+ 
++#ifdef STA_NANO
++#define HAS_STA_NANO(f) (f & STA_NANO)
++#else
++#define HAS_STA_NANO(f) 0
++#endif
++
+ int F_print = 0;
+ 
+ #ifndef LOG_PATH
+@@ -216,11 +222,11 @@ usage(void)
+ "       -p, --print               print values of kernel time variables\n"
+ "       -t, --tick val            set the kernel tick interval in usec\n"
+ "       -f, --frequency newfreq   set system clock frequency offset\n"
+-"       -s, --singleshot adj      slew the system clock by adj usec\n"
++"       -s, --singleshot adj      slew the system clock by adj usec or nsec\n"
+ "       -S, --status val          set kernel clock status\n"
+ "       -R, --reset               reset status after setting parameters\n"
+ "                                 (needed for early kernels)\n"
+-"       -o, --offset adj          add a time offset of adj usec\n"
++"       -o, --offset adj          add a time offset of adj usec or nsec\n"
+ "       -m, --maxerror val        set maximum error (usec)\n"
+ "       -e, --esterror val        set estimated error (usec)\n"
+ "       -T, --timeconstant val    set phase locked loop time constant\n"
+@@ -493,7 +499,7 @@ main(int argc, char *argv[])
+ 	       "    precision: %ld\n"
+ 	       "    tolerance: %ld\n"
+ 	       "         tick: %ld\n"
+-	       "     raw time:  %ds %dus = %d.%06d\n",
++	       "     raw time:  %ds %d%cs = %d.%0*d\n",
+ 	       txc.modes,
+ 	       txc.offset,
+ 	       txc.freq,
+@@ -506,7 +512,9 @@ main(int argc, char *argv[])
+ 	       txc.tick,
+ 	       (int)txc.time.tv_sec, 
+ 	       (int)txc.time.tv_usec,
++	       HAS_STA_NANO(txc.status) ? 'n' : 'u',
+ 	       (int)txc.time.tv_sec, 
++	       HAS_STA_NANO(txc.status) ? 9 : 6,
+ 	       (int)txc.time.tv_usec);
+ 	if (saveerr == 0 && ret != 0)
+ 	    printf(" return value = %d\n", ret);

@@ -3,6 +3,8 @@ adjtimex (1.29-10) UNRELEASED; urgency=medium
   * debian/patches:
       - Add 08 patch to fix FTCBFS in rebootstrap (Closes: #882577).
       - Add 09 patch to fix the adjtimex.8 manual (Closes: #902300).
+      - Add 10 patch to fix STA_NANO issue in manpage adjtimex(8), and
+        what displays on command "adjtime -p". (Closes: #858668)
   * debian/changelog:
       - Remove trailing spaces in previous entries to make lintian happy.
   * debian/watch:

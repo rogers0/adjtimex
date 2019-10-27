@@ -3,7 +3,7 @@ Section: admin
 Priority: optional
 Maintainer: Roger Shimizu <rogershimizu@gmail.com>
 Build-Depends:
- debhelper (>= 10),
+ debhelper-compat (= 12),
  po-debconf
 Standards-Version: 3.9.8
 Homepage: http://metalab.unc.edu/pub/Linux/system/admin/time

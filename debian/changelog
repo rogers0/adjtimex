@@ -1,3 +1,9 @@
+adjtimex (1.29-11) UNRELEASED; urgency=medium
+
+  * Bump debhelper from old 10 to 12.
+
+ -- Debian Janitor <janitor@jelmer.uk>  Sun, 27 Oct 2019 16:41:44 +0000
+
 adjtimex (1.29-10) unstable; urgency=medium
 
   * debian/patches:

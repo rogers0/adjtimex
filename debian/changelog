@@ -1,6 +1,7 @@
 adjtimex (1.29-11) UNRELEASED; urgency=medium
 
   * Bump debhelper from old 10 to 12.
+  * Wrap long lines in changelog entries: 1.16-3.
 
  -- Debian Janitor <janitor@jelmer.uk>  Sun, 27 Oct 2019 16:41:44 +0000
 
@@ -599,7 +600,8 @@ adjtimex (1.17-1) unstable; urgency=low
 
 adjtimex (1.16-3) unstable; urgency=low
 
-  * Dutch translation of gettext debconf templates (courtesy of  Michiel Sikkes, closes:bug#215162)
+  * Dutch translation of gettext debconf templates (courtesy of  Michiel Sikkes,
+    closes:bug#215162)
 
  -- James R. Van Zandt <jrv@debian.org>  Sun, 12 Oct 2003 17:33:55 -0400
 

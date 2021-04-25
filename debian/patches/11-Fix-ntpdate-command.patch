@@ -1,0 +1,25 @@
+From: Roger Shimizu <rosh@debian.org>
+Date: Mon, 26 Apr 2021 02:49:16 +0900
+Subject: Fix ntpdate command
+
+Add option "-p4" to ntpdate command due to:
+* http://bugs.debian.org/987625
+
+Closes: #944867
+---
+ adjtimex.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/adjtimex.c b/adjtimex.c
+index 692b722..7699fe5 100644
+--- a/adjtimex.c
++++ b/adjtimex.c
+@@ -1424,7 +1424,7 @@ static void log_times()
+       failntpdate("cannot find ntpdate");
+ 
+     found_ntpdate:
+-      sprintf(command, "%s -q -d %.32s ", paths[i], timeserver);
++      sprintf(command, "%s -q -p4 -d %.32s ", paths[i], timeserver);
+       ifile = popen(command, "r");
+ 	      
+       if (ifile == NULL) 

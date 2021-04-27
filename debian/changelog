@@ -5,6 +5,7 @@ adjtimex (1.29-11) UNRELEASED; urgency=medium
   * debian/control:
     - Use my debian email.
     - Move Vcs-* to salsa.
+    - Add Rules-Requires-Root: no
 
  -- Roger Shimizu <rosh@debian.org>  Sun, 19 Jul 2020 00:29:28 +0900
 

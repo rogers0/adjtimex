@@ -6,6 +6,7 @@ Build-Depends:
  debhelper (>= 10),
  po-debconf
 Standards-Version: 3.9.8
+Rules-Requires-Root: no
 Homepage: http://metalab.unc.edu/pub/Linux/system/admin/time
 Vcs-Git: https://salsa.debian.org/debian/adjtimex.git
 Vcs-Browser: https://salsa.debian.org/debian/adjtimex

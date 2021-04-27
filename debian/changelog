@@ -1,4 +1,4 @@
-adjtimex (1.29-11) UNRELEASED; urgency=medium
+adjtimex (1.29-11) unstable; urgency=medium
 
   * debian/patches:
     - Add patch to fix ntpdate command (Closes: #944867).
@@ -7,7 +7,7 @@ adjtimex (1.29-11) UNRELEASED; urgency=medium
     - Move Vcs-* to salsa.
     - Add Rules-Requires-Root: no
 
- -- Roger Shimizu <rosh@debian.org>  Sun, 19 Jul 2020 00:29:28 +0900
+ -- Roger Shimizu <rosh@debian.org>  Wed, 28 Apr 2021 00:11:49 +0900
 
 adjtimex (1.29-10) unstable; urgency=medium
 

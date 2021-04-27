@@ -2,6 +2,9 @@ adjtimex (1.29-11) UNRELEASED; urgency=medium
 
   * debian/patches:
     - Add patch to fix ntpdate command (Closes: #944867).
+  * debian/control:
+    - Use my debian email.
+    - Move Vcs-* to salsa.
 
  -- Roger Shimizu <rosh@debian.org>  Sun, 19 Jul 2020 00:29:28 +0900
 
